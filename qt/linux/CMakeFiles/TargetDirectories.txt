@@ -1,1 +1,0 @@
-/home/kanehiro/Dropbox/src/qt/linux/CMakeFiles/qtgl.dir
