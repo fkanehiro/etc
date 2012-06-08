@@ -1,3 +1,0 @@
-import popen2 
-
-p = popen2.popen3("ls -1")
