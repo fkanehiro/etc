@@ -1,0 +1,189 @@
+#include <QMouseEvent>
+#include <math.h>
+#include <GLUT/glut.h>
+#include "GLmodel.h"
+#include "canvaswidget.h"
+
+#include <rtm/Manager.h>
+#include <rtm/CorbaNaming.h>
+#include <hrpModel/ModelLoaderUtil.h>
+#include <boost/bind.hpp>
+#include <boost/function.hpp>
+#include "Simulator.h"
+#include "GLmodel.h"
+#include "Project.h"
+#include "OpenRTMUtil.h"
+#include "BodyRTC.h"
+
+using namespace hrp;
+using namespace OpenHRP;
+
+hrp::BodyPtr createBody(const std::string& name, const std::string& url,
+                        RTC::CorbaNaming *naming)
+{
+    std::cout << "createBody(" << name << "," << url << ")" << std::endl;
+    RTC::Manager& manager = RTC::Manager::instance();
+    std::string args = "BodyRTC?instance_name="+name;
+    BodyRTCPtr body = (BodyRTC *)manager.createComponent(args.c_str());
+    if (!loadBodyFromModelLoader(body, url.c_str(), 
+                                 CosNaming::NamingContext::_duplicate(naming->getRootContext()),
+                                 true)){
+        std::cerr << "failed to load model[" << url << "]" << std::endl;
+        manager.deleteComponent(body.get());
+        return hrp::BodyPtr();
+    }else{
+        body->createDataPorts();
+        return body;
+    }
+}
+
+CanvasWidget::CanvasWidget(QWidget *parent, const char *name) 
+    : QGLWidget(parent)
+{
+    initViewParameters();
+}
+
+CanvasWidget::~CanvasWidget()
+{
+    RTC::Manager::instance().shutdown();
+}
+
+void CanvasWidget::initViewParameters()
+{
+    pan  = M_PI/4;
+    tilt = M_PI/16;
+    radius = 5;
+    
+    xCenter = 0;
+    yCenter = 0;
+    zCenter = 0.8;
+}
+
+void CanvasWidget::initializeGL(){
+    //std::cout << "initializeGL()" << std::endl;
+    int width = geometry().width();
+    int height = geometry().height();
+    aspect = ((double)width)/height;
+
+    GLscene *scene = GLscene::getInstance();
+    scene->init();
+
+    int argc=2;
+    char *argv[] = {"dummy",
+                    "../../project/SamplePD.xml"};
+
+    Project prj;
+    if (!prj.parse(argv[1])){
+        //std::cerr << "failed to parse " << argv[1] << std::endl;
+        //return 1;
+    }
+
+    //================= OpenRTM =========================
+    RTC::Manager* manager;
+    manager = RTC::Manager::init(argc, argv);
+    manager->init(argc, argv);
+    BodyRTC::moduleInit(manager);
+    manager->activateManager();
+    manager->runManager(true);
+
+    std::string nameServer = manager->getConfig()["corba.nameservers"];
+    int comPos = nameServer.find(",");
+    if (comPos < 0){
+        comPos = nameServer.length();
+    }
+    nameServer = nameServer.substr(0, comPos);
+    RTC::CorbaNaming naming(manager->getORB(), nameServer.c_str());
+
+    //==================== Viewer setup ===============
+    for (std::map<std::string, ModelItem>::iterator it=prj.models().begin();
+         it != prj.models().end(); it++){
+        OpenHRP::BodyInfo_var binfo
+            = loadBodyInfo(it->second.url.c_str(), 
+                           CosNaming::NamingContext::_duplicate(naming.getRootContext()));
+        GLbody *body = new GLbody(binfo);
+        scene->addBody(it->first, body);
+    }
+
+    //================= setup World ======================
+    BodyFactory factory = boost::bind(createBody, _1, _2, &naming);
+    m_simulator = new Simulator;
+    std::cout << "simulator = " << m_simulator << std::endl;
+    m_simulator->init(prj, factory, scene);
+
+    std::cout << "timestep = " << prj.timeStep() << ", total time = " 
+              << prj.totalTime() << std::endl;
+
+}
+
+void CanvasWidget::resizeGL( int width, int height )
+{
+    //std::cout << "resizeGL(" << width << "," << height << ")" << std::endl;
+    glViewport(0, 0, width, height);
+    GLscene::getInstance()->setScreenSize(width, height);
+    aspect = ((double)width)/height;
+}
+
+void CanvasWidget::paintGL()
+{
+    //std::cout << "paintGL()" << std::endl;
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(30,aspect, 0.1, 100);
+
+    double xEye = xCenter + radius*cos(tilt)*cos(pan);
+    double yEye = yCenter + radius*cos(tilt)*sin(pan);
+    double zEye = zCenter + radius*sin(tilt);
+    
+    gluLookAt(xEye, yEye, zEye,
+              xCenter, yCenter, zCenter,
+              0,0,1);
+    
+    glClear(GL_COLOR_BUFFER_BIT| GL_DEPTH_BUFFER_BIT);
+    
+    GLscene *scene = GLscene::getInstance();
+    scene->draw();
+}
+
+void CanvasWidget::mousePressEvent(QMouseEvent *event)
+{
+    //std::cout << "mousePressEvent()" << std::endl;
+    lastPos = event->pos();
+}
+
+void CanvasWidget::mouseMoveEvent(QMouseEvent *event)
+{
+    //std::cout << "mouseMoveEvent()" << std::endl;
+    int dx = event->x() - lastPos.x();
+    int dy = event->y() - lastPos.y();
+    Qt::MouseButtons enButton = event->buttons();
+    if (enButton & Qt::LeftButton) {
+        pan  -= 0.05*dx;
+        tilt += 0.05*dy;
+        if (tilt >  M_PI/2) tilt =  M_PI/2;
+        if (tilt < -M_PI/2) tilt = -M_PI/2;
+    } else if (enButton & Qt::RightButton) {
+        xCenter += sin(pan)*dx*0.01;
+        yCenter -= cos(pan)*dx*0.01;
+        zCenter += dy*0.01;
+    } else if (enButton & Qt::MidButton){
+        radius *= (1+ 0.1*dy);
+        if (radius < 0.1) radius = 0.1; 
+    }
+    lastPos = event->pos();
+    glDraw();
+}
+
+void CanvasWidget::wheelEvent(QWheelEvent *event)
+{
+    //zoom( (qreal)event->delta() );
+    glDraw();
+}
+
+void CanvasWidget::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    Qt::MouseButtons enButton = event->buttons();
+    if (enButton & Qt::LeftButton) {
+        initViewParameters();
+        glDraw();
+    }
+}

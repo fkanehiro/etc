@@ -1,0 +1,132 @@
+Apr 02 22:54:40 INFO: manager: OpenRTM-aist-1.0.2
+Apr 02 22:54:40 INFO: manager: Copyright (C) 2003-2010
+Apr 02 22:54:40 INFO: manager:   Noriaki Ando
+Apr 02 22:54:40 INFO: manager:   Intelligent Systems Research Institute, AIST
+Apr 02 22:54:40 INFO: manager: Manager starting.
+Apr 02 22:54:40 INFO: manager: Starting local logging.
+Apr 02 22:54:40 TRACE: manager: Manager::initORB()
+Apr 02 22:54:40 DEBUG: manager: corba.args: 
+Apr 02 22:54:40 DEBUG: manager: - config
+  - version: 1.0.2
+- openrtm
+  - version: OpenRTM-aist-1.0.2
+- manager
+  - instance_name: manager
+  - name: manager
+  - naming_formats: %h.host_cxt/%n.mgr
+  - pid: 12156
+  - refstring_path: /var/log/rtcmanager.ref
+  - modules
+    - load_path: .
+    - abs_path_allowed: yes
+    - preload: SamplePD
+    - config_path: 
+    - download_allowed: 
+    - init_func_suffix: 
+    - init_func_prefix: 
+  - is_master: NO
+  - corba_servant: YES
+  - shutdown_nortcs: YES
+  - shutdown_auto: YES
+  - command: rtcd
+  - components
+    - precreate: SamplePD
+  - os
+    - name: Linux
+    - release: 2.6.32-38-generic
+    - version: #83-Ubuntu SMP Wed Jan 4 11:13:04 UTC 2012
+    - arch: i686
+    - hostname: marseille
+- os
+  - name: 
+  - release: 
+  - version: 
+  - arch: 
+  - hostname: 
+- logger
+  - enable: YES
+  - file_name: ./rtc12156.log
+  - date_format: %b %d %H:%M:%S
+  - log_level: TRACE
+  - stream_lock: NO
+  - master_logger: 
+- module
+  - conf_path: 
+  - load_path: 
+- naming
+  - enable: YES
+  - type: corba
+  - formats: %n.rtc
+  - update
+    - enable: YES
+    - interval: 10.0
+- timer
+  - enable: YES
+  - tick: 0.1
+- corba
+  - args: 
+  - endpoint: 
+  - id: omniORB
+  - nameservers: 127.0.0.1:2809
+  - master_manager: localhost:2810
+  - nameservice
+    - replace_endpoint: NO
+- exec_cxt
+  - periodic
+    - type: SynchExtTriggerEC
+    - rate: 1000000
+  - evdriven
+    - type: EventDrivenExecutionContext
+
+Apr 02 22:54:40 DEBUG: manager: corba.endpoint: 
+Apr 02 22:54:40 DEBUG: manager: manager.is_master: NO
+Apr 02 22:54:40 DEBUG: manager: corba.id: omniORB
+Apr 02 22:54:40 TRACE: manager: Manager::initNaming()
+Apr 02 22:54:40 TRACE: manager: Register Naming Server: corba/127.0.0.1:2809
+Apr 02 22:54:40 TRACE: NamingManager: NamingManager::registerNameServer(corba, 127.0.0.1:2809)
+Apr 02 22:54:40 TRACE: NamingManager: createNamingObj(method = corba, nameserver = 127.0.0.1:2809
+Apr 02 22:54:40 TRACE: manager: Manager::getORB()
+Apr 02 22:54:40 WARNING: NamingOnCorba: No endpoint for the CORBA naming service (127.0.0.1) was found.
+Apr 02 22:54:40 INFO: NamingManager: NameServer connection succeeded: corba/127.0.0.1:2809
+Apr 02 22:54:40 TRACE: manager: Manager::initFactories()
+Apr 02 22:54:40 TRACE: manager: Manager::initExecContext()
+Apr 02 22:54:40 TRACE: manager: Manager::registerECFactory(PeriodicExecutionContext)
+Apr 02 22:54:40 TRACE: manager: Manager::registerECFactory(ExtTrigExecutionContext)
+Apr 02 22:54:40 TRACE: manager: Manager::registerECFactory(SynchExtTriggerEC)
+Apr 02 22:54:40 TRACE: manager: Manager::initComposite()
+Apr 02 22:54:40 TRACE: manager: Manager::registerFactory(PeriodicECSharedComposite)
+Apr 02 22:54:40 TRACE: manager: Manager::initManagerServant()
+Apr 02 22:54:40 TRACE: ManagerServant: This manager is slave.
+Apr 02 22:54:40 TRACE: ManagerServant: findManager(host_port = localhost:2810)
+Apr 02 22:54:40 DEBUG: ManagerServant: corbaloc: corbaloc:iiop:localhost:2810/manager
+Apr 02 22:54:40 TRACE: manager: Manager::getORB()
+Apr 02 22:54:40 DEBUG: ManagerServant: CORBA SystemException cought (CORBA::TRANSIENT)
+Apr 02 22:54:40 INFO: ManagerServant: Master manager not found
+Apr 02 22:54:40 TRACE: manager: Manager::activateManager()
+Apr 02 22:54:40 TRACE: manager: Manager::getPOAManager()
+Apr 02 22:54:40 TRACE: manager: Manager::getPOAManager()
+Apr 02 22:54:40 TRACE: manager: POA Manager activated.
+Apr 02 22:54:40 TRACE: ModuleManager: load(fname = SamplePD, init_func = SamplePDInit)
+Apr 02 22:54:40 TRACE: ModuleManager: load(fname = SamplePD)
+Apr 02 22:54:40 ERROR: manager: Module load error: Invalid file name.
+Apr 02 22:54:40 TRACE: manager: Manager::createComponent(SamplePD)
+Apr 02 22:54:40 TRACE: manager: RTC basic propfile vendor: 
+Apr 02 22:54:40 TRACE: manager: RTC basic propfile category: 
+Apr 02 22:54:40 TRACE: manager: RTC basic propfile implementation_id: SamplePD
+Apr 02 22:54:40 TRACE: manager: RTC basic propfile version: 
+Apr 02 22:54:40 ERROR: manager: Factory not found: SamplePD
+Apr 02 22:54:40 INFO: manager: 0 loadable modules found
+Apr 02 22:54:40 ERROR: manager: No module for SamplePD in loadable modules list
+Apr 02 22:54:40 TRACE: manager: Manager::runManager(): non-blocking mode
+Apr 02 22:54:41 TRACE: manager: Manager::shutdown()
+Apr 02 22:54:41 TRACE: manager: Manager::shutdownComponents()
+Apr 02 22:54:41 TRACE: manager: Manager::shutdownNaming()
+Apr 02 22:54:41 TRACE: NamingManager: NamingManager::unbindAll(): 0 names.
+Apr 02 22:54:41 TRACE: manager: Manager::shutdownORB()
+Apr 02 22:54:41 DEBUG: manager: No pending works of ORB. Shutting down POA and ORB.
+Apr 02 22:54:41 DEBUG: manager: POA Manager was deactivated.
+Apr 02 22:54:41 DEBUG: manager: POA was destroid.
+Apr 02 22:54:41 DEBUG: manager: ORB was shutdown.
+Apr 02 22:54:41 DEBUG: manager: ORB was destroied.
+Apr 02 22:54:41 TRACE: manager: Manager::shutdownManager()
+Apr 02 22:54:41 TRACE: manager: Manager::shutdownLogger()

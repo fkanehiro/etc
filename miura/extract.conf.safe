@@ -1,0 +1,17 @@
+datafile Sub01_130_GaitW45RN_Right_jcPos.txt
+xscale 0.3
+zscale 0.82
+thscale 0.0
+rscale 0.0
+fyoffset 0.06
+fzoffset 0.03
+fyscale 0.1
+fzscale 0.3
+vthd 0.15
+heel2ankle 0.065 0 0.093
+ball2ankle -0.115 0 0.077
+toe2ball -0.065 0 0.016
+ankle2zmp 0.03 0 -0.093
+toe2zmp 0.03 0 -0.016
+
+

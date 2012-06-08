@@ -1,0 +1,13 @@
+/Users/kanehiro/Dropbox/test/OpenGL002_004/Classes/EAGLView.m: In function '-[EAGLView drawView:]':
+/Users/kanehiro/Dropbox/test/OpenGL002_004/Classes/EAGLView.m:103: warning: '-render:view:robotConfig:voxels:' not found in protocol(s)
+/Users/kanehiro/Dropbox/test/OpenGL002_004/Classes/EAGLView.m: In function '-[EAGLView touchesEnded:withEvent:]':
+/Users/kanehiro/Dropbox/test/OpenGL002_004/Classes/EAGLView.m:246: warning: unused variable 'touch'
+/Users/kanehiro/Dropbox/test/OpenGL002_004/Classes/EAGLView.m: In function '-[EAGLView writeCommand]':
+/Users/kanehiro/Dropbox/test/OpenGL002_004/Classes/EAGLView.m:329: warning: '-getAxes:' not found in protocol(s)
+/Users/kanehiro/Dropbox/test/OpenGL002_004/Classes/EAGLView.m: In function '-[EAGLView ButtonAction]':
+/Users/kanehiro/Dropbox/test/OpenGL002_004/Classes/EAGLView.m:484: warning: format not a string literal and no format arguments
+/Users/kanehiro/Dropbox/test/OpenGL002_004/Classes/EAGLView.m: In function '-[EAGLView disconnect]':
+/Users/kanehiro/Dropbox/test/OpenGL002_004/Classes/EAGLView.m:502: warning: implicit declaration of function 'close'
+/Users/kanehiro/Dropbox/test/OpenGL002_004/Classes/EAGLView.m: At top level:
+/Users/kanehiro/Dropbox/test/OpenGL002_004/Classes/EAGLView.m:509: warning: incomplete implementation of class 'EAGLView'
+/Users/kanehiro/Dropbox/test/OpenGL002_004/Classes/EAGLView.m:509: warning: method definition for '-SegmentedControAction' not found

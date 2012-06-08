@@ -1,0 +1,12 @@
+./findgoal3 -ORBInitRef NameService=corbaloc:iiop:localhost:2809/NameService -robot file:///home/kanehiro/openhrp3.0/Controller/IOserver/robot/HRP2/model/HRP2main.wrl -obstacle file:///home/kanehiro/Dropbox/src/iros/EnvPlant.wrl 0.0 0.0 0 0 0 0 -goal file:///home/kanehiro/Dropbox/src/iros/arrow.wrl -goalpos 0.71 0.03 0.9 0 -1.5708 0 -ngoal 100 -no-display
+AnkleHeight = 0.105
+NameService OK.
+OK.
+the number of triangles:74934
+136 pairs are defined
+time to construct sphere tree:17.3589[ms]
+
+total time = 30.8938[s](308.938[ms/goal])
+time spent in collision detection:0.119221[s](0.385905[%])
+collision is checked 8253times(0.0144457[ms/call])
+profile:1329009 1311165 19326 3053 

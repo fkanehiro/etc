@@ -1,0 +1,6 @@
+all: sdl texture
+
+sdl: sdl.cpp
+	g++ -o $@ $< `sdl-config --cflags --libs`
+texture: texture.cpp
+	g++ -o $@ $< `sdl-config --cflags --libs` -lGL

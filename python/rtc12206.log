@@ -1,0 +1,8 @@
+Apr 22 22:06:44 INFO: manager: OpenRTM-aist-1.0.2
+Apr 22 22:06:44 INFO: manager: Copyright (C) 2003-2010
+Apr 22 22:06:44 INFO: manager:   Noriaki Ando
+Apr 22 22:06:44 INFO: manager:   Intelligent Systems Research Institute, AIST
+Apr 22 22:06:44 INFO: manager: Manager starting.
+Apr 22 22:06:44 INFO: manager: Starting local logging.
+Apr 22 22:06:44 WARNING: NamingOnCorba: No endpoint for the CORBA naming service (localhost) was found.
+Apr 22 22:06:44 INFO: NamingManager: NameServer connection succeeded: corba/localhost

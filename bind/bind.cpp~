@@ -1,0 +1,12 @@
+class Boo
+{
+    　void f(int i, int j){
+        std::cout<<"Sum is "<<(i+j)<<"."<<std::endl; 
+    }
+};
+void main(){
+    　Boo boo; 
+    　boost::function2<void, int, int> func;
+    　func= boost::bind(&Boo::f, &boo, _1, _2); // boo.fを代入
+    　func(13, 7);
+}

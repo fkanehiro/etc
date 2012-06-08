@@ -1,0 +1,90 @@
+#include "TrueTypeFont.h"
+
+static SDL_Surface *Text;
+static TTF_Font *fontType;
+
+bool InitTTF(void){//TTFの初期化
+    if( TTF_Init() == -1){
+        printf("ttf_InitErr %s",SDL_GetError() );
+        return false;
+    }
+    return true;
+}
+
+bool SetTTF(const char *path,int size){
+    //SettingTTF_Font
+    FreeTTF();
+    
+    //TTFを開く
+    fontType=TTF_OpenFont(path,size);
+    
+    if(fontType == NULL){
+        if(fopen(path,"r")==NULL){
+            printf("TTF File is not Found %s",SDL_GetError());
+            return false;
+        }else{
+            printf("TTF_File OpenError%s",SDL_GetError());
+            return false;
+        }
+    }
+    return true;
+}
+
+void 
+TextPut(SDL_Surface *screen,const char *string,const char *color,Uint16 x,Uint16 y)
+{
+    SDL_Surface *textSurface;
+    SDL_Color fontColor;//カラー構造体
+    SDL_Rect dst = { x, y, 0, 0};
+    
+    if(fontType == NULL){
+        //No InstanceTTF
+        return;
+    }
+    //色をセット
+    SetColor( &fontColor, color);
+    
+    //TTFから文字列を作成
+    textSurface = TTF_RenderUTF8_Solid(fontType,string, fontColor);
+    
+    //TTFフォントの文字列を、ビデオスクリーンに高速転送
+    SDL_BlitSurface( textSurface, NULL, screen, &dst );
+    
+
+}
+}
+
+void SetColor(SDL_Color *color,const char *type){
+    if(strcmp(type,"red")==0){
+        color->r = 255;
+        color->g = 0;
+        color->b = 0;
+    }else if(strcmp(type,"green")==0){
+        color->r = 0;
+        color->g = 255;
+        color->b = 0;
+    }else if(strcmp(type,"blue")==0){
+        color->r = 0;
+        color->g = 0;
+        color->b = 255;
+    }else if(strcmp(type,"white")==0){
+        color->r = 255;
+        color->g = 255;
+        color->b = 255;
+    }else if(strcmp(type,"black")==0){
+        color->r = 0;
+        color->g = 0;
+        color->b = 0;
+    }else{//default Color(Black)
+        color->r = 0;
+        color->g = 0;
+        color->b = 0;
+    }
+}
+
+void FreeTTF(void){
+    if(fontType != NULL){
+        TTF_CloseFont(fontType);
+        fontType = NULL;
+    }
+}

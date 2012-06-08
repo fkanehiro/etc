@@ -1,0 +1,17 @@
+$MeshFormat
+2.1 0 8
+$EndMeshFormat
+$Nodes
+417 <= number of nodes
+1 0.0212 0.0212 0 <= nodeid x y z
+.
+.
+.
+$EndNodes
+$Elements
+2000 <= number of elements 
+1 2 3 0 0 0 1 186 19 <= elementid 2 number_of_tags tag0 ... tagn node0 node1 node2
+.
+.
+.
+

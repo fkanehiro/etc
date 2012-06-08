@@ -1,0 +1,38 @@
+cube111.msh
+**
+
+*ELEMENT-TYPE
+0
+**
+
+*MATERIAL
+1
+100 .4 10
+**
+
+*GEOMETRY-VOLUME
+1
+100 0
+**
+
+*PHYSICAL-VOLUME
+100
+**
+
+*DIRICHLET-BC
+1
+10 
+**
+
+*EFFORT-BC
+2
+20 30
+**
+
+*COLORS
+10 1.0 0.0 0.0 0.0
+20 0.0 1.0 0.0 0.0
+30 0.0 1.0 0.0 0.0
+**
+
+*ENDFILE

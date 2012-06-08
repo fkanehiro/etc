@@ -1,0 +1,39 @@
+#include <hrpModel/ModelLoaderUtil.h>
+
+using namespace hrp;
+
+int main(int argc, char *argv[])
+{
+    BodyPtr body = loadBody("file:///home/kanehiro/spiralStairs.wrl", argc, argv);
+
+    Opcode::RayCollider RC;
+#define DZ 0.3
+    Opcode::CollisionFace CF;
+    Opcode::SetupClosestHit(RC, CF);
+    udword Cache;
+    Link *l = body->rootLink();
+    const Matrix33 R = l->attitude();
+    const Vector3& p = l->p;
+    Matrix4x4 transform;
+    transform.Set((float)R(0,0), (float)R(1,0), (float)R(2,0), 0.0f,
+                  (float)R(0,1), (float)R(1,1), (float)R(2,1), 0.0f,
+                  (float)R(0,2), (float)R(1,2), (float)R(2,2), 0.0f,
+                  (float)p(0),   (float)p(1),   (float)p(2),   1.0f);
+
+    double x=-1.71412, y=0.506532, th=-4.7007;
+    double [4][2] = {
+    double costh = cos(th);
+    double sinth = sin(th);
+    Vector3 pos(0,0,0), normal(0,0,1);
+    for (unsigned int i=0; i<io_tls.data.polygon.length(); i++){
+        double x = io_tls.data.pose.position.x + costh*io_tls.data.polygon[i].x
+            - sinth*io_tls.data.polygon[i].y;
+        double y = io_tls.data.pose.position.y + sinth*io_tls.data.polygon[i].x
+            + costh*io_tls.data.polygon[i].y;
+        Ray world_ray(Point(x, y, io_tls.data.pose.position.z+DZ),
+                      Point(0,0,-1));
+        Opcode::SetupClosestHit(RC, CF);
+        RC.Collide(world_ray, l->coldetModel->getDataSet()->model, &transform, &Cache);
+        std::cout << CF.mDistance << std::endl;
+    }
+}

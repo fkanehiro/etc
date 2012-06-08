@@ -1,0 +1,4 @@
+all: fk
+
+fk: fk.cpp
+	g++ -o $@ `pkg-config --cflags openhrp3.1` $< `pkg-config --libs openhrp3.1`

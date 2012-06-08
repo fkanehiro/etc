@@ -1,0 +1,15 @@
+#include <SDL.h>
+#include <stdio.h>
+
+int main(int argc,char *argv[])
+{
+    /* 初期化 */
+    if(SDL_Init(SDL_INIT_VIDEO)<0) {
+        fprintf(stderr,"failed to initialize SDL.\n");
+        return -1;
+    }
+
+    /* 終了 */
+    SDL_Quit();
+    return 0;
+}
