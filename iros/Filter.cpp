@@ -47,7 +47,7 @@ Filter::Filter(HumanoidBodyPtr i_body, int i_arm, bool i_balance) :
 
     m_cm = new ConstraintManager(m_tss, m_body, NULL);
 
-    dvector usedJoints;
+    ivector usedJoints;
     usedJoints.resize(m_body->numJoints()+6);
     usedJoints.setZero();
 #if 0

@@ -1,4 +1,5 @@
 #include <Util/OnlineViewerUtil.h>
+#include <hrpUtil/OnlineViewerUtil.h>
 #include <hrpModel/Link.h>
 #include "problem.h"
 
@@ -87,12 +88,12 @@ void problem::initCollisionCheckPairs(bool checkSelfCollision)
 
 void problem::initOLV(int argc, char *argv[])
 {
-    olv.init(argc, argv);
+    olv = hrp::getOnlineViewer(argc, argv);
 
     for (unsigned int i=0; i<m_urls.size(); i++){
-        olv.load(m_names[i].c_str(), m_urls[i].c_str());
+        olv->load(m_names[i].c_str(), m_urls[i].c_str());
     }
-    olv.clearLog();
+    olv->clearLog();
 
     wstate.time = 0.0;
 
@@ -111,7 +112,7 @@ void problem::updateOLV()
     for (unsigned int i=0; i<m_bodies.size(); i++){
         updateCharacterPosition(wstate.characterPositions[i], m_bodies[i]);
     }
-    olv.update(wstate);
+    olv->update(wstate);
     wstate.time += 0.005;
 }
 

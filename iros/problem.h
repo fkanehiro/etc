@@ -1,6 +1,5 @@
 #include <vector>
 #include <hrpPlanner/PathPlanner.h>
-#include "OnlineViewerClient.h"
 
 class problem
 {
@@ -29,5 +28,5 @@ private:
     std::vector<hrp::BodyPtr> m_obstacles, m_bodies;
     PathEngine::PathPlanner m_planner;
     OpenHRP::WorldState wstate;
-    OnlineViewerClient olv;
+    OpenHRP::OnlineViewer_var olv;
 };
