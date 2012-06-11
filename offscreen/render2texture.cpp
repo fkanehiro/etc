@@ -99,50 +99,6 @@ SetMaterial( void )
     glMaterialfv( GL_FRONT, GL_SHININESS, mat_shininess0 );
 }
 
-/* draw cube with texture coordinates */
-
-void
-DrawCubeSub( float l )
-{
-    glPushMatrix();
-
-    glTranslatef( l, 0.0f, 0.0f );
-    glBegin( GL_QUADS );
-    glNormal3f( 1.0f, 0.0f, 0.0f );
-    glTexCoord2f( 0.0f, 0.0f );
-    glVertex3f( 0.0f, -l, -l );
-    glTexCoord2f( 1.0f, 0.0f );
-    glVertex3f( 0.0f, l, -l );
-    glTexCoord2f( 1.0f, 1.0f );
-    glVertex3f( 0.0f, l, l );
-    glTexCoord2f( 0.0f, 1.0f );
-    glVertex3f( 0.0f, -l, l );
-    glEnd();
-	
-    glPopMatrix();
-}
-
-void
-DrawCube( float l )
-{
-    int	i;
-	
-    glPushMatrix();
-
-    for ( i = 0; i < 4; i++ ) {
-        DrawCubeSub( l );
-        glRotatef( 90.0f, 0.0f, 0.0f, 1.0f );
-    }
-    glRotatef( 90.0f, 0.0f, 1.0f, 0.0f );
-    DrawCubeSub( l );
-    glRotatef( 180.0f, 0.0f, 1.0f, 0.0f );
-    DrawCubeSub( l );
-	
-    glPopMatrix();
-}
-
-
-
 /* framebuffer object ********************************************************/
 
 #define	FRAMEBUFFER_WIDTH		256
@@ -308,112 +264,6 @@ RenderToTexture( void )
 }
 
 /*****************************************************************************/
-
-
-
-/* callback functions */
-
-void
-Display( void )
-{
-    /* rendering teapot on texture */
-	
-    RenderToTexture();
-
-    /* clear buffer */
-    
-    glClearColor( 0.0, 0.0, 0.0, 0.0 );
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-    /* set camera */
-
-    glMatrixMode( GL_MODELVIEW );
-    glLoadIdentity();
-    gluLookAt( EYE_X, EYE_Y, EYE_Z,
-               TARGET_X, TARGET_Y, TARGET_Z,
-               UP_X, UP_Y, UP_Z );
-
-    /* set light (in world coordinates) */
-
-    SetLight();
-
-    /* set material */
-
-    glEnable( GL_COLOR_MATERIAL );
-    glColor3f( 1.0f, 1.0f, 1.0f );
-
-    /* put object */
-
-    glEnable( GL_TEXTURE_2D );
-    glBindTexture( GL_TEXTURE_2D, texture_name );
-    glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-	
-    glPushMatrix();
-    glRotatef( counter_cube * 0.1, 0.0, 1.0, 0.0 );
-    glRotatef( counter_cube * 0.07, 0.0, 0.0, 1.0 );
-
-    DrawCube( 30.0 );
-
-    glPopMatrix();
-
-    glDisable( GL_COLOR_MATERIAL );
-    glDisable( GL_TEXTURE_2D );
-
-    /* swap buffers */
-
-    glutSwapBuffers();
-}
-
-void
-Reshape( int w, int h )
-{
-    window_width = w;
-    window_height = h;
-
-    glViewport( 0, 0, window_width, window_height );
-    
-    glMatrixMode( GL_PROJECTION );
-    glLoadIdentity();
-    gluPerspective( FIELD_OF_VIEW, window_width / ( double ) window_height,
-                    NEAR_CLIPPING_LENGTH, FAR_CLIPPING_LENGTH );
-
-    glMatrixMode( GL_MODELVIEW );
-}
-
-void
-Keyboard( unsigned char key, int x, int y )
-{
-    if ( key == 'q' || key == 3 || key == 27 ) {    /* 3: Ctrl-C, 27: ESC */
-        exit( 0 );
-    }
-}
-
-void
-MouseButton( int button, int state, int x, int y )
-{
-    if ( button == GLUT_LEFT_BUTTON && state == GLUT_DOWN ) {
-        is_rotate_cube = 1 - is_rotate_cube;
-    }
-    if ( button == GLUT_MIDDLE_BUTTON && state == GLUT_DOWN ) {}
-    if ( button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN ) {
-        is_rotate_teapot = 1 - is_rotate_teapot;
-    }
-}
-
-void
-Idle( void )
-{
-    if ( is_rotate_cube ) {
-        counter_cube++;
-    }
-    if ( is_rotate_teapot ) {
-        counter_teapot++;
-    }
-    if ( is_rotate_cube || is_rotate_teapot ) {
-        glutPostRedisplay();
-    }
-}
-
 /* main */
 
 int
@@ -430,21 +280,12 @@ main( int argc, char **argv )
     
     glutInit( &argc, argv );
     glutInitDisplayMode( GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH );
-    glutInitWindowSize( window_width, window_height );
-    glutInitWindowPosition( WINDOW_POSITION_X, WINDOW_POSITION_Y );
+    glutInitWindowSize(0,0);
     glutCreateWindow( argv[ 0 ] );
 
     /* initialize GLEW */
 
     glewInit();
-
-    /* set callback functions */
-
-    glutDisplayFunc( Display );
-    glutReshapeFunc( Reshape );
-    glutKeyboardFunc( Keyboard );
-    glutMouseFunc( MouseButton );
-    glutIdleFunc( Idle );
 
     /* initialize OpenGL settings */
 
@@ -458,8 +299,6 @@ main( int argc, char **argv )
     
     //glutMainLoop();
     RenderToTexture();
-
-    /* never reach here */
 
     return 0;
 }
