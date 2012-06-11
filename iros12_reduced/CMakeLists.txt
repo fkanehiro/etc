@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 2.4)
+
 include(FindPkgConfig)
 pkg_check_modules(OPENHRP openhrp3.1)
 include_directories(${OPENHRP_INCLUDE_DIRS})
