@@ -111,8 +111,8 @@ int main(int argc, char *argv[])
     halfconf[16] = halfconf[23] = ToRad(20);
     halfconf[17] = ToRad(-10); halfconf[24] = -halfconf[17];
     halfconf[19] = halfconf[26] = ToRad(-30);
-    halfconf[20] = ToRad(80); halfconf[27] = -halfconf[20];
     if (robot->modelName() == "HRP2"){
+        halfconf[20] = ToRad(80); halfconf[27] = -halfconf[20];
         halfconf[22] = halfconf[29] = -1.0;
     }
     leg_link_len1 = leg_link_len2 = 0.3;
