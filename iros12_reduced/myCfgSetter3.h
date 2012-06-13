@@ -21,6 +21,11 @@ public:
             hrp::Link *j = m_body->joint(i);
             if (j) m_q[i] = j->q;
         }
+        if (i_body->modelName() == "HRP2"){
+            m_wrist2grasp = hrp::Vector3(-0.03,0,0.18);
+        }else{
+            m_wrist2grasp = hrp::Vector3(0,0,0.18);
+        }
     }
     bool set(PathEngine::PathPlanner *i_planner,
              const PathEngine::Configuration &i_cfg){
@@ -31,7 +36,7 @@ public:
         hrp::Matrix33 R = hrp::rotFromRpy(i_cfg[4], i_cfg[5], i_cfg[6]); 
         hrp::Matrix33 wristR(bulbR*R);
 
-        hrp::Vector3 wristP(m_goalP + wristR*hrp::Vector3(-0.03,0,0.18));
+        hrp::Vector3 wristP(m_goalP + wristR*m_wrist2grasp);
         m_reachedArm=0;
         if (!calcIKwithLimitCheck(m_arm[0],wristP, wristR)) {
             m_ikFailCount[0]++;
@@ -66,4 +71,5 @@ private:
     hrp::Vector3 m_goalP;
     hrp::dvector m_q;
     int m_reachedArm;
+    hrp::Vector3 m_wrist2grasp;
 };
