@@ -6,6 +6,7 @@
 	    <property name="simple_vehicle.period" value="0.002"/>  
 	    <property name="Joystick0.period" value="0.03"/>  
 	    <property name="Joystick2Velocity2D0.period" value="0.03"/>  
+	    <property name="CameraImageViewer0.period" value="0.03"/>  
 	    <property name="connection" value="simple_vehicle.q:JoystickController0.angle"/>  
 	    <property name="connection" value="simple_vehicle.dq:JoystickController0.velocity"/>  
 	    <property name="connection" value="simple_vehicle.VISION_SENSOR1:CameraImageViewer0.imageIn"/>  
