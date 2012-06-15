@@ -23,10 +23,13 @@ void parsePortConfig(const std::string &config,
     std::string elist = config.substr(start, pos);
     {
       std::string::size_type comma;
+      start = 0;
       comma = elist.find(',', start);
       while (comma != std::string::npos){
 	elements.push_back(elist.substr(start, comma));
-	start += 1;
+	std::cout << elements.back() << std::endl;
+	start = comma+1;
+	comma = elist.find(',', start);
       }
       elements.push_back(elist.substr(start));
     }
