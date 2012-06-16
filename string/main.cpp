@@ -6,34 +6,32 @@ void parsePortConfig(const std::string &config,
                      std::string &name, std::string &type,
                      std::vector<std::string> &elements)
 {
-    std::string::size_type pos = 0, start=0; 
-    pos = config.find(':', start);
-    if (pos == std::string::npos){
+    std::string::size_type colon = 0, start=0; 
+    colon = config.find(':', start);
+    if (colon == std::string::npos){
         std::cerr << "can't find the first separator in [" << config << "]" 
                   << std::endl;
         return;
     }
-    name = config.substr(start, pos);
-    start = pos+1;
-    pos = config.find(':', start);
-    if (pos == std::string::npos){
+    name = config.substr(start, colon);
+    start = colon+1;
+    colon = config.find(':', start);
+    if (colon == std::string::npos){
         type = config.substr(start);
         return;
     }
-    std::string elist = config.substr(start, pos);
-    {
-      std::string::size_type comma;
-      start = 0;
-      comma = elist.find(',', start);
-      while (comma != std::string::npos){
-	elements.push_back(elist.substr(start, comma));
-	std::cout << elements.back() << std::endl;
-	start = comma+1;
-	comma = elist.find(',', start);
-      }
-      elements.push_back(elist.substr(start));
+    std::string elist = config.substr(start, colon-start);
+    std::string::size_type comma;
+    start = 0;
+    comma = elist.find(',', start);
+    while (comma != std::string::npos){
+        std::string e = elist.substr(start, comma-start);
+        elements.push_back(e);
+        start = comma+1;
+        comma = elist.find(',', start);
     }
-    start = pos+1;
+    elements.push_back(elist.substr(start));
+    start = colon+1;
     type = config.substr(start);
 }
 
