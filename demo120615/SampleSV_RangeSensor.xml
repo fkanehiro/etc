@@ -24,7 +24,7 @@
             <property name="viewsimulationTimeStep" value="0.033 "/>
             <property name="gravity" value="9.8 "/>
         </item>
-        <item class="com.generalrobotix.ui.item.GrxModelItem" name="longfloor" select="true" url="$(CURRENT_DIR)/plane.wrl">
+        <item class="com.generalrobotix.ui.item.GrxModelItem" name="longfloor" select="true" url="$(CURRENT_DIR)/EnvPlant_separated.wrl">
             <property name="markRadius" value="0.05 "/>
             <property name="WAIST.rotation" value="0 0 1 1.5708"/>
             <property name="WAIST.angularVelocity" value="0.0 0.0 0.0 "/>
@@ -33,6 +33,11 @@
             <property name="WAIST.velocity" value="0.0 0.0 0.0 "/>
         </item>
         <item class="com.generalrobotix.ui.item.GrxModelItem" name="simple_vehicle" select="true" url="$(CURRENT_DIR)/simple_vehicle_with_rangesensor.wrl">
+	    <property name="outport" value="q:JOINT_VALUE"/>  
+	    <property name="outport" value="dq:JOINT_VELOCITY"/>  
+	    <property name="outport" value="VISION_SENSOR1:VISION_SENSOR1:VISION_SENSOR"/>  
+	    <property name="outport" value="range:RANGE_SENSOR1:RANGE_SENSOR"/>  
+	    <property name="inport" value="tau:JOINT_TORQUE"/>  
             <property name="BODY.mode" value="Torque"/>
             <property name="setupCommand" value="SampleSV$(BIN_SFX)"/>
             <property name="FRONT_WHEEL.mode" value="Torque"/>
