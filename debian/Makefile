@@ -6,7 +6,7 @@ $(TARGET):
 
 $(TARGET)-1.deb: $(TARGET)
 	\cp -r ./debian $(TARGET)
-	cd $(TARGET); fakeroot debian/rules binary
+#	cd $(TARGET); fakeroot debian/rules binary
 
 $(TARGET)-1-src.deb: $(TARGET)
 	cd $(TARGET)/debian; debuild -S -sa
