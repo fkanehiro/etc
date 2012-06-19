@@ -2,7 +2,7 @@ TARGET = openhrp-3.1.3
 all: $(TARGET) $(TARGET)-1.deb $(TARGET)-1-src.deb
 
 $(TARGET):
-	svn co https://openrtp.jp/svn/hrg/openhrp/3.1/trunk openhrp-3.1.3
+	svn export https://openrtp.jp/svn/hrg/openhrp/3.1/trunk $(TARGET)
 
 $(TARGET)-1.deb: $(TARGET)
 	\cp -r ./debian $(TARGET)
@@ -10,10 +10,15 @@ $(TARGET)-1.deb: $(TARGET)
 
 $(TARGET)-1-src.deb: $(TARGET)
 	cd $(TARGET)/debian; debuild -S -sa
-	./openhrp3_upload.sh
+	\cp ./debian/control* ./debian/changelog $(TARGET)/debian/
+	#cd $(TARGET); ../ppa_publish.sh ppa:hrg/release lucid maverick natty oneiric precise
+	cd $(TARGET); ../ppa_publish.sh ppa:hrg/release maverick
+
 
 clean:
-	-rm -rf openhrp-3.1.3 openhrp_3.1.3* *~ debian/*~
+	-rm -rf $(TARGET) *~ debian/*~ *.build *.dsc *.tar.gz *.changes
+
+
 
 
 
