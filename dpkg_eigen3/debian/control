@@ -1,0 +1,12 @@
+Source: libeigen3-dev
+Section: science
+Priority: extra
+Maintainer: Fumio KANEHIRO <f-kanehiro@aist.go.jp>
+Build-Depends: debhelper (>= 7.4), cmake(>= 2.4.0), pkg-config (>= 0.22)
+Standards-Version: 3.9.2
+Homepage: http://eigen.tuxfamily.org/
+
+Package: libeigen3-dev
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Eigen is a C++ template library for linear algebra
