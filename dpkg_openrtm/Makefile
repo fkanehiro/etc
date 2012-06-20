@@ -1,5 +1,5 @@
 TARGET = openrtm-aist-1.1.0
-PPA = ppa:hrg/stable
+PPA = ppa:hrg/unstable
 all: $(TARGET) $(TARGET)-1.deb $(TARGET)-1-src.deb
 
 $(TARGET):

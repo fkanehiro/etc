@@ -1,5 +1,6 @@
-openrtm-aist (1.1.0-1~ppa1~lucid) unstable; urgency=low
+openrtm-aist (1.1.0-1~ppa4~lucid) unstable; urgency=low
 
   * Initial release
+  * Adds omniORB nameserver to required packages
 
- -- Fumio KANEHIRO <f-kanehiro@aist.go.jp>  Wed, 20 Jun 2012 17:50:56 +0900
+ -- Fumio KANEHIRO <f-kanehiro@aist.go.jp>  Wed, 20 Jun 2012 19:50:55 +0900
