@@ -1,5 +1,5 @@
-libeigen3-dev (3.0.5-1~ppa2~lucid) unstable; urgency=low
+libeigen3-dev (3.0.5-1~ppa1~lucid) unstable; urgency=low
 
   * Initial release
 
- -- Fumio KANEHIRO <f-kanehiro@aist.go.jp>  Thu, 07 Jun 2012 01:37:51 +0900
+ -- Fumio KANEHIRO <f-kanehiro@aist.go.jp>  Wed, 20 Jun 2012 17:32:11 +0900
