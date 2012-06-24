@@ -1,3 +1,9 @@
+openhrp (3.1.3-1~ppa33~lucid) lucid; urgency=low
+
+  * Enables simplified crawler simulation
+
+ -- Fumio KANEHIRO <f-kanehiro@aist.go.jp>  Sun, 24 Jun 2012 23:07:28 +0900
+
 openhrp (3.1.3-1~ppa32~lucid) unstable; urgency=low
 
   * Initial release
