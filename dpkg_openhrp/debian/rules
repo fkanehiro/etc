@@ -13,4 +13,4 @@
 	dh $@ 
 
 override_dh_auto_configure:
-	dh_auto_configure -- -DOPT_COLLADASUPPORT=ON
+	dh_auto_configure -- -DOPT_COLLADASUPPORT=ON -DENABLE_DOCUMENTS_GENERATE=ON -DENABLE_CPACK=ON -DGENERATE_DEBIANPACKAGE=ON
