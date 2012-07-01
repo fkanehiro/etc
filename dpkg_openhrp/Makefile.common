@@ -1,0 +1,19 @@
+PPA = ppa:hrg/$(DIR)
+all: $(TARGET) $(TARGET)-1.deb $(TARGET)-1-src.deb
+
+$(TARGET):
+	svn export $(REPO) $(TARGET)
+
+$(TARGET)-1.deb: $(TARGET)
+	\cp -r ./debian $(TARGET)
+	#cd $(TARGET); fakeroot debian/rules binary
+
+$(TARGET)-1-src.deb: $(TARGET)
+	dch -i -c ./debian/changelog.$(DIR)
+	\cp ./debian/control* $(TARGET)/debian/
+	\cp ./debian/changelog.$(DIR) $(TARGET)/debian/changelog
+	cd $(TARGET)/debian; debuild -S -sa
+	cd $(TARGET); ../ppa_publish.sh $(PPA) lucid maverick natty oneiric precise
+
+clean:
+	-rm -rf $(TARGET) *~ debian/*~ debian/*.log *.build *.dsc *.tar.gz *.changes *.deb

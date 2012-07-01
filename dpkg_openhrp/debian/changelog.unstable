@@ -1,0 +1,30 @@
+openhrp (3.1.4-1~ppa3~lucid) lucid; urgency=low
+
+  * Supports lights
+
+ -- Fumio Kanehiro <f-kanehiro@aist.go.jp>  Sat, 30 Jun 2012 18:38:08 +0900
+
+openhrp (3.1.4-1~ppa2~lucid) lucid; urgency=low
+
+  * Update dependencies
+
+ -- Fumio KANEHIRO <f-kanehiro@aist.go.jp>  Fri, 29 Jun 2012 16:35:40 +0900
+
+openhrp (3.1.4-1~ppa1~lucid) lucid; urgency=low
+
+  * Updates cmake options
+
+ -- Fumio KANEHIRO <f-kanehiro@aist.go.jp>  Fri, 29 Jun 2012 15:39:12 +0900
+
+openhrp (3.1.3-1~ppa33~lucid) lucid; urgency=low
+
+  * Enables simplified crawler simulation
+
+ -- Fumio KANEHIRO <f-kanehiro@aist.go.jp>  Sun, 24 Jun 2012 23:07:28 +0900
+
+openhrp (3.1.3-1~ppa32~lucid) unstable; urgency=low
+
+  * Initial release
+  * Changes data type for ABS_TRANSFORM to RTC::TimedPose3D
+
+ -- Fumio KANEHIRO <f-kanehiro@aist.go.jp>  Wed, 20 Jun 2012 23:29:38 +0900
