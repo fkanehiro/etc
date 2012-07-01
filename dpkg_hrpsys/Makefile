@@ -1,21 +1,8 @@
-TARGET = hrpsys-base-3.1.3
-all: $(TARGET) $(TARGET)-1.deb $(TARGET)-1-src.deb
+TARGET = hrpsys-base-3.1.4
+DIR = unstable
+REPO = https://hrpsys-base.googlecode.com/svn/trunk
 
-$(TARGET):
-	svn export https://hrpsys-base.googlecode.com/svn/branches/eigen $(TARGET) --username fkanehiro@gmail.com 
-
-$(TARGET)-1.deb: $(TARGET)
-	\cp -r ./debian $(TARGET)
-#	cd $(TARGET); fakeroot debian/rules binary
-
-$(TARGET)-1-src.deb: $(TARGET)
-	cd $(TARGET)/debian; debuild -S -sa
-	\cp ./debian/control* ./debian/changelog $(TARGET)/debian/
-	cd $(TARGET); ../ppa_publish.sh ppa:hrg/unstable lucid maverick natty oneiric precise
-
-clean:
-	-rm -rf $(TARGET) *~ debian/*~ *.build *.dsc *.tar.gz *.changes
-
+include Makefile.common
 
 
 
