@@ -2,7 +2,7 @@
 <grxui>
     <mode name="Simulation">
         <item class="com.generalrobotix.ui.item.GrxRTSItem" name="untitled" select="true">
-	    <property name="JoystickController0.factory" value="JoystickController"/>  
+	    <property name="JoystickController0.factory" value="JoystickController2"/>  
 	    <property name="Joystick0.factory" value="Joystick"/>  
 	    <property name="Joystick2Velocity2D0.factory" value="Joystick2Velocity2D"/>  
 	    <property name="CameraImageViewer0.factory" value="CameraImageViewer"/>  
@@ -11,8 +11,6 @@
 	    <property name="Joystick0.period" value="0.03"/>  
 	    <property name="Joystick2Velocity2D0.period" value="0.03"/>  
 	    <property name="CameraImageViewer0.period" value="0.03"/>  
-	    <property name="connection" value="simple_vehicle.q:JoystickController0.angle"/>  
-	    <property name="connection" value="simple_vehicle.dq:JoystickController0.velocity"/>  
 	    <property name="connection" value="simple_vehicle.VISION_SENSOR1:CameraImageViewer0.imageIn"/>  
 	    <property name="connection" value="JoystickController0.torque:simple_vehicle.tau"/>  
 	    <property name="connection" value="Joystick0.Axes:Joystick2Velocity2D0.axes"/>  
@@ -36,7 +34,7 @@
             <property name="isRobot" value="false"/>
             <property name="WAIST.velocity" value="0.0 0.0 0.0 "/>
         </item>
-        <item class="com.generalrobotix.ui.item.GrxModelItem" name="simple_vehicle" select="true" url="$(CURRENT_DIR)/simple_vehicle_with_rangesensor.wrl">
+        <item class="com.generalrobotix.ui.item.GrxModelItem" name="simple_vehicle" select="true" url="$(CURRENT_DIR)/crawler.wrl">
 	    <property name="outport" value="q:JOINT_VALUE"/>  
 	    <property name="outport" value="dq:JOINT_VELOCITY"/>  
 	    <property name="outport" value="VISION_SENSOR1:VISION_SENSOR1:VISION_SENSOR"/>  
@@ -53,7 +51,7 @@
             <property name="markRadius" value="0.05 "/>
             <property name="REAR_WHEEL_R.angle" value="0.0 "/>
             <property name="isRobot" value="true"/>
-            <property name="BODY.rotation" value="5.845551260101391E-4 -0.0012503904589774894 0.9999990474090488 1.0552500569859855 "/>
+            <property name="BODY.rotation" value="0 0 1 0 "/>
             <property name="REAR_WHEEL_L.mode" value="Torque"/>
             <property name="controller" value="SampleSVController"/>
             <property name="BODY.translation" value="0.16525592291725483 -0.5631259371508932 0.0996712361915264 "/>

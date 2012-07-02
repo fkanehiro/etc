@@ -330,7 +330,7 @@ DEF SimpleVehicle Humanoid {
       translation 0 0 0.1
       children [
         Transform {
-	  translation 0 0 0
+	  translation 0 -0.3 0.1
 	  children DEF slight SpotLight{
 	    color 1 1 1
 	    direction 0 -1 0
