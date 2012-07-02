@@ -29,10 +29,11 @@ SKEL_OBJ =
 STUB_OBJ = 
 IMPL_OBJ = 
 OBJS     = JoystickController.o $(SKEL_OBJ) $(IMPL_OBJ)
+OBJS2     = JoystickController2.o $(SKEL_OBJ) $(IMPL_OBJ)
 
 .SUFFIXES : .dylib
 
-all: JoystickController.dylib JoystickControllerComp
+all: JoystickController.dylib JoystickControllerComp JoystickController2.dylib 
 
 .cpp.o:
 	rm -f $@
@@ -40,7 +41,7 @@ all: JoystickController.dylib JoystickControllerComp
 
 .o.dylib:
 	rm -f $@
-	$(CXX) $(SHFLAGS) -o $@ $(OBJS) $(LDFLAGS)
+	$(CXX) $(SHFLAGS) -o $@ $^ $(LDFLAGS)
 
 JoystickControllerComp: JoystickControllerComp.o $(OBJS)
 	$(CXX) -o $@ $(OBJS) JoystickControllerComp.o $(LDFLAGS) 
@@ -50,7 +51,7 @@ clean: clean_objs clean_skelstub
 	rm -f *~
 
 clean_objs:
-	rm -f $(OBJS) JoystickControllerComp.o JoystickController.dylib JoystickControllerComp
+	rm -f $(OBJS) $(OBJS2) JoystickControllerComp.o JoystickController.dylib JoystickControllerComp JoystickController2.dylib 
 
 clean_skelstub:
 	rm -f *Skel.h *Skel.cpp
@@ -61,6 +62,8 @@ clean_skelstub:
 JoystickController.dylib: $(OBJS)
 JoystickController.o: JoystickController.h 	 	
 JoystickControllerComp.o: JoystickControllerComp.cpp JoystickController.cpp JoystickController.h 
+JoystickController2.dylib: $(OBJS)
+JoystickController2.o: JoystickController2.h 	 	
 
 
 
