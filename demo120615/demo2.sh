@@ -1,1 +1,1 @@
-hrpsys-simulator Crawler.xml -realtime -endless -no-default-lights -max-edge-length 0.1
+hrpsys-simulator Crawler.xml -no-default-lights -max-edge-length 0.1

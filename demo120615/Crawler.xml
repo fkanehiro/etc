@@ -18,8 +18,8 @@
         </item>
         <item class="com.generalrobotix.ui.item.GrxSimulationItem" name="simulationItem" select="true">
             <property name="method" value="RUNGE_KUTTA"/>
-            <property name="totalTime" value="10.0 "/>
-            <property name="realTime" value="false"/>
+            <property name="totalTime" value="0.0 "/>
+            <property name="realTime" value="true"/>
             <property name="integrate" value="true"/>
             <property name="timeStep" value="0.0020 "/>
             <property name="viewsimulate" value="false"/>
