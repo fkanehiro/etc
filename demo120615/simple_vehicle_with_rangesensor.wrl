@@ -329,6 +329,15 @@ DEF SimpleVehicle Humanoid {
       jointType "free"
       translation 0 0 0.1
       children [
+        Transform {
+	  translation 0 0 0
+	  children DEF slight SpotLight{
+	    color 1 1 1
+	    direction 0 -1 0
+	    cutOffAngle 0.5
+#	    attenuation 2 0 0
+	  }
+	}
         DEF BODY_LINK Segment {
           centerOfMass  0 0 0
           mass    10.0
@@ -426,6 +435,8 @@ DEF SimpleVehicle Humanoid {
           rotation     0 1 1 3.1415
           sensorId      0
 	  type "COLOR"
+	  width 640
+	  height 480
           children [
            DEF CAMERA_SHAPE Transform {
               rotation  1 0 0 1.5708
