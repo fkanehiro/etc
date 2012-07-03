@@ -107,7 +107,7 @@
             <property name="showCoMonFloor" value="false"/>
             <property name="showDistance" value="false"/>
             <property name="showIntersection" value="false"/>
-            <property name="showCollision" value="true"/>
+            <property name="showCollision" value="false"/>
             <property name="showActualState" value="true"/>
             <property name="showScale" value="false"/>
             <property name="eyeHomePosition" value="0.53441 0.20091 -0.821 -4.22196 -0.84523 0.12703 -0.51909 -3.22042 -0 0.97134 0.2377 2.16153 0 0 0 1 "/>
