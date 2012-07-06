@@ -1,3 +1,9 @@
+hrpsys-base (3.1.4-1~ppa2~lucid) lucid; urgency=low
+
+  * Loads various settings from project files
+
+ -- Fumio KANEHIRO <f-kanehiro@aist.go.jp>  Thu, 05 Jul 2012 18:27:06 +0900
+
 hrpsys-base (3.1.4-1~ppa1~lucid) lucid; urgency=low
 
   * Support lights
