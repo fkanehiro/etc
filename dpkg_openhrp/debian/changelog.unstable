@@ -1,3 +1,15 @@
+openhrp (3.1.4-1~ppa6~lucid) lucid; urgency=low
+
+  * Renames some of data types of ControllerBridge to restore compatibility
+
+ -- Fumio KANEHIRO <f-kanehiro@aist.go.jp>  Wed, 11 Jul 2012 10:38:48 +0900
+
+openhrp (3.1.4-1~ppa5~lucid) lucid; urgency=low
+
+  * Switches from boost::intrusive_ptr to boost::shared_ptr
+
+ -- Fumio KANEHIRO <f-kanehiro@aist.go.jp>  Tue, 10 Jul 2012 18:42:04 +0900
+
 openhrp (3.1.4-1~ppa4~lucid) lucid; urgency=low
 
   * Includes pre-compiled GrxUI plugin

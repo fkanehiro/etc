@@ -1,3 +1,9 @@
+openhrp (3.1.3-1~ppa37~lucid) lucid; urgency=low
+
+  * Renames some of data types of ControllerBridge to restore compatibility
+
+ -- Fumio KANEHIRO <f-kanehiro@aist.go.jp>  Wed, 11 Jul 2012 10:31:57 +0900
+
 openhrp (3.1.3-1~ppa36~lucid) lucid; urgency=low
 
   * Updates GrxUI plugin
