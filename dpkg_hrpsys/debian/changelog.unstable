@@ -1,3 +1,12 @@
+hrpsys-base (3.1.4-1~ppa3~lucid) lucid; urgency=low
+
+  * uses boost::shared_ptr for BodyPtr since it is thread-safe(r387)
+  * stops playback when clear() is called(r386)
+  * checks if modelloader is alive(r385)
+  * changes data type for range sensors from TimedDoubleSeq to RangeData(r384)
+
+ -- Fumio KANEHIRO <f-kanehiro@aist.go.jp>  Wed, 11 Jul 2012 13:44:19 +0900
+
 hrpsys-base (3.1.4-1~ppa2~lucid) lucid; urgency=low
 
   * Loads various settings from project files
