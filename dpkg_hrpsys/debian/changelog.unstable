@@ -1,3 +1,17 @@
+hrpsys-base (3.1.4-1~ppa4~lucid) lucid; urgency=low
+
+  * supports changes of input image size(r399)
+  * restores ports replaced by the scene state port(r398)
+  * adds an outport for joint torques(r395)
+  * puts timestamps to output data(r394)
+  * adds scroll bars(r393)
+  * makes priority adjustable and improves compatibility with official execution contexts(r391)
+  * adds arguments to resolve redundancy of services(r390)
+  * fixes an issue: waitInputMenu is not displayed once waitInputSelect or waitInputConfirm is called(r389)
+  * fixes class paths(r388)
+
+ -- Fumio KANEHIRO <f-kanehiro@aist.go.jp>  Fri, 20 Jul 2012 17:37:08 +0900
+
 hrpsys-base (3.1.4-1~ppa3~lucid) lucid; urgency=low
 
   * uses boost::shared_ptr for BodyPtr since it is thread-safe(r387)
