@@ -1,3 +1,15 @@
+hrpsys-base (3.1.4-1~ppa5~lucid) lucid; urgency=low
+
+  * increments CPACK_PACKAGE_VERSION_PATCH(r406)
+  * updates document(r405)
+  * adds components, Range2PointCloud and OGMap3DViewer(r404)
+  * fixes a bug in setupRangeData()(r403)
+  * renames some of configuration variables since dots cannot be used(r402)
+  * outputs data only when data are available(r401)
+  * adapts to changes in OpenHRP(r400)
+
+ -- Fumio KANEHIRO <f-kanehiro@aist.go.jp>  Mon, 23 Jul 2012 09:42:14 +0900
+
 hrpsys-base (3.1.4-1~ppa4~lucid) lucid; urgency=low
 
   * supports changes of input image size(r399)
