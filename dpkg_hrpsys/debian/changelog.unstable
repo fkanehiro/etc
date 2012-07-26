@@ -1,3 +1,22 @@
+hrpsys-base (3.1.4-1~ppa7~lucid) lucid; urgency=low
+
+  * specifies joint id to read extra servo states(r418)
+  * changes data type for servoState to sequence<sequence<long> > to store extra servo states(r417)
+
+ -- Fumio KANEHIRO <f-kanehiro@aist.go.jp>  Thu, 26 Jul 2012 19:04:03 +0900
+
+hrpsys-base (3.1.4-1~ppa6~lucid) lucid; urgency=low
+
+  * adds RobotHardwareService::initializeJointAngle()(r415)
+  * improves compatibility of execution contexts for RT Preempt Linux and ART-Linux(r413)
+  * adds new API, set_signal_period() and get_signal_period()(r412)
+  * generates python stubs for OpenHRP IDL files(r410)
+  * sets defaut value to the second argument of findObject()(r409)
+  * adds an option -record to hrpsys-simulator(r408)
+  * adds an option -exit-on-finish to hrpsys-simulator(r407)
+
+ -- Fumio KANEHIRO <f-kanehiro@aist.go.jp>  Wed, 25 Jul 2012 19:12:47 +0900
+
 hrpsys-base (3.1.4-1~ppa5~lucid) lucid; urgency=low
 
   * increments CPACK_PACKAGE_VERSION_PATCH(r406)
