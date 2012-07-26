@@ -1,3 +1,9 @@
+hrpsys-base (3.1.4-1~ppa8~lucid) lucid; urgency=low
+
+  * supports 64bit systems(r421)
+
+ -- Fumio Kanehiro <f-kanehiro@aist.go.jp>  Thu, 26 Jul 2012 22:21:36 +0900
+
 hrpsys-base (3.1.4-1~ppa7~lucid) lucid; urgency=low
 
   * specifies joint id to read extra servo states(r418)
