@@ -1,3 +1,63 @@
+hrpsys-base (3.1.4-1~ppa7~lucid) lucid; urgency=low
+
+  * specifies joint id to read extra servo states(r418)
+  * changes data type for servoState to sequence<sequence<long> > to store extra servo states(r417)
+
+ -- Fumio KANEHIRO <f-kanehiro@aist.go.jp>  Thu, 26 Jul 2012 19:04:03 +0900
+
+hrpsys-base (3.1.4-1~ppa6~lucid) lucid; urgency=low
+
+  * adds RobotHardwareService::initializeJointAngle()(r415)
+  * improves compatibility of execution contexts for RT Preempt Linux and ART-Linux(r413)
+  * adds new API, set_signal_period() and get_signal_period()(r412)
+  * generates python stubs for OpenHRP IDL files(r410)
+  * sets defaut value to the second argument of findObject()(r409)
+  * adds an option -record to hrpsys-simulator(r408)
+  * adds an option -exit-on-finish to hrpsys-simulator(r407)
+
+ -- Fumio KANEHIRO <f-kanehiro@aist.go.jp>  Wed, 25 Jul 2012 19:12:47 +0900
+
+hrpsys-base (3.1.4-1~ppa5~lucid) lucid; urgency=low
+
+  * increments CPACK_PACKAGE_VERSION_PATCH(r406)
+  * updates document(r405)
+  * adds components, Range2PointCloud and OGMap3DViewer(r404)
+  * fixes a bug in setupRangeData()(r403)
+  * renames some of configuration variables since dots cannot be used(r402)
+  * outputs data only when data are available(r401)
+  * adapts to changes in OpenHRP(r400)
+
+ -- Fumio KANEHIRO <f-kanehiro@aist.go.jp>  Mon, 23 Jul 2012 09:42:14 +0900
+
+hrpsys-base (3.1.4-1~ppa4~lucid) lucid; urgency=low
+
+  * supports changes of input image size(r399)
+  * restores ports replaced by the scene state port(r398)
+  * adds an outport for joint torques(r395)
+  * puts timestamps to output data(r394)
+  * adds scroll bars(r393)
+  * makes priority adjustable and improves compatibility with official execution contexts(r391)
+  * adds arguments to resolve redundancy of services(r390)
+  * fixes an issue: waitInputMenu is not displayed once waitInputSelect or waitInputConfirm is called(r389)
+  * fixes class paths(r388)
+
+ -- Fumio KANEHIRO <f-kanehiro@aist.go.jp>  Fri, 20 Jul 2012 17:37:08 +0900
+
+hrpsys-base (3.1.4-1~ppa3~lucid) lucid; urgency=low
+
+  * uses boost::shared_ptr for BodyPtr since it is thread-safe(r387)
+  * stops playback when clear() is called(r386)
+  * checks if modelloader is alive(r385)
+  * changes data type for range sensors from TimedDoubleSeq to RangeData(r384)
+
+ -- Fumio KANEHIRO <f-kanehiro@aist.go.jp>  Wed, 11 Jul 2012 13:44:19 +0900
+
+hrpsys-base (3.1.4-1~ppa2~lucid) lucid; urgency=low
+
+  * Loads various settings from project files
+
+ -- Fumio KANEHIRO <f-kanehiro@aist.go.jp>  Thu, 05 Jul 2012 18:27:06 +0900
+
 hrpsys-base (3.1.4-1~ppa1~lucid) lucid; urgency=low
 
   * Support lights

@@ -1,3 +1,9 @@
+libeigen3-dev (3.0.6-1~ppa1~lucid) lucid; urgency=low
+
+  * Upgrade to 3.0.6
+
+ -- Fumio KANEHIRO <f-kanehiro@aist.go.jp>  Thu, 12 Jul 2012 16:33:16 +0900
+
 libeigen3-dev (3.0.5-1~ppa1~lucid) unstable; urgency=low
 
   * Initial release
