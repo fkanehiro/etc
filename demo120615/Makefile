@@ -29,10 +29,11 @@ STUB_OBJ =
 IMPL_OBJ = 
 OBJS     = JoystickController.o $(SKEL_OBJ) $(IMPL_OBJ)
 OBJS2    = JoystickController2.o $(SKEL_OBJ) $(IMPL_OBJ)
+OBJS3    = SRController.o $(SKEL_OBJ) $(IMPL_OBJ)
 
 .SUFFIXES : .so
 
-all: JoystickController.so JoystickControllerComp JoystickController2.so 
+all: JoystickController.so JoystickControllerComp JoystickController2.so SRController.so
 
 .cpp.o:
 	rm -f $@
@@ -50,7 +51,7 @@ clean: clean_objs clean_skelstub
 	rm -f *~
 
 clean_objs:
-	rm -f $(OBJS) JoystickControllerComp.o JoystickController.so JoystickControllerComp JoystickController2.o
+	rm -f $(OBJS) JoystickControllerComp *.o *.so
 
 clean_skelstub:
 	rm -f *Skel.h *Skel.cpp
@@ -63,6 +64,8 @@ JoystickController.o: JoystickController.h
 JoystickControllerComp.o: JoystickControllerComp.cpp JoystickController.cpp JoystickController.h 
 JoystickController2.so: $(OBJS2)
 JoystickController2.o: JoystickController2.h 	 	
+SRController.so: $(OBJS3)
+SRController.o: SRController.h 	 	
 
 
 
