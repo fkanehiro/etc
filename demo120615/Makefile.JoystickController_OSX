@@ -30,10 +30,11 @@ STUB_OBJ =
 IMPL_OBJ = 
 OBJS     = JoystickController.o $(SKEL_OBJ) $(IMPL_OBJ)
 OBJS2     = JoystickController2.o $(SKEL_OBJ) $(IMPL_OBJ)
+OBJS3    = SRController.o $(SKEL_OBJ) $(IMPL_OBJ)
 
 .SUFFIXES : .dylib
 
-all: JoystickController.dylib JoystickControllerComp JoystickController2.dylib 
+all: JoystickController.dylib JoystickControllerComp JoystickController2.dylib SRController.dylib
 
 .cpp.o:
 	rm -f $@
@@ -64,6 +65,8 @@ JoystickController.o: JoystickController.h
 JoystickControllerComp.o: JoystickControllerComp.cpp JoystickController.cpp JoystickController.h 
 JoystickController2.dylib: $(OBJS)
 JoystickController2.o: JoystickController2.h 	 	
+SRController.dylib: $(OBJS3)
+SRController.o: SRController.h 	 	
 
 
 
