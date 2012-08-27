@@ -1,3 +1,18 @@
+openhrp (3.1.4-1~ppa9~lucid) lucid; urgency=low
+
+  * backports constraints solver from choreonoid(r2506)
+  * removes unused codes(r2505)
+
+ -- Fumio Kanehiro <f-kanehiro@aist.go.jp>  Mon, 27 Aug 2012 20:17:48 +0900
+
+openhrp (3.1.4-1~ppa8~lucid) lucid; urgency=low
+
+  * changes return type of ColdetModel::name()(r2504)
+  * removes debug messages(r2503)
+  * makes initNeighbor and setNeighborTriangle private(r2502)
+
+ -- Fumio Kanehiro <f-kanehiro@aist.go.jp>  Sun, 26 Aug 2012 11:02:00 +0900
+
 openhrp (3.1.4-1~ppa7~lucid) lucid; urgency=low
 
   * supports closed link(r2499-r2501)
