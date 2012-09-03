@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
     }
 
 
-    HumanoidBodyPtr robot = new HumanoidBody();
+    HumanoidBodyPtr robot = HumanoidBodyPtr(new HumanoidBody());
     loadHumanoidBodyFromModelLoader(robot, robotURL, argc, argv, true);
 
     problem prob;

@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 2.4)
+
 include(FindPkgConfig)
 pkg_check_modules(HMC2 hmc2)
 include_directories(${HMC2_INCLUDE_DIRS})

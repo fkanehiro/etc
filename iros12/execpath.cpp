@@ -129,7 +129,7 @@ int main(int argc, char *argv[])
 
     // load robot
     const char *robotURL = "file:///home/kanehiro/openhrp3.0/Controller/IOserver/robot/HRP2/model/HRP2main.wrl";
-    HumanoidBodyPtr robot = new HumanoidBody();
+    HumanoidBodyPtr robot = HumanoidBodyPtr(new HumanoidBody());
     loadHumanoidBodyFromModelLoader(robot, robotURL, argc, argv, false);
     
     // load path

@@ -19,13 +19,13 @@ int main(int argc, char** argv) {
         }
     }
 
-    BodyPtr cube = new Body();
+    BodyPtr cube = BodyPtr(new Body());
     const char *url = "/home/kanehiro/Dropbox/src/iros/cube.wrl";
     if (!loadBodyFromModelLoader(cube, url, argc, argv, true)){
         std::cerr << "failed to load \"cube.wrl\"" << std::endl;
         return 1;
     }
-    BodyPtr env = new Body();
+    BodyPtr env = BodyPtr(new Body());
     if (!loadBodyFromModelLoader(env, argv[1], argc, argv, true)){
         std::cerr << "failed to load(" << argv[1] << ")" << std::endl;
         return 1;

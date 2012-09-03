@@ -25,7 +25,7 @@ using namespace hrp;
 Filter::Filter(HumanoidBodyPtr i_body, int i_arm, bool i_balance) : 
     m_body(i_body), m_arm(i_arm)
 {
-    m_refBody = new HumanoidBody(*m_body);
+    m_refBody = HumanoidBodyPtr(new HumanoidBody(*m_body));
     Link *hand = m_body->wristLink[i_arm];
 
     // constraint for right hand
