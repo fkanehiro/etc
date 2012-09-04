@@ -2,6 +2,7 @@
 #include <hrpModel/ModelLoaderUtil.h>
 #include <hrpUtil/OnlineViewerUtil.h>
 #include <Util/OnlineViewerUtil.h>
+#include <util/BVutil.h>
 #include "polysplit.h"
 
 using namespace OpenHRP;
@@ -9,7 +10,6 @@ using namespace hrp;
 
 const char url[] = "/home/kanehiro/openrtp/share/OpenHRP-3.1/robot/HRP2/model/HRP2main.wrl";
 std::vector<std::string> linknames;
-std::vector<anchor> anchors;
 
 int main(int argc, char *argv[])
 {
@@ -26,6 +26,7 @@ int main(int argc, char *argv[])
     wstate.time = 0.0;
     wstate.characterPositions.length(1);
     setupCharacterPosition(wstate.characterPositions[0], body);
+    wstate.collisions.length(1);
 
     linknames.push_back("CHEST_JOINT1");
     linknames.push_back("WAIST");
@@ -41,17 +42,28 @@ int main(int argc, char *argv[])
         }
     }
 
-    anchors.push_back(anchor(body->link("CHEST_JOINT1"), Vector3(0,0.2,0.5)));
-    anchors.push_back(anchor(body->link("RLEG_JOINT2"), Vector3(-0.2,0,-0.2)));
-
-    ColdetModelPtr chull = convertToConvexHull(links, anchors);
-    std::vector<int> anchorVertices = findAnchors(chull, anchors);
-
-    for (int i=0; i<10; i++){
-        updateCharacterPosition(wstate.characterPositions[0], body);
-        olv->update(wstate);
-        wstate.time += 0.005;
+    std::vector<Anchor> anchors;
+    anchors.push_back(Anchor(body->link("CHEST_JOINT1"), Vector3(0,0.2,0.5)));
+    anchors.push_back(Anchor(body->link("RLEG_JOINT2"), Vector3(-0.2,0,-0.2)));
+    String st(&anchors[0], &anchors[1]);
+        
+    ColdetModelPtr chull = convertToConvexHull(links, st);
+    if (!checkAnchors(chull, anchors)){
+        std::cerr << "at least one of anchors is not on the surface of the convex hull" << std::endl;
+        return 1;
     }
+
+    Plane plane(st.first->position(), st.second->position(), 0);
+    LineSegmentArray lsa = split(chull, plane);
+    updateCharacterPosition(wstate.characterPositions[0], body);
+    wstate.collisions[0].points.length(lsa.size());
+    for (size_t i=0; i<lsa.size(); i++){
+        updateLineSegment(wstate.collisions[0].points[i],
+                          lsa[i].first.cast<double>(), 
+                          lsa[i].second.cast<double>());
+    }
+    olv->update(wstate);
+    wstate.time += 0.005;
     
     return 0;
 }
