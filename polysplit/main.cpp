@@ -10,7 +10,7 @@
 using namespace OpenHRP;
 using namespace hrp;
 
-const char url[] = "/home/kanehiro/openrtp/share/OpenHRP-3.1/robot/HRP4Cg/model/HRP4Cg_main.wrl";
+const char url[] = "file:///home/kanehiro/openrtp/share/OpenHRP-3.1/robot/HRP4Cg/model/HRP4Cg_main.wrl";
 const char logfile[] = "1625_smartsuit_0kg_trial01-astate.log";
 
 int main(int argc, char *argv[])
