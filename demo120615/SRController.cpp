@@ -17,6 +17,7 @@
  */
 
 #include "SRController.h"
+#include "VectorConvert.h"
 
 // Module specification
 // <rtc-template block="module_spec">
@@ -32,6 +33,9 @@ static const char* joystickcontroller_spec[] =
     "max_instance",      "1",
     "language",          "C++",
     "lang_type",         "compile",
+    "conf.default.axisIds", "1,2",
+    "conf.default.axisScales", "1,1",
+    "conf.default.buttonIds", "9,11,8,10",
     ""
   };
 // </rtc-template>
@@ -68,6 +72,11 @@ SRController::~SRController()
 
 RTC::ReturnCode_t SRController::onInitialize()
 {
+  coil::Properties& ref = getProperties();
+  bindParameter("axisIds", m_axisIds, ref["conf.default.axisIds"].c_str());
+  bindParameter("axisScales", m_axisScales, ref["conf.default.axisScales"].c_str());
+  bindParameter("buttonIds", m_buttonIds, ref["conf.default.buttonIds"].c_str());
+
   // Set InPort buffers
   addInPort("buttons", m_buttonsIn);
   addInPort("axes", m_axesIn);
@@ -131,8 +140,10 @@ RTC::ReturnCode_t SRController::onExecute(RTC::UniqueId ec_id)
   if (m_velsIn.isNew()) m_velsIn.read();
   if (!m_axes.data.length()) return RTC::RTC_OK;
 
-  double commandTorqueR = -m_axes.data[1] - 0.2*m_axes.data[2];
-  double commandTorqueL = -m_axes.data[1] + 0.2*m_axes.data[2];
+  float a1 = m_axes.data[m_axisIds[0]]*m_axisScales[0];
+  float a2 = m_axes.data[m_axisIds[1]]*m_axisScales[1];
+  double commandTorqueR = -a1 - 0.2*a2;
+  double commandTorqueL = -a1 + 0.2*a2;
 
   // ロボットへのトルク出力 //
   m_torque.data[0] = m_torque.data[2] = commandTorqueR;
@@ -144,14 +155,14 @@ RTC::ReturnCode_t SRController::onExecute(RTC::UniqueId ec_id)
   }
   std::cout << std::endl;
 #endif
-  if (m_buttons.data[9]){
+  if (m_buttons.data[m_buttonIds[0]]){
       m_qRef[0] += 0.02;
-  }else if(m_buttons.data[11]){
+  }else if(m_buttons.data[m_buttonIds[1]]){
       m_qRef[0] -= 0.02;
   } 
-  if (m_buttons.data[8]){
+  if (m_buttons.data[m_buttonIds[2]]){
       m_qRef[1] += 0.02;
-  }else if(m_buttons.data[10]){
+  }else if(m_buttons.data[m_buttonIds[3]]){
       m_qRef[1] -= 0.02;
   } 
 #define P 200.0

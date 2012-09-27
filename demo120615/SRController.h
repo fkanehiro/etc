@@ -149,6 +149,8 @@ class SRController
 
  private:
   double m_qRef[2];
+  std::vector<int> m_axisIds, m_buttonIds;
+  std::vector<float> m_axisScales;
   int dummy;
   // <rtc-template block="private_attribute">
   
