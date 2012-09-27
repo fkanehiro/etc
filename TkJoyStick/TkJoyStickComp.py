@@ -33,14 +33,10 @@ class TkJoyStick(OpenRTM_aist.DataFlowComponentBase):
 		OpenRTM_aist.DataFlowComponentBase.__init__(self, manager)
 
 		self._d_axes = RTC.TimedFloatSeq(RTC.Time(0,0),[])
-		self._axesOut = OpenRTM_aist.OutPort("axes", self._d_axes)
+		self._axesOut = OpenRTM_aist.OutPort("Axes", self._d_axes)
 		self._d_buttons = RTC.TimedBooleanSeq(RTC.Time(0,0),[])
-		self._buttonsOut = OpenRTM_aist.OutPort("buttons", self._d_buttons)
+		self._buttonsOut = OpenRTM_aist.OutPort("Buttons", self._d_buttons)
 
-
-		# Set OutPort buffers
-		self.registerOutPort("axes",self._axesOut)
-		self.registerOutPort("buttons",self._buttonsOut)
 
 		self.x = 0.0
 		self.y = 0.0
@@ -49,6 +45,11 @@ class TkJoyStick(OpenRTM_aist.DataFlowComponentBase):
 		 
 	def onInitialize(self):
 		# Bind variables and configuration variable
+
+		# Set OutPort buffers
+		self.registerOutPort("Axes",self._axesOut)
+		self.registerOutPort("Buttons",self._buttonsOut)
+
 		
 		return RTC.RTC_OK
 
@@ -93,7 +94,7 @@ def main():
 			    TkJoyStick,
 			    OpenRTM_aist.Delete)
 	# Create a component
-	comp = mgr.createComponent("TkJoyStick")
+	comp = mgr.createComponent("TkJoyStick?instance_name=Joystick0")
 
 	tkJoyCanvas.set_on_update(comp.set_pos)
 	mgr.runManager(True)
