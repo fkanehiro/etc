@@ -1,3 +1,14 @@
+openhrp (3.1.4-1~ppa11~lucid) lucid; urgency=low
+
+  * adds tlimit field to Joint node(r2528)
+  * supports boost(>=1.50)(r2527)
+  * shows an error dialog if server is not running or OnlineViewer::load() fails(r2525)
+  * fixes column width issue of RobtStateView(r2521)
+  * enables to set a tolerance to ColdetLinkPair(r2520)
+  * adds registerExtraJoint() to DynamicsSimulator.idl(r2512)
+
+ -- Fumio Kanehiro <f-kanehiro@aist.go.jp>  Mon, 01 Oct 2012 21:22:03 +0900
+
 openhrp (3.1.4-1~ppa10~lucid) lucid; urgency=low
 
   * updates plugin files(r2509)
