@@ -1,0 +1,50 @@
+Format: http://dep.debian.net/deps/dep5
+Upstream-Name: openrtm-aist
+Source: http://www.openrtm.org/openrtm/ja
+
+Files: *
+Copyright: 2003-2011
+     Noriaki Ando and the OpenRTM-aist Project team
+     Intelligent Systems Research Institute,
+     National Institute of Advanced Industrial Science and Technology (AIST),
+     Tsukuba, Japan, All rights reserved.
+
+License: The OpenRTM-aist (H22PRO-1089) is the dual-licensed open source
+software. You can use, copy, distribute and/or modify this library
+under the terms and conditions of either of the licenses below.
+.
+1) LGPL (GNU LESSER GENERAL PUBLIC LICENSE)
+See COPYING.LIB.
+.
+2) Individual Licnese
+You can purchase license from AIST and/or AIST's TLO to copy,
+distribute, modify and/or sublicense the library without any
+limitation in the terms of LGPL. The individual license should be
+concluded with a negotiated agreement between you and AIST and/or AIST
+TLO. To conclude individual license, contact the person responsible of
+AIST.
+ .
+
+# If you want to use GPL v2 or later for the /debian/* files use 
+# the following clauses, or change it to suit. Delete these two lines
+Files: debian/*
+Copyright: 2012 k-okada <k-okada@jsk.t.u-tokyo.ac.jp>
+License: GPL-2+
+ This package is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+ .
+ This package is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ .
+ You should have received a copy of the GNU General Public License
+ along with this program. If not, see <http://www.gnu.org/licenses/>
+ .
+ On Debian systems, the complete text of the GNU General
+ Public License version 2 can be found in "/usr/share/common-licenses/GPL-2".
+
+# Please also look if there are files or directories which have a
+# different copyright/license attached and list them here.
