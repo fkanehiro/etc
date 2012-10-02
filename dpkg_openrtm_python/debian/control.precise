@@ -1,12 +1,12 @@
-Source: openrtm-aist
+Source: openrtm-aist-python
 Section: science
 Priority: extra
 Maintainer: Fumio KANEHIRO <f-kanehiro@aist.go.jp>
-Build-Depends: debhelper (>= 7.5), cmake(>= 2.4.0), pkg-config (>= 0.22), doxygen (>=1.6.3), libomniorb4-dev, omniidl, omniorb-nameserver, uuid-dev
+Build-Depends: debhelper (>= 7.5), omniidl-python, omniorb-nameserver
 Standards-Version: 3.9.2
 Homepage: http://www.openrtm.org
 
-Package: openrtm-aist
+Package: openrtm-aist-python
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, omniorb-nameserver
 Description: OpenRTM-aist, RT-Middleware distributed by AIST
