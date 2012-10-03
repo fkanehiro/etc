@@ -5,7 +5,7 @@ all: $(TARGET) $(TARGET)-1.deb $(TARGET)-1-src.deb
 $(TARGET):
 	tar zxvf OpenRTM-aist-Python-1.1.0-RC1.tar.gz
 	mv OpenRTM-aist-Python-1.1.0 $(TARGET)
-#	cp Makefile.openrtm $(TARGET)/Makefile
+	cp setup.py $(TARGET)
 
 $(TARGET)-1.deb: $(TARGET)
 	\cp -r ./debian $(TARGET)
