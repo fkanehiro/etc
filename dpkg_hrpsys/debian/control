@@ -8,5 +8,5 @@ Homepage: http://code.google.com/p/hrpsys-base
 
 Package: hrpsys-base
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, ipython, jython, omniidl4-python
+Depends: ${shlibs:Depends}, ${misc:Depends}, ipython, jython, openrtm-aist-python, omniidl4-python, python-tk
 Description: Basic RT components and utilities to control robots using OpenRTM

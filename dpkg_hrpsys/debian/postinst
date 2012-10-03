@@ -1,9 +1,13 @@
 #!/bin/bash
 set -e
 if [ "$1" = "configure" ]; then
-  mkdir -p /usr/share/hrpsys/python
+  PYTHON_VER=`python -c "from distutils import sysconfig; print sysconfig.get_config_var(\"VERSION\")"`
+  DEST_DIR=/usr/lib/python$PYTHON_VER/dist-packages
+  mkdir -p $DEST_DIR
   cd /usr/share/hrpsys/idl
-  omniidl -bpython -C/usr/share/hrpsys/python -I/usr/include/openrtm-1.1/rtm/idl *.idl 
-  cd /usr/share/hrpsys/python
+  omniidl -bpython -C$DEST_DIR -I/usr/include/openrtm-1.1/rtm/idl *.idl 
+  cd /usr/share/OpenHRP-3.1/idl/OpenHRP
+  omniidl -bpython -C$DEST_DIR -I/usr/include/openrtm-1.1/rtm/idl *.idl 
+  cd $DEST_DIR
   python -m compileall .
 fi
