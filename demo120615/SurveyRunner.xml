@@ -42,6 +42,7 @@
 	    <property name="outport" value="range:RANGE_SENSOR1:RANGE_SENSOR"/>  
 	    <property name="inport" value="tau:JOINT_TORQUE"/>  
 	    <property name="inport" value="light:slight:LIGHT_SWITCH"/>  
+	    <property name="inport" value="fps:VISION_SENSOR1:FRAME_RATE"/>  
             <property name="root.mode" value="Torque"/>
             <property name="setupCommand" value="SampleSV$(BIN_SFX)"/>
             <property name="root.angularVelocity" value="0.0 0.0 0.0 "/>

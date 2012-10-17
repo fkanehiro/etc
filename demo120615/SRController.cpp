@@ -93,7 +93,7 @@ RTC::ReturnCode_t SRController::onInitialize()
   for (size_t i=0; i<m_torque.data.length(); i++){
       m_torque.data[i] = 0;
   }
-  m_light.data = false;
+  m_light.data = true;
 
   for (int i=0; i<2; i++) m_qRef[i] = 0;
   return RTC::RTC_OK;
@@ -137,7 +137,11 @@ RTC::ReturnCode_t SRController::onDeactivated(RTC::UniqueId ec_id)
 RTC::ReturnCode_t SRController::onExecute(RTC::UniqueId ec_id)
 {
   // ジョイスティック（ユーザ）からのデータ入力 //
-  if (m_buttonsIn.isNew()) m_buttonsIn.read();
+  if (m_buttonsIn.isNew()){
+      m_buttonsOld = m_buttons;
+      m_buttonsIn.read();
+      if (!m_buttonsOld.data.length()) m_buttonsOld = m_buttons;
+  }
   if (m_axesIn.isNew()) m_axesIn.read();
   if (m_anglesIn.isNew()) m_anglesIn.read();
   if (m_velsIn.isNew()) m_velsIn.read();
@@ -182,7 +186,8 @@ RTC::ReturnCode_t SRController::onExecute(RTC::UniqueId ec_id)
   m_torque.data[4] = flipperTorqueL;
 
   m_torqueOut.write(); 
-  if (m_buttons.data.length() > m_buttonIds[4] && m_buttons.data[m_buttonIds[4]]){
+  if (m_buttons.data.length() > m_buttonIds[4] 
+      && !m_buttonsOld.data[m_buttonIds[4]] && m_buttons.data[m_buttonIds[4]]){
       m_light.data = !m_light.data;
       m_lightOut.write();
   }

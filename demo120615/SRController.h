@@ -153,6 +153,7 @@ class SRController
   double m_qRef[2];
   std::vector<int> m_axisIds, m_buttonIds;
   std::vector<float> m_axisScales;
+  TimedBooleanSeq m_buttonsOld;
   int dummy;
   // <rtc-template block="private_attribute">
   
