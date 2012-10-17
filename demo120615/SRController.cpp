@@ -35,7 +35,7 @@ static const char* joystickcontroller_spec[] =
     "lang_type",         "compile",
     "conf.default.axisIds", "1,2",
     "conf.default.axisScales", "1,1",
-    "conf.default.buttonIds", "9,11,8,10",
+    "conf.default.buttonIds", "9,11,8,10,0",
     ""
   };
 // </rtc-template>
@@ -48,6 +48,7 @@ SRController::SRController(RTC::Manager* manager)
     m_anglesIn("angles", m_angles),
     m_velsIn("vels", m_vels),
     m_torqueOut("torque", m_torque),
+    m_lightOut("light", m_light),
     
     // </rtc-template>
 	dummy(0)
@@ -85,12 +86,14 @@ RTC::ReturnCode_t SRController::onInitialize()
   
   // Set OutPort buffer
   addOutPort("torque", m_torqueOut);
+  addOutPort("light", m_lightOut);
 
   // ポート初期化 //
   m_torque.data.length(6);
   for (size_t i=0; i<m_torque.data.length(); i++){
       m_torque.data[i] = 0;
   }
+  m_light.data = false;
 
   for (int i=0; i<2; i++) m_qRef[i] = 0;
   return RTC::RTC_OK;
@@ -179,6 +182,10 @@ RTC::ReturnCode_t SRController::onExecute(RTC::UniqueId ec_id)
   m_torque.data[4] = flipperTorqueL;
 
   m_torqueOut.write(); 
+  if (m_buttons.data.length() > m_buttonIds[4] && m_buttons.data[m_buttonIds[4]]){
+      m_light.data = !m_light.data;
+      m_lightOut.write();
+  }
   return RTC::RTC_OK;
 }
 

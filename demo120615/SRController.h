@@ -128,7 +128,9 @@ class SRController
   // DataOutPort declaration
   // <rtc-template block="outport_declare">
   TimedDoubleSeq m_torque;
+  TimedBoolean m_light;
   OutPort<TimedDoubleSeq> m_torqueOut;
+  OutPort<TimedBoolean> m_lightOut;
   
   // </rtc-template>
 

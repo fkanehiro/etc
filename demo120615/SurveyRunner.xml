@@ -13,6 +13,7 @@
 	    <property name="connection" value="simple_vehicle.q:SRController0.angles"/>  
 	    <property name="connection" value="simple_vehicle.dq:SRController0.vels"/>  
 	    <property name="connection" value="SRController0.torque:simple_vehicle.tau"/>  
+	    <property name="connection" value="SRController0.light:simple_vehicle.light"/>  
 	    <property name="connection" value="Joystick0.Axes:SRController0.axes"/>  
 	    <property name="connection" value="Joystick0.Buttons:SRController0.buttons"/>  
         </item>
@@ -40,6 +41,7 @@
 	    <property name="outport" value="VISION_SENSOR1:VISION_SENSOR1:VISION_SENSOR"/>  
 	    <property name="outport" value="range:RANGE_SENSOR1:RANGE_SENSOR"/>  
 	    <property name="inport" value="tau:JOINT_TORQUE"/>  
+	    <property name="inport" value="light:slight:LIGHT_SWITCH"/>  
             <property name="root.mode" value="Torque"/>
             <property name="setupCommand" value="SampleSV$(BIN_SFX)"/>
             <property name="root.angularVelocity" value="0.0 0.0 0.0 "/>
