@@ -1,3 +1,9 @@
+openrtm-aist (1.1.0-1~ppa5~lucid) lucid; urgency=low
+
+  * fixes required packages on quantal
+
+ -- Fumio KANEHIRO <f-kanehiro@aist.go.jp>  Thu, 18 Oct 2012 11:34:22 +0900
+
 openrtm-aist (1.1.0-1~ppa4~lucid) unstable; urgency=low
 
   * Initial release
