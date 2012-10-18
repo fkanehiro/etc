@@ -1,3 +1,5 @@
+#ifndef __CFG_SETTER_BASE_H__
+#define __CFG_SETTER_BASE_H__
 #include <Model/HumanoidBodyUtil.h>
 
 class cfgSetterBase
@@ -47,3 +49,4 @@ bool calcIKwithLimitCheck(hrp::JointPathPtr i_path,
     }
     return true;
 }
+#endif

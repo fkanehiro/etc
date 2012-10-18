@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
     std::vector<Vector3> obstacleRpy;
     Vector3 p, rpy;
     int ngoal=10;
-    bool display = true;
+    bool display = true, silent=false;
     for(int i = 1 ; i < argc; i++){
         if (strcmp(argv[i], "-robot") == 0){
             robotURL = argv[++i];
@@ -51,6 +51,8 @@ int main(int argc, char *argv[])
             ngoal = atoi(argv[++i]);
         }else if (strcmp(argv[i], "-no-display")==0){
             display = false;
+        }else if (strcmp(argv[i], "-silent")==0){
+            silent = true;
         }
     }
     // goal position
@@ -158,6 +160,7 @@ int main(int argc, char *argv[])
         PathEngine::Configuration cfg = PathEngine::Configuration::random();
         if (setter.set(prob.planner(), cfg) && !prob.planner()->checkCollision()){
             c++;
+            if (silent) continue;
             int arm = setter.reachedArm();
             goalf << arm << " ";
             for (unsigned int i=0; i<4; i++) goalf << cfg[i] << " "; 
@@ -175,7 +178,7 @@ int main(int argc, char *argv[])
                     << com[1]-initialcom[1] << std::endl;
             if (display) prob.updateOLV();
         }
-        fprintf(stderr, "%3d/%3d\r", c, ++n);
+        if (!silent) fprintf(stderr, "%3d/%3d\r", c, ++n);
     }
     gettimeofday(&tv2, NULL);
     std::cout << std::endl;
