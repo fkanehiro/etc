@@ -1,9 +1,13 @@
+/*
+  ランダムサンプリングした、体幹の高さ、回転、腕の関節角度から全関節角度を
+　決定する
+ */
 #include "cfgSetterBase.h"
 
-class myCfgSetter : public cfgSetterBase
+class myCfgSetter2 : public cfgSetterBase
 {
 public:
-    myCfgSetter(motion_generator::HumanoidBodyPtr i_body)
+    myCfgSetter2(motion_generator::HumanoidBodyPtr i_body)
         : cfgSetterBase(i_body){
         for (int i=0; i<2; i++){
             m_arm[i] = m_body->getJointPath(m_body->chestLink,

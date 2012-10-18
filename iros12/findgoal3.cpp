@@ -1,4 +1,13 @@
 /*
+  把持姿勢の探索
+  把持の位置は点で、回転は範囲で与えられる
+  環境は球の階層で、ロボットは球またはカプセルで近似した形状が干渉チェックに
+  使用される
+  探索した結果はgoal.txtに保存される。各行が1つの把持姿勢に対応し、順に
+  …使用した腕
+  …体幹の高さ、回転
+　…腕の関節角度
+　が記録される。
  */
 #include <fstream>
 #include <boost/bind.hpp>
@@ -7,9 +16,9 @@
 #include <hrpModel/JointPath.h>
 #include <hrpModel/Link.h>
 #include "problem.h"
-#include "CustomCD.h"
 #include "myCfgSetter3.h"
 #include <Math/Physics.h>
+#include "CustomCD.h"
 
 using namespace motion_generator;
 using namespace hrp;
@@ -131,7 +140,7 @@ int main(int argc, char *argv[])
         goal->calcForwardKinematics();
     }
 
-    myCfgSetter setter = myCfgSetter(robot, goalP);
+    myCfgSetter3 setter(robot, goalP);
 
     CustomCD cd(robot, "hrp2.shape", "hrp2.pairs", 
                 obstacles[0], "plant.pc");

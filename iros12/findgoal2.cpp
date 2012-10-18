@@ -1,4 +1,6 @@
 /*
+  テーブルの上に置かれた円筒上の物体を把持する姿勢の探索
+  把持の水平位置は固定で、高さは範囲、円筒軸回りの回転も範囲で与えられる
  */
 #include <fstream>
 #include <boost/bind.hpp>
@@ -7,7 +9,6 @@
 #include <hrpModel/JointPath.h>
 #include <hrpModel/Link.h>
 #include "problem.h"
-#include "CustomCD.h"
 #include "myCfgSetter4.h"
 #include <Math/Physics.h>
 
@@ -26,6 +27,7 @@ int main(int argc, char *argv[])
     std::vector<Vector3> obstacleRpy;
     Vector3 p, rpy;
     int ngoal=10;
+    bool display = true;
     for(int i = 1 ; i < argc; i++){
         if (strcmp(argv[i], "-robot") == 0){
             robotURL = argv[++i];
@@ -39,6 +41,8 @@ int main(int argc, char *argv[])
             goalURL = argv[++i];
         }else if (strcmp(argv[i], "-ngoal") == 0){
             ngoal = atoi(argv[++i]);
+        }else if (strcmp(argv[i], "-no-display")==0){
+            display = false;
         }
     }
     // goal position
@@ -77,7 +81,7 @@ int main(int argc, char *argv[])
     }
 
     // This must be called after all bodies are added
-    prob.initOLV(argc, argv);
+    if (display) prob.initOLV(argc, argv);
 
     PathEngine::Configuration::size(6); 
     PathEngine::Configuration::bounds(0,  0.2, 0.8); // body z
@@ -130,11 +134,7 @@ int main(int argc, char *argv[])
 
     myCfgSetter setter = myCfgSetter(robot, goalP);
 
-    CustomCD cd(robot, "hrp2.shape", "hrp2.pairs", 
-                obstacles[0], "table.pc");
-    prob.planner()->setCollisionDetector(&cd);
-    
-    prob.updateOLV();
+    if (display) prob.updateOLV();
 
     Vector3 initialcom = robot->calcCM();
     struct timeval tv1, tv2;
@@ -161,9 +161,9 @@ int main(int argc, char *argv[])
             Vector3 com = robot->calcCM();
             goalcmf << com[0]-initialcom[0] << " " 
                     << com[1]-initialcom[1] << std::endl;
-            prob.updateOLV();
+            if (display) prob.updateOLV();
         }
-        printf("%3d/%3d\r", c, ++n);
+        fprintf(stderr, "%3d/%3d\r", c, ++n);
     }
     gettimeofday(&tv2, NULL);
     std::cout << std::endl;

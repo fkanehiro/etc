@@ -147,7 +147,7 @@ int main(int argc, char *argv[])
     }
     robot->calcForwardKinematics();
 
-    myCfgSetter setter(robot);
+    myCfgSetter2 setter(robot);
 
     PathEngine::Configuration startCfg;
     startCfg[0] = robot->rootLink()->p[2];
@@ -159,7 +159,7 @@ int main(int argc, char *argv[])
     }
     planner->setStartConfiguration(startCfg);
     planner->setGoalConfiguration(goalCfg);
-    planner->setApplyConfigFunc(boost::bind(&myCfgSetter::set, &setter,
+    planner->setApplyConfigFunc(boost::bind(&myCfgSetter2::set, &setter,
                                             _1, _2));
     planner->setConfiguration(startCfg);
     prob.updateOLV();
@@ -192,10 +192,12 @@ int main(int argc, char *argv[])
     // plan
     bool ret = planner->calcPath();
     if (ret){
-        for (int i=0; i<500; i++) {
+        std::cout << "found a path. optimizing..." << std::flush;
+        for (int i=0; i<5; i++) {
             planner->optimize("RandomShortcut");
             planner->optimize("Shortcut");
         }
+        std::cout << "done." << std::endl;
     }
     gettimeofday(&tv2, NULL);
     if (ret){

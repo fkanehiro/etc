@@ -1,3 +1,7 @@
+/*
+  ランダムサンプリングした胴体の高さ、回転、手先の高さ、ピッチ軸回りの回転から
+  全関節角度を決定する
+ */
 #include <Math/MathFunction.h>
 #include "cfgSetterBase.h"
 
@@ -19,6 +23,7 @@ public:
     }
     bool set(PathEngine::PathPlanner *i_planner,
              const PathEngine::Configuration &i_cfg){
+        // compute trunk horizontal position
         setBase(i_cfg[0], i_cfg[1], i_cfg[2], i_cfg[3]);
         m_trunk->calcForwardKinematics();
 

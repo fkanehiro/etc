@@ -1,11 +1,14 @@
+/*
+  ランダムサンプリングした胴体の高さ、回転、手先の回転から全関節角度を決定する
+ */
 #include <Math/MathFunction.h>
 #include "cfgSetterBase.h"
 
-class myCfgSetter : public cfgSetterBase
+class myCfgSetter3 : public cfgSetterBase
 {
 public:
-    myCfgSetter(motion_generator::HumanoidBodyPtr i_body,
-                const hrp::Vector3 &i_goalP)
+    myCfgSetter3(motion_generator::HumanoidBodyPtr i_body,
+                 const hrp::Vector3 &i_goalP)
         : cfgSetterBase(i_body), m_goalP(i_goalP), m_q(i_body->numJoints()){
         for (int i=0; i<2; i++){
             m_arm[i] = m_body->getJointPath(m_body->chestLink,
@@ -19,6 +22,7 @@ public:
     }
     bool set(PathEngine::PathPlanner *i_planner,
              const PathEngine::Configuration &i_cfg){
+        // compute trunk horizontal position
         setBase(i_cfg[0], i_cfg[1], i_cfg[2], i_cfg[3]);
         m_trunk->calcForwardKinematics();
 
