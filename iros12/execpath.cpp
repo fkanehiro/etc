@@ -274,7 +274,7 @@ int main(int argc, char *argv[])
     int frames = totalFrames;
 
     // viewer
-    problem prob;
+    problem prob(0);
     std::vector<BodyPtr> obstacles;
     if (display){
         prob.addRobot("robot", robotURL, robot);

@@ -4,7 +4,7 @@
 class problem
 {
 public:
-    problem();
+    problem(unsigned int dim);
     hrp::BodyPtr addRobot(const std::string& i_name, const std::string &i_url,
                           hrp::BodyPtr i_body=hrp::BodyPtr());
     hrp::BodyPtr addObstacle(const std::string& i_name, const std::string &i_url,

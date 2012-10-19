@@ -8,6 +8,7 @@
 #include <Model/HumanoidBodyUtil.h>
 #include <hrpModel/JointPath.h>
 #include <hrpModel/Link.h>
+#include <hrpPlanner/ConfigurationSpace.h>
 #include "problem.h"
 #include "myCfgSetter4.h"
 #include <Math/Physics.h>
@@ -67,7 +68,7 @@ int main(int argc, char *argv[])
     HumanoidBodyPtr robot = HumanoidBodyPtr(new HumanoidBody());
     loadHumanoidBodyFromModelLoader(robot, robotURL, argc, argv, true);
 
-    problem prob;
+    problem prob(0);
     prob.addRobot("robot", robotURL, robot);
     std::vector<BodyPtr> obstacles;
     for (unsigned int i=0; i<obstacleURL.size(); i++){
@@ -83,14 +84,14 @@ int main(int argc, char *argv[])
     // This must be called after all bodies are added
     if (display) prob.initOLV(argc, argv);
 
-    PathEngine::Configuration::size(6); 
-    PathEngine::Configuration::bounds(0,  0.2, 0.8); // body z
-    PathEngine::Configuration::bounds(1, -0.5, 0.5); // body roll
-    PathEngine::Configuration::bounds(2, -0.0, M_PI/4); // body pitch
-    PathEngine::Configuration::bounds(3, -M_PI/4, M_PI/4); // body yaw
-    PathEngine::Configuration::bounds(4, -0.05, 0.05);   // hand z
-    //PathEngine::Configuration::bounds(5, -M_PI/2, M_PI/2); // hand pitch
-    PathEngine::Configuration::bounds(5, -M_PI/2, M_PI/2); // hand pitch
+    PathEngine::ConfigurationSpace cspace(6); 
+    cspace.bounds(0,  0.2, 0.8); // body z
+    cspace.bounds(1, -0.5, 0.5); // body roll
+    cspace.bounds(2, -0.0, M_PI/4); // body pitch
+    cspace.bounds(3, -M_PI/4, M_PI/4); // body yaw
+    cspace.bounds(4, -0.05, 0.05);   // hand z
+    //cspace.bounds(5, -M_PI/2, M_PI/2); // hand pitch
+    cspace.bounds(5, -M_PI/2, M_PI/2); // hand pitch
 
     prob.initCollisionCheckPairs();
     prob.initPlanner();
@@ -143,7 +144,7 @@ int main(int argc, char *argv[])
     gettimeofday(&tv1, NULL);
     int n=0, c = 0;
     while (c < ngoal){
-        PathEngine::Configuration cfg = PathEngine::Configuration::random();
+        PathEngine::Configuration cfg = cspace.random();
         if (setter.set(prob.planner(), cfg) && !prob.planner()->checkCollision()){
             c++;
             int arm = setter.reachedArm();

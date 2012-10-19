@@ -3,7 +3,7 @@
 #include <hrpModel/Link.h>
 #include "problem.h"
 
-problem::problem()
+problem::problem(unsigned int dim) : m_planner(dim)
 {
     m_planner.initPlanner("localhost:2809");
 }

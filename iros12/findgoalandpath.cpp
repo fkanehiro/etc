@@ -15,6 +15,7 @@
 #include <hrpPlanner/RoadmapNode.h>
 #include <hrpPlanner/RandomShortcutOptimizer.h>
 #include <hrpPlanner/ShortcutOptimizer.h>
+#include <hrpPlanner/ConfigurationSpace.h>
 #include "problem.h"
 #include "myCfgSetter2.h"
 #include "myCfgSetter3.h"
@@ -26,21 +27,10 @@ using namespace hrp;
 using namespace PathEngine;
 
 bool find_a_goal(problem &prob, myCfgSetter3 &setter, 
+                 ConfigurationSpace& cspace, 
                  Configuration& goalCfg, JointPathPtr armPath[2])
 {
-    Configuration::size(7); 
-    Configuration::bounds(0,  0.2, 0.8); // body z
-    Configuration::bounds(1, -0.5, 0.5); // body roll
-    Configuration::bounds(2, -0.0, 0.5); // body pitch
-    Configuration::bounds(3, -0.5, 0.5); // body yaw
-    Configuration::bounds(4, -M_PI/2, M_PI/2);   // hand roll
-    Configuration::bounds(5, -M_PI/2, M_PI/2); // hand pitch
-    Configuration::bounds(6, -M_PI, M_PI);   // hand yaw
-    for (int i=0; i<7; i++){
-        Configuration::weight(i) = 1.0;
-    }
-
-    Configuration cfg = Configuration::random();
+    Configuration cfg = cspace.random();
     if (setter.set(prob.planner(), cfg) && !prob.planner()->checkCollision()){
         for (int i=0; i<4; i++) goalCfg[i] = cfg[i];
         for (int i=0; i<2; i++){
@@ -51,41 +41,6 @@ bool find_a_goal(problem &prob, myCfgSetter3 &setter,
         return true;
     }
     return false;
-}
-
-void setupCSforPath(JointPathPtr armPath[2])
-{
-    PathEngine::Configuration::size(4+6+6); 
-
-    PathEngine::Configuration::bounds(0,  0.2, 0.8); // body z
-    PathEngine::Configuration::bounds(1, -0.5, 0.5); // body roll
-    PathEngine::Configuration::bounds(2, -0.0, 0.5); // body pitch
-    PathEngine::Configuration::bounds(3, -0.5, 0.5); // body yaw
-    for (int k=0; k<2; k++){
-        for (int i=0; i<armPath[k]->numJoints(); i++){
-            Link *j = armPath[k]->joint(i);
-            PathEngine::Configuration::bounds(4+k*6+i, j->llimit, j->ulimit);
-        }
-    }
-
-    PathEngine::Configuration::weight(0) = 0.1; // z
-    PathEngine::Configuration::weight(1) = 1;  // roll
-    PathEngine::Configuration::weight(2) = 1;  // pitch
-    PathEngine::Configuration::weight(3) = 1;  // yaw
-
-    PathEngine::Configuration::weight(4) = 0.8;
-    PathEngine::Configuration::weight(5) = 0.6;
-    PathEngine::Configuration::weight(6) = 0.4;
-    PathEngine::Configuration::weight(7) = 0.3;
-    PathEngine::Configuration::weight(8) = 0.2;
-    PathEngine::Configuration::weight(9) = 0.1;
-
-    PathEngine::Configuration::weight(10) = 0.8;
-    PathEngine::Configuration::weight(11) = 0.6;
-    PathEngine::Configuration::weight(12) = 0.4;
-    PathEngine::Configuration::weight(13) = 0.3;
-    PathEngine::Configuration::weight(14) = 0.2;
-    PathEngine::Configuration::weight(15) = 0.1;
 }
 
 int main(int argc, char *argv[])
@@ -139,7 +94,7 @@ int main(int argc, char *argv[])
     HumanoidBodyPtr robot = HumanoidBodyPtr(new HumanoidBody());
     loadHumanoidBodyFromModelLoader(robot, robotURL, argc, argv, true);
 
-    problem prob;
+    problem prob(4+6+6);
     prob.addRobot("robot", robotURL, robot);
     std::vector<BodyPtr> obstacles;
     for (unsigned int i=0; i<obstacleURL.size(); i++){
@@ -217,8 +172,39 @@ int main(int argc, char *argv[])
                                          robot->wristLink[k]);
     }
 
-    setupCSforPath(armPath);
-    Configuration startCfg, goalCfg;
+    ConfigurationSpace* CSforPath = planner->getConfigurationSpace();
+
+    CSforPath->bounds(0,  0.2, 0.8); // body z
+    CSforPath->bounds(1, -0.5, 0.5); // body roll
+    CSforPath->bounds(2, -0.0, 0.5); // body pitch
+    CSforPath->bounds(3, -0.5, 0.5); // body yaw
+    for (int k=0; k<2; k++){
+        for (int i=0; i<armPath[k]->numJoints(); i++){
+            Link *j = armPath[k]->joint(i);
+            CSforPath->bounds(4+k*6+i, j->llimit, j->ulimit);
+        }
+    }
+
+    CSforPath->weight(0) = 0.1; // z
+    CSforPath->weight(1) = 1;  // roll
+    CSforPath->weight(2) = 1;  // pitch
+    CSforPath->weight(3) = 1;  // yaw
+
+    CSforPath->weight(4) = 0.8;
+    CSforPath->weight(5) = 0.6;
+    CSforPath->weight(6) = 0.4;
+    CSforPath->weight(7) = 0.3;
+    CSforPath->weight(8) = 0.2;
+    CSforPath->weight(9) = 0.1;
+
+    CSforPath->weight(10) = 0.8;
+    CSforPath->weight(11) = 0.6;
+    CSforPath->weight(12) = 0.4;
+    CSforPath->weight(13) = 0.3;
+    CSforPath->weight(14) = 0.2;
+    CSforPath->weight(15) = 0.1;
+
+    Configuration startCfg(CSforPath->size()), goalCfg(CSforPath->size());
     startCfg[0] = robot->rootLink()->p[2];
     startCfg[1] = startCfg[2] = startCfg[3] = 0;
     for (int j=0; j<2; j++){
@@ -230,6 +216,18 @@ int main(int argc, char *argv[])
     planner->setApplyConfigFunc(boost::bind(&myCfgSetter2::set, 
                                             &setterForPath, _1, _2));
 
+    ConfigurationSpace CSforGoal(7); 
+    CSforGoal.bounds(0,  0.2, 0.8); // body z
+    CSforGoal.bounds(1, -0.5, 0.5); // body roll
+    CSforGoal.bounds(2, -0.0, 0.5); // body pitch
+    CSforGoal.bounds(3, -0.5, 0.5); // body yaw
+    CSforGoal.bounds(4, -M_PI/2, M_PI/2);   // hand roll
+    CSforGoal.bounds(5, -M_PI/2, M_PI/2); // hand pitch
+    CSforGoal.bounds(6, -M_PI, M_PI);   // hand yaw
+    for (int i=0; i<7; i++){
+        CSforGoal.weight(i) = 1.0;
+    }
+
     struct timeval tv1, tv2;
     Roadmap *Tg  = rrt->getBackwardTree();
     double Psample = 0.1;
@@ -238,12 +236,10 @@ int main(int argc, char *argv[])
     gettimeofday(&tv1, NULL);
     for (int i=0; i<n; i++){
         if (!Tg->nNodes() || rand() < Psample*RAND_MAX){
-            if (find_a_goal(prob, setterForGoal, goalCfg, armPath)){
-                std::cerr << std::endl << "find a goal" << std::endl;
+            if (find_a_goal(prob, setterForGoal, CSforGoal, goalCfg, armPath)){
                 Tg->addNode(new RoadmapNode(goalCfg));
             }
         }else{
-            setupCSforPath(armPath);
             if (ret = rrt->extendOneStep()) break;
         }
     }

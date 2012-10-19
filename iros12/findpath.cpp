@@ -9,6 +9,7 @@
 #include <hrpPlanner/RRT.h>
 #include <hrpPlanner/Roadmap.h>
 #include <hrpPlanner/RoadmapNode.h>
+#include <hrpPlanner/ConfigurationSpace.h>
 #include "problem.h"
 #include "myCfgSetter.h"
 #include <Math/Physics.h>
@@ -47,7 +48,7 @@ int main(int argc, char *argv[])
     HumanoidBodyPtr robot = HumanoidBodyPtr(new HumanoidBody());
     loadHumanoidBodyFromModelLoader(robot, robotURL, argc, argv, true);
 
-    problem prob;
+    problem prob(4+6);
     prob.addRobot("robot", robotURL, robot);
     std::vector<BodyPtr> obstacles;
     for (unsigned int i=0; i<obstacleURL.size(); i++){
@@ -59,38 +60,39 @@ int main(int argc, char *argv[])
     // This must be called after all bodies are added
     prob.initOLV(argc, argv);
 
-    PathEngine::Configuration::size(4+6); 
-    PathEngine::Configuration::bounds(0,  0.2, 0.8); // body z
-    PathEngine::Configuration::bounds(1, -0.5, 0.5); // body roll
-    PathEngine::Configuration::bounds(2, -0.0, 0.5); // body pitch
-    PathEngine::Configuration::bounds(3, -0.5, 0.5); // body yaw
+    PathEngine::ConfigurationSpace* cspace
+        = prob.planner()->getConfigurationSpace();
+    cspace->bounds(0,  0.2, 0.8); // body z
+    cspace->bounds(1, -0.5, 0.5); // body roll
+    cspace->bounds(2, -0.0, 0.5); // body pitch
+    cspace->bounds(3, -0.5, 0.5); // body yaw
 
     int arm;
-    PathEngine::Configuration goalCfg;
+    PathEngine::Configuration goalCfg(cspace->size());
     std::ifstream ifs("goal.txt");
     ifs >> arm;
-    for (unsigned int i=0; i<PathEngine::Configuration::size(); i++){
+    for (unsigned int i=0; i<cspace->size(); i++){
         ifs >> goalCfg[i];
     }
     
-    PathEngine::Configuration::weight(0) = 10;
+    cspace->weight(0) = 10;
 
-    PathEngine::Configuration::weight(1) = 1;
-    PathEngine::Configuration::weight(2) = 1;
-    PathEngine::Configuration::weight(3) = 1;
+    cspace->weight(1) = 1;
+    cspace->weight(2) = 1;
+    cspace->weight(3) = 1;
 
-    PathEngine::Configuration::weight(4) = 0.8;
-    PathEngine::Configuration::weight(5) = 0.6;
-    PathEngine::Configuration::weight(6) = 0.4;
-    PathEngine::Configuration::weight(7) = 0.3;
-    PathEngine::Configuration::weight(8) = 0.2;
-    PathEngine::Configuration::weight(9) = 0.1;
+    cspace->weight(4) = 0.8;
+    cspace->weight(5) = 0.6;
+    cspace->weight(6) = 0.4;
+    cspace->weight(7) = 0.3;
+    cspace->weight(8) = 0.2;
+    cspace->weight(9) = 0.1;
 
     JointPathPtr armPath = robot->getJointPath(robot->chestLink,
                                            robot->wristLink[arm]);
     for (int i=0; i<armPath->numJoints(); i++){
         Link *j = armPath->joint(i);
-        PathEngine::Configuration::bounds(4+i, j->llimit, j->ulimit);
+        cspace->bounds(4+i, j->llimit, j->ulimit);
     }
 
     PathEngine::PathPlanner *planner = prob.planner();
@@ -136,7 +138,7 @@ int main(int argc, char *argv[])
 
     myCfgSetter setter(robot, arm);
 
-    PathEngine::Configuration startCfg;
+    PathEngine::Configuration startCfg(cspace->size());
     startCfg[0] = robot->rootLink()->p[2];
     startCfg[1] = startCfg[2] = startCfg[3] = 0;
     for (int i=0; i<armPath->numJoints(); i++){
@@ -154,8 +156,8 @@ int main(int argc, char *argv[])
     int earm;
     ifs >> earm;
     while (!ifs.eof()){
-        PathEngine::Configuration cfg;
-        for (unsigned int i=0; i<PathEngine::Configuration::size(); i++){
+        PathEngine::Configuration cfg(cspace->size());
+        for (unsigned int i=0; i<cspace->size(); i++){
             ifs >> cfg[i];
         }
         if (arm == earm) {

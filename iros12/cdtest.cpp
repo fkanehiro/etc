@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
     std::vector<std::pair<const CdShape *, const CdShape *> > pairs;
     loadCdPairs(shapes, "hrp2.pairs", pairs);
 
-    problem prob;
+    problem prob(0);
     prob.addRobot("robot", robotURL, robot);
     hrp::BodyPtr obstacle = prob.addObstacle("obstacle", "file:///home/kanehiro/openhrp3.1/sample/model/house/table.main.wrl");
     obstacle->rootLink()->p = hrp::Vector3(-1,1,0.5);
