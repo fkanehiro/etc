@@ -13,5 +13,5 @@ export GOAL_POS='0.71 0.03 0.9 0 -1.5708 0'
 export LD_LIBRARY_PATH=$OPENHRPHOME/client/gui/corba:$LD_LIBRARY_PATH
 export DYLD_LIBRARY_PATH=$LD_LIBRARY_PATH
 
-echo ./findgoal3 $NS_OPT -robot $MODEL_URL -obstacle $OBSTACLE_URL $OBSTACLE_POS -goal $GOAL_URL -goalpos $GOAL_POS $*
-./findgoal3 $NS_OPT -robot $MODEL_URL -obstacle $OBSTACLE_URL $OBSTACLE_POS -goal $GOAL_URL -goalpos $GOAL_POS $*
+echo ./valve $NS_OPT -robot $MODEL_URL -obstacle $OBSTACLE_URL $OBSTACLE_POS -goal $GOAL_URL -goalpos $GOAL_POS $*
+./valve $NS_OPT -robot $MODEL_URL -obstacle $OBSTACLE_URL $OBSTACLE_POS -goal $GOAL_URL -goalpos $GOAL_POS $*

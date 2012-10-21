@@ -45,5 +45,8 @@ target_link_libraries(execpath ${HMC2_LIBRARIES} )
 add_executable(findgoalandpath findgoalandpath.cpp problem.cpp SphereTree.cpp CdShape.cpp DistUtil.cpp problem.cpp CdShapeUtil.cpp SphereTreeUtil.cpp CustomCD.cpp)
 target_link_libraries(findgoalandpath ${HMC2_LIBRARIES} )
 
+add_executable(valve valve.cpp problem.cpp SphereTree.cpp CdShape.cpp DistUtil.cpp problem.cpp CdShapeUtil.cpp SphereTreeUtil.cpp CustomCD.cpp)
+target_link_libraries(valve ${HMC2_LIBRARIES} )
+
 
 

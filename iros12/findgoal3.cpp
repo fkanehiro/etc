@@ -154,6 +154,7 @@ int main(int argc, char *argv[])
     Vector3 initialcom = robot->calcCM();
     struct timeval tv1, tv2;
     std::ofstream goalf("goal.txt");
+    std::ofstream goalcfgf("goalcfg.txt");
     std::ofstream goalcmf("goalcm.txt");
     gettimeofday(&tv1, NULL);
     int n=0, c = 0;
@@ -173,6 +174,11 @@ int main(int argc, char *argv[])
                 }
             }
             goalf << std::endl;
+            goalcfgf << arm << " ";
+            for (int i=0; i<7; i++){
+                goalcfgf << cfg[i] << " ";
+            }
+            goalcfgf << std::endl;
 
             Vector3 com = robot->calcCM();
             goalcmf << com[0]-initialcom[0] << " " 

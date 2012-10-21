@@ -1,25 +1,27 @@
 /*
   ランダムサンプリングした胴体の高さ、回転、手先の回転から全関節角度を決定する
-  コンフィギュレーションの長さは4+3
+  使用する腕、ヨー角は固定
+  コンフィギュレーションの長さは4+2
  */
 #include <Math/MathFunction.h>
 #include "cfgSetterBase.h"
 
-class myCfgSetter3 : public cfgSetterBase
+class myCfgSetter5 : public cfgSetterBase
 {
 public:
-    myCfgSetter3(motion_generator::HumanoidBodyPtr i_body,
-                 const hrp::Vector3 &i_goalP)
-        : cfgSetterBase(i_body), m_goalP(i_goalP), m_q(i_body->numJoints()){
+    myCfgSetter5(motion_generator::HumanoidBodyPtr i_body, int i_arm,
+                 const hrp::Vector3 &i_goalP, double i_yaw)
+        : cfgSetterBase(i_body), m_reachingArm(i_arm), m_goalP(i_goalP), m_yaw(i_yaw), m_q(i_body->numJoints()){
         for (int i=0; i<2; i++){
             m_arm[i] = m_body->getJointPath(m_body->chestLink,
                                             m_body->wristLink[i]);
         }
         m_trunk = m_body->getJointPath(m_body->rootLink(), m_body->chestLink);
-        for (int i=0; i<4; i++){
+        for (int i=0; i<3; i++){
             m_ikFailCount[i] = 0;
         }
         m_body->getPosture(m_q);
+        std::cout << "arm = " << m_reachingArm << ", yaw = " << m_yaw << std::endl;
     }
     bool set(PathEngine::PathPlanner *i_planner,
              const PathEngine::Configuration &i_cfg){
@@ -28,42 +30,37 @@ public:
         m_trunk->calcForwardKinematics();
 
         hrp::Matrix33 bulbR = hrp::rotFromPitch(-M_PI/2);
-        hrp::Matrix33 R = hrp::rotFromRpy(i_cfg[4], i_cfg[5], i_cfg[6]); 
+        hrp::Matrix33 R = hrp::rotFromRpy(i_cfg[4], i_cfg[5], m_yaw); 
         hrp::Matrix33 wristR(bulbR*R);
 
         hrp::Vector3 wristP(m_goalP + wristR*hrp::Vector3(-0.03,0,0.18));
-        m_reachedArm=0;
-        if (!calcIKwithLimitCheck(m_arm[0],wristP, wristR)) {
+        if (!calcIKwithLimitCheck(m_arm[m_reachingArm],wristP, wristR)) {
             m_ikFailCount[0]++;
-            m_reachedArm = 1;
-            if (!calcIKwithLimitCheck(m_arm[1], wristP, wristR)){
-                m_ikFailCount[1]++;
-                return false;
-            }
+            return false;
         }
         for (int i=0; i<2; i++){ 
             if (!calcIKwithLimitCheck(m_leg[i], m_footP[i], m_footR[i])){
-                m_ikFailCount[i+2]++; 
+                m_ikFailCount[i+1]++; 
                 return false;
             }
         }
-        hrp::JointPathPtr path = m_reachedArm == 0 ? m_arm[1] : m_arm[0];
-        for (int i=0; i<path->numJoints(); i++){
-            hrp::Link *j = path->joint(i);
+        int freeArm = m_reachingArm == 0 ? 1 : 0;
+        for (int i=0; i<m_arm[freeArm]->numJoints(); i++){
+            hrp::Link *j = m_arm[freeArm]->joint(i);
             j->q = m_q[j->jointId];
         }
         m_body->calcForwardKinematics();
         return true;
     }
     void profile(){
-        for (int i=0; i<4; i++) std::cout << m_ikFailCount[i] << " ";
+        for (int i=0; i<3; i++) std::cout << m_ikFailCount[i] << " ";
         std::cout << std::endl;
     }
-    int reachedArm(){ return m_reachedArm; }
 private:
-    int m_ikFailCount[4];
+    int m_ikFailCount[3];
+    int m_reachingArm;
     hrp::JointPathPtr m_arm[2], m_trunk;
     hrp::Vector3 m_goalP;
+    double m_yaw;
     hrp::dvector m_q;
-    int m_reachedArm;
 };
