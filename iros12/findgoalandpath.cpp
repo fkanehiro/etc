@@ -53,7 +53,6 @@ int main(int argc, char *argv[])
     std::vector<Vector3> obstacleP;
     std::vector<Vector3> obstacleRpy;
     Vector3 p, rpy;
-    int ngoal=10;
     bool display = true;
     for(int i = 1 ; i < argc; i++){
         if (strcmp(argv[i], "-robot") == 0){
@@ -66,8 +65,6 @@ int main(int argc, char *argv[])
             obstacleRpy.push_back(rpy);
         }else if (strcmp(argv[i], "-goal") == 0){
             goalURL = argv[++i];
-        }else if (strcmp(argv[i], "-ngoal") == 0){
-            ngoal = atoi(argv[++i]);
         }else if (strcmp(argv[i], "-no-display")==0){
             display = false;
         }
@@ -241,10 +238,9 @@ int main(int argc, char *argv[])
             if (ret = rrt->extendOneStep()) break;
         }
     }
-    fprintf(stderr,"\n");
     std::vector<Configuration> path;
-    rrt->extractPath(path);
     if (ret){
+        rrt->extractPath(path);
         RandomShortcutOptimizer opt1(planner);
         ShortcutOptimizer       opt2(planner);
         for (int i=0; i<5; i++) {
@@ -267,7 +263,9 @@ int main(int argc, char *argv[])
 
     }else{
         std::cout << "failed to find a path" << std::endl;
-        std::cout << "nnnodes = " << rrt->getForwardTree()->nNodes() << ","
+        std::cout << "profile of setter for goal:" << std::endl;
+        setterForGoal.profile();
+        std::cout << "nnodes = " << rrt->getForwardTree()->nNodes() << ","
                   << Tg->nNodes() << std::endl;
     }
 

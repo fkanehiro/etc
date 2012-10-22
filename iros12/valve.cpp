@@ -14,8 +14,9 @@
 #include <hrpPlanner/ShortcutOptimizer.h>
 #include <hrpPlanner/ConfigurationSpace.h>
 #include "problem.h"
-#include "myCfgSetter5.h"
-#include "myCfgSetter3.h"
+#include "myCfgSetter2.h" // setter for intermediate goal
+#include "myCfgSetter3.h" // setter for path from intermediate goal to final one
+#include "myCfgSetter5.h" // setter for final goal
 #include <Math/Physics.h>
 #include "CustomCD.h"
 
@@ -23,9 +24,9 @@ using namespace motion_generator;
 using namespace hrp;
 using namespace PathEngine;
 
-bool find_a_goal(problem &prob, myCfgSetter5 &setter, 
-                 ConfigurationSpace& cspace, 
-                 Configuration& goalCfg, JointPathPtr armPath[2])
+bool find_a_final_goal(problem &prob, myCfgSetter5 &setter, 
+                       ConfigurationSpace& cspace, 
+                       Configuration& goalCfg, JointPathPtr armPath[2])
 {
     Configuration cfg = cspace.random();
     if (setter.set(prob.planner(), cfg)){
@@ -35,6 +36,23 @@ bool find_a_goal(problem &prob, myCfgSetter5 &setter,
         }
     }
     //prob.updateOLV();
+    return false;
+}
+
+bool find_an_intermediate_goal(problem &prob, myCfgSetter3 &setter, 
+                               ConfigurationSpace& cspace, 
+                               Configuration& goalCfg, JointPathPtr armPath[2])
+{
+    Configuration cfg = cspace.random();
+    if (setter.set(prob.planner(), cfg) && !prob.planner()->checkCollision()){
+        for (int i=0; i<4; i++) goalCfg[i] = cfg[i];
+        for (int i=0; i<2; i++){
+            for (int j=0; j<armPath[i]->numJoints(); j++){
+                goalCfg[4+i*6+j] = armPath[i]->joint(j)->q;
+            }
+        }
+        return true;
+    }
     return false;
 }
 
@@ -89,7 +107,7 @@ int main(int argc, char *argv[])
     HumanoidBodyPtr robot = HumanoidBodyPtr(new HumanoidBody());
     loadHumanoidBodyFromModelLoader(robot, robotURL, argc, argv, true);
 
-    problem prob(4+3);
+    problem prob(4+6+6);
     prob.addRobot("robot", robotURL, robot);
     std::vector<BodyPtr> obstacles;
     for (unsigned int i=0; i<obstacleURL.size(); i++){
@@ -152,7 +170,9 @@ int main(int argc, char *argv[])
         goal->calcForwardKinematics();
     }
 
-    myCfgSetter3 setterForPath(robot, goalP);
+    myCfgSetter3 setterForIntermediateGoal(robot, goalP);
+    //myCfgSetter3 setterForPath(robot, goalP);
+    myCfgSetter2 setterForPath(robot);
 
     CustomCD cd(robot, "hrp2.shape", "hrp2.pairs", 
                 obstacles[0], "plant.pc");
@@ -170,36 +190,60 @@ int main(int argc, char *argv[])
     CSforPath->bounds(1, -0.5, 0.5); // body roll
     CSforPath->bounds(2, -0.0, 0.5); // body pitch
     CSforPath->bounds(3, -0.5, 0.5); // body yaw
-    CSforPath->bounds(4, -M_PI/2, M_PI/2); // hand roll
-    CSforPath->bounds(5, -M_PI/2, M_PI/2); // hand pitch
-    CSforPath->bounds(6, -M_PI, M_PI);   // hand yaw
+    for (int k=0; k<2; k++){
+        for (int i=0; i<armPath[k]->numJoints(); i++){
+            Link *j = armPath[k]->joint(i);
+            CSforPath->bounds(4+k*6+i, j->llimit, j->ulimit);
+        }
+    }
+
+    CSforPath->weight(0) = 0.1; // z
+    CSforPath->weight(1) = 1;  // roll
+    CSforPath->weight(2) = 1;  // pitch
+    CSforPath->weight(3) = 1;  // yaw
+
+    CSforPath->weight(4) = 0.8;
+    CSforPath->weight(5) = 0.6;
+    CSforPath->weight(6) = 0.4;
+    CSforPath->weight(7) = 0.3;
+    CSforPath->weight(8) = 0.2;
+    CSforPath->weight(9) = 0.1;
+
+    CSforPath->weight(10) = 0.8;
+    CSforPath->weight(11) = 0.6;
+    CSforPath->weight(12) = 0.4;
+    CSforPath->weight(13) = 0.3;
+    CSforPath->weight(14) = 0.2;
+    CSforPath->weight(15) = 0.1;
 
     Configuration startCfg(CSforPath->size()), goalCfg(CSforPath->size());
-    int arm;
-    std::ifstream ifs("goalcfg.txt");
-    ifs >> arm;
-    for (int i=0; i<4+3; i++){
-        ifs >> startCfg[i];
+    startCfg[0] = robot->rootLink()->p[2];
+    startCfg[1] = startCfg[2] = startCfg[3] = 0;
+    for (int j=0; j<2; j++){
+        for (int i=0; i<armPath[j]->numJoints(); i++){
+            startCfg[4+j*6+i] = armPath[j]->joint(i)->q;
+        }
     }
-    goalCfg[6] = startCfg[6] + angle;
-    std::cout << "start:" << startCfg << std::endl;
     rrt->getForwardTree()->addNode(new RoadmapNode(startCfg));
-    planner->setApplyConfigFunc(boost::bind(&myCfgSetter3::set, 
+    planner->setApplyConfigFunc(boost::bind(&myCfgSetter2::set, 
                                             &setterForPath, _1, _2));
 
-    myCfgSetter5 setterForGoal(robot, arm, goalP, goalCfg[6]);
-    ConfigurationSpace CSforGoal(4+2); 
-#if 1
+#if 0
+    myCfgSetter5 setterForFinalGoal(robot, arm, goalP, goalCfg[6]);
+    ConfigurationSpace CSforFinalGoal(4+2); 
+    for (int i=0; i<4; i++) CSforFinalGoal.bounds(i, startCfg[i]-0.1, startCfg[i]+0.1);
+    CSforGoal.bounds(4, -M_PI/2, M_PI/2);   // hand roll
+    CSforGoal.bounds(5, -M_PI/2, M_PI/2); // hand pitch
+#endif
+    ConfigurationSpace CSforGoal(7); 
     CSforGoal.bounds(0,  0.2, 0.8); // body z
     CSforGoal.bounds(1, -0.5, 0.5); // body roll
     CSforGoal.bounds(2, -0.0, 0.5); // body pitch
     CSforGoal.bounds(3, -0.5, 0.5); // body yaw
     CSforGoal.bounds(4, -M_PI/2, M_PI/2);   // hand roll
     CSforGoal.bounds(5, -M_PI/2, M_PI/2); // hand pitch
-    for (int i=0; i<4; i++) CSforGoal.bounds(i, startCfg[i]-0.1, startCfg[i]+0.1);
-#else
-    for (int i=0; i<6; i++) CSforGoal.bounds(i, startCfg[i], startCfg[i]);
-#endif
+    CSforGoal.bounds(6, -M_PI, M_PI);   // hand yaw
+
     planner->setConfiguration(startCfg);
     prob.updateOLV();
 
@@ -207,19 +251,51 @@ int main(int argc, char *argv[])
     Roadmap *Tg  = rrt->getBackwardTree();
     double Psample = 0.1;
     bool ret = false;
-    int n=10000;
+    int n=100000;
+    std::vector<PathPlanner *> planners;
+    std::vector<RRT *> rrts;
     gettimeofday(&tv1, NULL);
     for (int i=0; i<n; i++){
         if (!Tg->nNodes() || rand() < Psample*RAND_MAX){
-            if (find_a_goal(prob, setterForGoal, CSforGoal, goalCfg, armPath)){
+            if (find_an_intermediate_goal(prob, setterForIntermediateGoal, 
+                                          CSforGoal, goalCfg, armPath)){
                 Tg->addNode(new RoadmapNode(goalCfg));
-                std::cout << "found a goal(" << i << "/" << n << ")" << std::endl;
+                std::cout << "found an intermediate goal(" << i << "/" << n << ")" << std::endl;
                 prob.updateOLV();
+#if 0
+                PathPlanner *p = new PathPlanner(4+3, planner->world());
+                p->setMobilityName("OmniWheel");
+                p->setAlgorithmName("RRT");
+                p->getMobility()->interpolationDistance(0.05);
+                p->setCollisionDetector(&cd);
+                RRT *rrt = (RRT *)p->getAlgorithm();
+                rrt->getForwardTree()->addNode(new RoadmapNode(goalCfg));
+                rrt->extendFromGoal(true);
+                rrt->epsilon(0.1);
+                planners.push_back(p);
+                rrts.push_back(rrt);
+#endif
                 //exit(0);
             }
         }else{
             if (ret = rrt->extendOneStep()) break;
         }
+#if 0
+        for (size_t i=0; i<rrts.size(); i++){
+            RRT *rrt = rrts[i];
+            Roadmap *Tg = rrt->getBackwardTree();
+            if (!Tg->nNodes() || rand() < Psample*RAND_MAX){
+                if (find_a_final_goal(prob, setterForFinalGoal,
+                                      CSforGoal, goalCfg, armPath)){
+                    Tg->addNode(new RoadmapNode(goalCfg));
+                    std::cout << "found a final goal(" << i << "/" << n << ")" << std::endl;
+                    prob.updateOLV();
+                }
+            }else{
+                if (ret = rrt->extendOneStep()) break;
+            }
+        }
+#endif
     }
     std::vector<Configuration> path;
     if (ret){
@@ -246,8 +322,8 @@ int main(int argc, char *argv[])
 
     }else{
         std::cout << "failed to find a path" << std::endl;
-        std::cout << "profile of setter for goal:" << std::endl;
-        setterForGoal.profile();
+        std::cout << "profile of setter for intermediate goal:" << std::endl;
+        setterForIntermediateGoal.profile();
         std::cout << "nnodes = " << rrt->getForwardTree()->nNodes() << ","
                   << Tg->nNodes() << std::endl;
     }
