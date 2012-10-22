@@ -30,10 +30,11 @@ IMPL_OBJ =
 OBJS     = JoystickController.o $(SKEL_OBJ) $(IMPL_OBJ)
 OBJS2    = JoystickController2.o $(SKEL_OBJ) $(IMPL_OBJ)
 OBJS3    = SRController.o $(SKEL_OBJ) $(IMPL_OBJ)
+OBJS4    = QController.o $(SKEL_OBJ) $(IMPL_OBJ)
 
 .SUFFIXES : .so
 
-all: JoystickController.so JoystickControllerComp JoystickController2.so SRController.so
+all: JoystickController.so JoystickControllerComp JoystickController2.so SRController.so QController.so
 
 .cpp.o:
 	rm -f $@
@@ -66,6 +67,8 @@ JoystickController2.so: $(OBJS2)
 JoystickController2.o: JoystickController2.h 	 	
 SRController.so: $(OBJS3)
 SRController.o: SRController.h 	 	
+QController.so: $(OBJS4)
+QController.o: QController.h 	 	
 
 
 
