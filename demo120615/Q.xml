@@ -13,7 +13,8 @@
 	    <property name="connection" value="simple_vehicle.q:QController0.angles"/>  
 	    <property name="connection" value="simple_vehicle.dq:QController0.vels"/>  
 	    <property name="connection" value="QController0.torque:simple_vehicle.tau"/>  
-	    <property name="connection" value="QController0.light:simple_vehicle.light"/>  
+	    <property name="connection" value="QController0.lightF:simple_vehicle.lightF"/>  
+	    <property name="connection" value="QController0.lightB:simple_vehicle.lightB"/>  
 	    <property name="connection" value="Joystick0.Axes:QController0.axes"/>  
 	    <property name="connection" value="Joystick0.Buttons:QController0.buttons"/>  
         </item>
@@ -41,7 +42,8 @@
 	    <property name="outport" value="VISION_SENSOR1:VISION_SENSOR1:VISION_SENSOR"/>  
 	    <property name="outport" value="range:RANGE_SENSOR1:RANGE_SENSOR"/>  
 	    <property name="inport" value="tau:JOINT_TORQUE"/>  
-	    <property name="inport" value="light:slight:LIGHT_SWITCH"/>  
+	    <property name="inport" value="lightF:lightF:LIGHT_SWITCH"/>  
+	    <property name="inport" value="lightB:lightB:LIGHT_SWITCH"/>  
 	    <property name="inport" value="fps:VISION_SENSOR1:FRAME_RATE"/>  
             <property name="root.mode" value="Torque"/>
             <property name="setupCommand" value="SampleSV$(BIN_SFX)"/>

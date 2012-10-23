@@ -128,9 +128,9 @@ class QController
   // DataOutPort declaration
   // <rtc-template block="outport_declare">
   TimedDoubleSeq m_torque;
-  TimedBoolean m_light;
+  TimedBoolean m_lightF, m_lightB;
   OutPort<TimedDoubleSeq> m_torqueOut;
-  OutPort<TimedBoolean> m_lightOut;
+  OutPort<TimedBoolean> m_lightFOut, m_lightBOut;
   
   // </rtc-template>
 
@@ -151,7 +151,7 @@ class QController
 
  private:
   double m_qRef[2];
-  std::vector<int> m_axisIds, m_buttonIds;
+  std::vector<unsigned int> m_axisIds, m_buttonIds;
   std::vector<float> m_axisScales;
   TimedBooleanSeq m_buttonsOld;
   int dummy;

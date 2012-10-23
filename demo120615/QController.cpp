@@ -35,7 +35,7 @@ static const char* joystickcontroller_spec[] =
     "lang_type",         "compile",
     "conf.default.axisIds", "1,2",
     "conf.default.axisScales", "1,1",
-    "conf.default.buttonIds", "9,11,8,10,0",
+    "conf.default.buttonIds", "9,11,8,10,0,3",
     ""
   };
 // </rtc-template>
@@ -48,7 +48,8 @@ QController::QController(RTC::Manager* manager)
     m_anglesIn("angles", m_angles),
     m_velsIn("vels", m_vels),
     m_torqueOut("torque", m_torque),
-    m_lightOut("light", m_light),
+    m_lightFOut("lightF", m_lightF),
+    m_lightBOut("lightB", m_lightB),
     
     // </rtc-template>
 	dummy(0)
@@ -86,14 +87,15 @@ RTC::ReturnCode_t QController::onInitialize()
   
   // Set OutPort buffer
   addOutPort("torque", m_torqueOut);
-  addOutPort("light", m_lightOut);
+  addOutPort("lightF", m_lightFOut);
+  addOutPort("lightB", m_lightBOut);
 
   // ポート初期化 //
   m_torque.data.length(10);
   for (size_t i=0; i<m_torque.data.length(); i++){
       m_torque.data[i] = 0;
   }
-  m_light.data = true;
+  m_lightF.data = m_lightB.data = true;
 
   for (int i=0; i<2; i++) m_qRef[i] = 0;
   return RTC::RTC_OK;
@@ -178,13 +180,13 @@ RTC::ReturnCode_t QController::onExecute(RTC::UniqueId ec_id)
   double flipperTorqueRB = P*(m_qRef[0] - m_angles.data[1])+D*m_vels.data[1];
   flipperTorqueRB = std::min( MaxTau, flipperTorqueRB);
   flipperTorqueRB = std::max(-MaxTau, flipperTorqueRB);
-  double flipperTorqueRF = P*(m_qRef[0] - m_angles.data[3])+D*m_vels.data[3];
+  double flipperTorqueRF = P*(-m_qRef[0] - m_angles.data[3])+D*m_vels.data[3];
   flipperTorqueRF = std::min( MaxTau, flipperTorqueRF);
   flipperTorqueRF = std::max(-MaxTau, flipperTorqueRF);
   double flipperTorqueLB = P*(m_qRef[1] - m_angles.data[6])+D*m_vels.data[6];
   flipperTorqueLB = std::min( MaxTau, flipperTorqueLB);
   flipperTorqueLB = std::max(-MaxTau, flipperTorqueLB);
-  double flipperTorqueLF = P*(m_qRef[1] - m_angles.data[8])+D*m_vels.data[8];
+  double flipperTorqueLF = P*(-m_qRef[1] - m_angles.data[8])+D*m_vels.data[8];
   flipperTorqueLF = std::min( MaxTau, flipperTorqueLF);
   flipperTorqueLF = std::max(-MaxTau, flipperTorqueLF);
   //std::cout << m_qRef[0] << ", " << m_angles.data[1] << "," << flipperTorqueR << std::endl; 
@@ -196,8 +198,15 @@ RTC::ReturnCode_t QController::onExecute(RTC::UniqueId ec_id)
   m_torqueOut.write(); 
   if (m_buttons.data.length() > m_buttonIds[4] 
       && !m_buttonsOld.data[m_buttonIds[4]] && m_buttons.data[m_buttonIds[4]]){
-      m_light.data = !m_light.data;
-      m_lightOut.write();
+      std::cout << "toggle front light" << std::endl;
+      m_lightF.data = !m_lightF.data;
+      m_lightFOut.write();
+  }
+  if (m_buttons.data.length() > m_buttonIds[5] 
+      && !m_buttonsOld.data[m_buttonIds[5]] && m_buttons.data[m_buttonIds[5]]){
+      std::cout << "toggle rear light" << std::endl;
+      m_lightB.data = !m_lightB.data;
+      m_lightBOut.write();
   }
   return RTC::RTC_OK;
 }
