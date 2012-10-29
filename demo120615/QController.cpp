@@ -198,13 +198,13 @@ RTC::ReturnCode_t QController::onExecute(RTC::UniqueId ec_id)
   m_torqueOut.write(); 
   if (m_buttons.data.length() > m_buttonIds[4] 
       && !m_buttonsOld.data[m_buttonIds[4]] && m_buttons.data[m_buttonIds[4]]){
-      std::cout << "toggle front light" << std::endl;
+      //std::cout << "toggle front light" << std::endl;
       m_lightF.data = !m_lightF.data;
       m_lightFOut.write();
   }
   if (m_buttons.data.length() > m_buttonIds[5] 
       && !m_buttonsOld.data[m_buttonIds[5]] && m_buttons.data[m_buttonIds[5]]){
-      std::cout << "toggle rear light" << std::endl;
+      //std::cout << "toggle rear light" << std::endl;
       m_lightB.data = !m_lightB.data;
       m_lightBOut.write();
   }

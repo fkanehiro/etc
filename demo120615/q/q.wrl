@@ -218,6 +218,8 @@ DEF surveyrunner Humanoid{
       rotorInertia 1.0
       rotorResistor 1.0
       children[
+        DEF gsensor AccelerationSensor { sensorId 0 }
+        DEF gyrometer Gyro { sensorId 0 }
         Transform {
 	  translation 0.1 0 0.1
 	  children DEF lightF SpotLight{
@@ -237,12 +239,38 @@ DEF surveyrunner Humanoid{
 #	    attenuation 2 0 0
 	  }
 	}
-        DEF RANGE_SENSOR1 RangeSensor {
-          translation  0.1 -0.05 0.1
-          rotation     0.57735 -0.57735 -0.57735 2.09439
-          sensorId     0
-	  scanStep 0.05
-	  scanRate 20
+        # DEF RANGE_SENSOR1 RangeSensor {
+        #   translation  0.1 -0.05 0.1
+        #   rotation     0.57735 -0.57735 -0.57735 2.09439
+        #   sensorId     0
+	#   scanStep 0.05
+	#   scanRate 20
+        #   children [
+        #    DEF CAMERA_SHAPE Transform {
+        #       rotation  1 0 0 1.5708
+        #       children [
+        #         Shape {
+        #           geometry Cylinder {
+        #             radius      0.02
+        #             height      0.018
+        #           }
+        #           appearance Appearance {
+        #             material Material {
+        #               diffuseColor      1 0 0
+        #             }
+        #           }
+        #         }
+        #       ]
+        #     }
+        #   ]
+        # }
+        DEF front_camera VisionSensor {
+          translation   0.1 0.0 0.1
+          rotation      0.57735 -0.57735 -0.57735 2.09439
+          sensorId      0
+	  type "COLOR"
+	  width 2048
+	  height 1536
           children [
            DEF CAMERA_SHAPE Transform {
               rotation  1 0 0 1.5708
@@ -254,7 +282,7 @@ DEF surveyrunner Humanoid{
                   }
                   appearance Appearance {
                     material Material {
-                      diffuseColor      1 0 0
+                      diffuseColor      0 0 1
                     }
                   }
                 }
@@ -262,13 +290,143 @@ DEF surveyrunner Humanoid{
             }
           ]
         }
-        DEF VISION_SENSOR1 VisionSensor {
-          translation   0.1 0.05 0.1
+        DEF rear_camera VisionSensor {
+          translation   0.1 0.0 0.1
           rotation      0.57735 -0.57735 -0.57735 2.09439
-          sensorId      0
+          sensorId      1
 	  type "COLOR"
-	  width 640
-	  height 480
+	  width 2048
+	  height 1536
+          children [
+           DEF CAMERA_SHAPE Transform {
+              rotation  1 0 0 1.5708
+              children [
+                Shape {
+                  geometry Cylinder {
+                    radius      0.02
+                    height      0.018
+                  }
+                  appearance Appearance {
+                    material Material {
+                      diffuseColor      0 0 1
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+        DEF camera0 VisionSensor {
+          translation   0.1 0.0 0.1
+          rotation      0.57735 -0.57735 -0.57735 2.09439
+          sensorId      2
+	  type "COLOR"
+	  width 320
+	  height 240
+          children [
+           DEF CAMERA_SHAPE Transform {
+              rotation  1 0 0 1.5708
+              children [
+                Shape {
+                  geometry Cylinder {
+                    radius      0.02
+                    height      0.018
+                  }
+                  appearance Appearance {
+                    material Material {
+                      diffuseColor      0 0 1
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+        DEF camera1 VisionSensor {
+          translation   0.1 0.0 0.1
+          rotation      0.57735 -0.57735 -0.57735 2.09439
+          sensorId      3
+	  type "COLOR"
+	  width 352
+	  height 288
+          children [
+           DEF CAMERA_SHAPE Transform {
+              rotation  1 0 0 1.5708
+              children [
+                Shape {
+                  geometry Cylinder {
+                    radius      0.02
+                    height      0.018
+                  }
+                  appearance Appearance {
+                    material Material {
+                      diffuseColor      0 0 1
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+        DEF camera2 VisionSensor {
+          translation   0.1 0.0 0.1
+          rotation      0.57735 -0.57735 -0.57735 2.09439
+          sensorId      4
+	  type "COLOR"
+	  width 352
+	  height 288
+          children [
+           DEF CAMERA_SHAPE Transform {
+              rotation  1 0 0 1.5708
+              children [
+                Shape {
+                  geometry Cylinder {
+                    radius      0.02
+                    height      0.018
+                  }
+                  appearance Appearance {
+                    material Material {
+                      diffuseColor      0 0 1
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+        DEF camera3 VisionSensor {
+          translation   0.1 0.0 0.1
+          rotation      0.57735 -0.57735 -0.57735 2.09439
+          sensorId      5
+	  type "COLOR"
+	  width 352
+	  height 288
+          children [
+           DEF CAMERA_SHAPE Transform {
+              rotation  1 0 0 1.5708
+              children [
+                Shape {
+                  geometry Cylinder {
+                    radius      0.02
+                    height      0.018
+                  }
+                  appearance Appearance {
+                    material Material {
+                      diffuseColor      0 0 1
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+        DEF camera4 VisionSensor {
+          translation   0.1 0.0 0.1
+          rotation      0.57735 -0.57735 -0.57735 2.09439
+          sensorId      6
+	  type "COLOR"
+	  width 352
+	  height 288
           children [
            DEF CAMERA_SHAPE Transform {
               rotation  1 0 0 1.5708

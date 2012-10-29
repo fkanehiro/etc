@@ -9,7 +9,7 @@
 	    <property name="Joystick0.period" value="0.03"/>  
 	    <property name="CameraImageViewer0.period" value="0.03"/>  
 	    <property name="QController0.period" value="0.03"/>  
-	    <property name="connection" value="simple_vehicle.VISION_SENSOR1:CameraImageViewer0.imageIn"/>  
+	    <property name="connection" value="simple_vehicle.camera0:CameraImageViewer0.imageIn"/>  
 	    <property name="connection" value="simple_vehicle.q:QController0.angles"/>  
 	    <property name="connection" value="simple_vehicle.dq:QController0.vels"/>  
 	    <property name="connection" value="QController0.torque:simple_vehicle.tau"/>  
@@ -20,7 +20,7 @@
         </item>
         <item class="com.generalrobotix.ui.item.GrxSimulationItem" name="simulationItem" select="true">
             <property name="method" value="RUNGE_KUTTA"/>
-            <property name="totalTime" value="0.0 "/>
+            <property name="totalTime" value="10.0 "/>
             <property name="realTime" value="true"/>
             <property name="integrate" value="true"/>
             <property name="timeStep" value="0.0020 "/>
@@ -39,12 +39,19 @@
         <item class="com.generalrobotix.ui.item.GrxModelItem" name="simple_vehicle" select="true" url="$(CURRENT_DIR)/q/q.wrl">
 	    <property name="outport" value="q:JOINT_VALUE"/>  
 	    <property name="outport" value="dq:JOINT_VELOCITY"/>  
-	    <property name="outport" value="VISION_SENSOR1:VISION_SENSOR1:VISION_SENSOR"/>  
-	    <property name="outport" value="range:RANGE_SENSOR1:RANGE_SENSOR"/>  
+	    <property name="outport" value="front_camera:front_camera:VISION_SENSOR"/>  
+	    <property name="outport" value="rear_camera:rear_camera:VISION_SENSOR"/>  
+	    <property name="outport" value="camera0:camera0:VISION_SENSOR"/>  
+	    <property name="outport" value="camera1:camera1:VISION_SENSOR"/>  
+	    <property name="outport" value="camera2:camera2:VISION_SENSOR"/>  
+	    <property name="outport" value="camera3:camera3:VISION_SENSOR"/>  
+	    <property name="outport" value="camera4:camera4:VISION_SENSOR"/>  
+            <property name="outport" value="gyrometer:gyrometer:RATE_GYRO_SENSOR"/>
+            <property name="outport" value="gsensor:gsensor:ACCELERATION_SENSOR"/>
 	    <property name="inport" value="tau:JOINT_TORQUE"/>  
 	    <property name="inport" value="lightF:lightF:LIGHT_SWITCH"/>  
 	    <property name="inport" value="lightB:lightB:LIGHT_SWITCH"/>  
-	    <property name="inport" value="fps:VISION_SENSOR1:FRAME_RATE"/>  
+	    <property name="inport" value="fps:front_camera:FRAME_RATE"/>  
             <property name="root.mode" value="Torque"/>
             <property name="setupCommand" value="SampleSV$(BIN_SFX)"/>
             <property name="root.angularVelocity" value="0.0 0.0 0.0 "/>
@@ -61,6 +68,7 @@
             <property name="smallCrawlerRB.collisionShape" value="convex hull "/>
             <property name="smallCrawlerLF.collisionShape" value="convex hull "/>
             <property name="smallCrawlerLB.collisionShape" value="convex hull "/>
+            <property name="setupDirectory" value="$(CURRENT_DIR)/../controller/SampleSV"/>
             <property name="setupDirectory" value="$(CURRENT_DIR)/../controller/SampleSV"/>
         </item>
         <item class="com.generalrobotix.ui.item.GrxWorldStateItem" name="untitled" select="true">
