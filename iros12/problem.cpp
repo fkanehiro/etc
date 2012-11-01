@@ -3,7 +3,7 @@
 #include <hrpModel/Link.h>
 #include "problem.h"
 
-problem::problem(unsigned int dim) : m_planner(dim)
+problem::problem(unsigned int dim) : m_planner(dim), m_dt(0.005)
 {
     m_planner.initPlanner("localhost:2809");
 }
@@ -113,7 +113,7 @@ void problem::updateOLV()
         updateCharacterPosition(wstate.characterPositions[i], m_bodies[i]);
     }
     olv->update(wstate);
-    wstate.time += 0.005;
+    wstate.time += m_dt;
 }
 
 void problem::updateOLV(const std::vector<hrp::Vector3>& i_starts,

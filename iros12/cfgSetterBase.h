@@ -18,7 +18,8 @@ public:
         double ubm = m_body->rootLink()->m + m_body->waistYjoint->subm;
         m_cog = (m_body->rootLink()->m*m_body->rootLink()->wc
                  + m_body->waistYjoint->submwc)/ubm;
-        m_cog2waist = m_body->rootLink()->p - m_cog;
+        hrp::Link *base = m_body->rootLink();
+        m_cog2waist = base->R.transpose()*(base->p - m_cog);
         //std::cout << "cog2waist:" << m_cog2waist << std::endl;
     }
     void setBase(double z, double r, double p, double y){

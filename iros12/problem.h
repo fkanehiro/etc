@@ -19,6 +19,7 @@ public:
                    const std::vector<hrp::Vector3>& i_ends);
     bool checkCollision();
     PathEngine::PathPlanner *planner() { return & m_planner; }
+    void dt(double t) { m_dt = t; }
 private:
     hrp::BodyPtr addBody(const std::string& i_name, const std::string &i_url,
                          hrp::BodyPtr i_body=hrp::BodyPtr());
@@ -29,4 +30,5 @@ private:
     PathEngine::PathPlanner m_planner;
     OpenHRP::WorldState wstate;
     OpenHRP::OnlineViewer_var olv;
+    double m_dt;
 };

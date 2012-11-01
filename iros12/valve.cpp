@@ -24,83 +24,121 @@ using namespace motion_generator;
 using namespace hrp;
 using namespace PathEngine;
 
-bool find_a_final_goal(problem &prob, myCfgSetter5 &setter, 
-                       ConfigurationSpace& cspace, 
-                       Configuration& goalCfg)
+std::ostream& operator<<(std::ostream &ost, HumanoidBodyPtr robot)
 {
-    Configuration cfg = cspace.random();
-    if (setter.set(prob.planner(), cfg)){
-        if (!prob.planner()->checkCollision()){
-            for (int i=0; i<4+2; i++) goalCfg[i] = cfg[i];
-            return true;
+    for (int j=0; j<3; j++){
+        ost << robot->rootLink()->p[j] << " ";
+    }
+    for (int j=0; j<3; j++){
+        for (int k=0; k<3; k++){
+            ost << robot->rootLink()->R(j,k) << " ";
         }
     }
-    //prob.updateOLV();
-    return false;
+    for (int j=0; j<robot->numJoints(); j++){
+        ost << robot->joint(j)->q << " ";
+    }
+    return ost;
 }
 
-bool find_an_intermediate_goal(problem &prob, myCfgSetter3 &setter, 
-                               ConfigurationSpace& cspace, 
-                               Configuration& goalCfg, JointPathPtr armPath[2])
+template<class T>
+bool testRandomConfig(PathPlanner *planner, T &setter, 
+                      ConfigurationSpace& cspace, 
+                      Configuration& cfg)
 {
-    Configuration cfg = cspace.random();
-    if (setter.set(prob.planner(), cfg) && !prob.planner()->checkCollision()){
-        for (int i=0; i<4; i++) goalCfg[i] = cfg[i];
-        for (int i=0; i<2; i++){
-            for (int j=0; j<armPath[i]->numJoints(); j++){
-                goalCfg[4+i*6+j] = armPath[i]->joint(j)->q;
-            }
-        }
-        return true;
-    }
-    return false;
+    cfg = cspace.random();
+    return setter.set(planner, cfg) && !planner->checkCollision();
 }
 
 class subproblem
 {
 public:
-    subproblem(int dim, problem *mainproblem_, CollisionDetector *cd,
+    subproblem(problem *mainproblem_, CollisionDetector *cd,
                HumanoidBodyPtr robot,
-               const Configuration& startCfg, int arm, Vector3& goalP) :
-        mainproblem(mainproblem_), found(false), CSforGoal(4+2),
-        setterForGoal(robot, arm, goalP, startCfg[6]),
-        goalCfg(dim){
-        planner = new PathPlanner(dim, mainproblem->planner()->world());
+               const Configuration& startCfg, int arm, Vector3& goalP,
+               double angle) :
+        mainproblem(mainproblem_), foundParent(false), foundChild(false),
+        CSforGoal(4+2),
+        setterForGoal(robot, arm, goalP, startCfg[6]+angle),
+        setterForPath(robot, goalP),
+        goalCfg(7), usedArm(arm){
+        if (goalCfg.size() != startCfg.size()){
+            std::cerr << "subproblem: dimension mismatch(" << goalCfg.size()
+                      << "<->" << startCfg.size() << ")" << std::endl;
+        }
+        goalCfg[6] = startCfg[6]+angle;
+        planner = new PathPlanner(goalCfg.size(), 
+                                  mainproblem->planner()->world());
         planner->setMobilityName("OmniWheel");
         planner->setAlgorithmName("RRT");
         planner->getMobility()->interpolationDistance(0.05);
         planner->setCollisionDetector(cd);
+        planner->setApplyConfigFunc(boost::bind(&myCfgSetter3::set, 
+                                                &setterForPath, _1, _2));
         RRT *rrt = (RRT *)planner->getAlgorithm();
         rrt->getForwardTree()->addNode(new RoadmapNode(startCfg));
         rrt->extendFromGoal(true);
         rrt->epsilon(0.1);
 
+        // configuration space for goal search
+#if 1
         for (int i=0; i<4; i++) CSforGoal.bounds(i, startCfg[i]-0.1, startCfg[i]+0.1);
         CSforGoal.bounds(4, -M_PI/2, M_PI/2); // hand roll
         CSforGoal.bounds(5, -M_PI/2, M_PI/2); // hand pitch
+#else
+        for (int i=0; i<CSforGoal.size(); i++) CSforGoal.bounds(i, startCfg[i], startCfg[i]);
+#endif
+
+        // configuration space for path search
+        ConfigurationSpace *CSforPath = planner->getConfigurationSpace();
+#if 0
+        CSforPath->bounds(0,  0.2, 0.8); // body z
+        CSforPath->bounds(1, -0.5, 0.5); // body roll
+        CSforPath->bounds(2, -0.0, 0.5); // body pitch
+        CSforPath->bounds(3, -0.5, 0.5); // body yaw
+#else
+        for (int i=0; i<4; i++) CSforPath->bounds(i, startCfg[i]-0.1, startCfg[i]+0.1);
+#endif
+        CSforPath->bounds(4, -M_PI/2, M_PI/2); // hand roll
+        CSforPath->bounds(5, -M_PI/2, M_PI/2); // hand pitch
+        CSforPath->bounds(6, -M_PI, M_PI);   // hand yaw
     }
-    void oneStep(){
+    bool oneStep(){
+        if (foundChild && foundParent){
+            return true;
+        }
+#if 0
+        if (foundChild) return false;
+#endif
         RRT *rrt = (RRT *)planner->getAlgorithm();
         Roadmap *Tg = rrt->getBackwardTree();
         double Psample = 0.1;
         if (!Tg->nNodes() || rand() < Psample*RAND_MAX){
-            if (find_a_final_goal(*mainproblem, setterForGoal,
-                                  CSforGoal, goalCfg)){
+            Configuration cfg(CSforGoal.size());
+            if (testRandomConfig(mainproblem->planner(), setterForGoal,
+                                 CSforGoal, cfg)){
+                for (int i=0; i<4+2; i++) goalCfg[i] = cfg[i];
                 Tg->addNode(new RoadmapNode(goalCfg));
-                std::cout << "found a final goal" << std::endl;
-                mainproblem->updateOLV();
+                std::cout << "found a final goal:" << goalCfg << std::endl;
+                //mainproblem->updateOLV();
             }
         }else{
-            rrt->extendOneStep();
+            if (rrt->extendOneStep()){
+                std::cout << "found a path between an intermediate goal and an final goal" << std::endl;
+                foundChild = true;
+                if (foundParent) return true;
+            }
         }
+        return false;
     }
 
     problem *mainproblem;
     PathPlanner *planner;
-    bool found; 
+    bool foundParent, foundChild; 
     ConfigurationSpace CSforGoal;
     myCfgSetter5 setterForGoal;
+    myCfgSetter3 setterForPath;
     Configuration goalCfg;
+    int usedArm;
 };
 
 int main(int argc, char *argv[])
@@ -263,7 +301,7 @@ int main(int argc, char *argv[])
     CSforPath->weight(14) = 0.2;
     CSforPath->weight(15) = 0.1;
 
-    Configuration startCfg(CSforPath->size()), goalCfg(CSforPath->size());
+    Configuration startCfg(CSforPath->size());
     startCfg[0] = robot->rootLink()->p[2];
     startCfg[1] = startCfg[2] = startCfg[3] = 0;
     for (int j=0; j<2; j++){
@@ -291,44 +329,131 @@ int main(int argc, char *argv[])
     Roadmap *Tg  = rrt->getBackwardTree();
     double Psample = 0.1;
     bool ret = false;
-    int n=100000;
+    int n=1000000;
+    std::vector<subproblem *> subproblems;
+    int subproblemId;
+    Configuration intermediateGoal(CSforGoal.size());
+    Configuration goalForPP(CSforPath->size());
+    bool foundPath=false; // TODO: remove
+    std::vector<RoadmapNode *> intermediateNodes;
+    std::vector<Configuration> reachingPath;
+    std::vector<Configuration> manipulationPath;
     gettimeofday(&tv1, NULL);
-    std::vector<subproblem> subproblems;
-    for (int i=0; i<n; i++){
+    for (int cnt=0; cnt<n; cnt++){
+#if 0
+        if (!foundPath){
+#endif
         if (!Tg->nNodes() || rand() < Psample*RAND_MAX){
-            if (find_an_intermediate_goal(prob, setterForIntermediateGoal, 
-                                          CSforGoal, goalCfg, armPath)){
-                Tg->addNode(new RoadmapNode(goalCfg));
-                std::cout << "found an intermediate goal(" << i << "/" << n << ")" << std::endl;
+            if (testRandomConfig(planner, setterForIntermediateGoal, 
+                                 CSforGoal, intermediateGoal)){
+                std::cout << "found an intermediate goal(" << cnt << "/" << n << "):" << intermediateGoal << std::endl;
+                for (int i=0; i<4; i++) goalForPP[i] = intermediateGoal[i];
+                for (int i=0; i<2; i++){
+                    for (int j=0; j<armPath[i]->numJoints(); j++){
+                        goalForPP[4+i*6+j] = armPath[i]->joint(j)->q;
+                    }
+                }
+                RoadmapNode *node = new RoadmapNode(goalForPP);
+                intermediateNodes.push_back(node);
+                Tg->addNode(node);
                 subproblems.push_back(
-                    subproblem(4+3, &prob, &cd, robot,
-                               goalCfg, setterForIntermediateGoal.reachedArm(),
-                               goalP));
-                prob.updateOLV();
+                    new subproblem(&prob, &cd, robot,
+                                   intermediateGoal, 
+                                   setterForIntermediateGoal.reachedArm(),
+                                   goalP, angle));
+                //prob.updateOLV();
                 //exit(0);
             }
         }else{
-            if (ret = rrt->extendOneStep()) break;
+            if (rrt->extendOneStep()){
+                std::cout << "found a path from the start to an intermediate goal"
+                          << std::endl;
+                RoadmapNode *node = Tg->lastAddedNode();
+                do{
+                    node = node->child(0);
+                }while(node->child(0)!=NULL);
+                for (size_t i=0; i<intermediateNodes.size(); i++){
+                    if (node == intermediateNodes[i]){
+                        std::cout << "this path is for " << i << "th intermediate goal" << std::endl;
+                        subproblems[i]->foundParent = true; 
+                    }
+                }
+                foundPath = true;
+            }
         }
+#if 0
+        }
+#endif
         for (size_t i=0; i<subproblems.size(); i++){
-            subproblems[i].oneStep();
+            if (ret = subproblems[i]->oneStep()) {
+                rrt->extractPath(reachingPath);
+                ((RRT *)subproblems[i]->planner->getAlgorithm())->extractPath(manipulationPath);
+                RandomShortcutOptimizer opt1(subproblems[i]->planner);
+                ShortcutOptimizer       opt2(subproblems[i]->planner);
+                for (int j=0; j<5; j++) {
+                    manipulationPath = opt1.optimize(manipulationPath);
+                    manipulationPath = opt2.optimize(manipulationPath);
+                }
+                subproblemId = i;
+                std::cout << "end of planning" << std::endl;
+                break;
+            }
         }
+        if (ret) break;
     }
-    std::vector<Configuration> path;
     if (ret){
-        rrt->extractPath(path);
         RandomShortcutOptimizer opt1(planner);
         ShortcutOptimizer       opt2(planner);
         for (int i=0; i<5; i++) {
-            path = opt1.optimize(path);
-            path = opt2.optimize(path);
+            reachingPath = opt1.optimize(reachingPath);
+            reachingPath = opt2.optimize(reachingPath);
         }
     }
     gettimeofday(&tv2, NULL);
+    bool bInterpolate = true;
+    prob.dt(0.1);
     if (ret){
-        for (unsigned int i=0; i<path.size(); i++){
-            planner->setConfiguration(path[i]);
-            prob.updateOLV();
+        std::ofstream ofs("path.txt");
+        ofs << subproblems[subproblemId]->usedArm << std::endl;
+        std::cout << "length of the reaching path:" << reachingPath.size()
+                  << std::endl;
+        if (bInterpolate){
+            for (unsigned int i=1; i<reachingPath.size(); i++){
+                std::vector<Configuration> interpolatedReachingPath;
+                planner->getMobility()->getPath(reachingPath[i-1],reachingPath[i],
+                                                interpolatedReachingPath);
+                for (size_t j=0; j<interpolatedReachingPath.size(); j++){
+                    planner->setConfiguration(interpolatedReachingPath[j]);
+                    ofs << robot << std::endl;
+                    prob.updateOLV();
+                }
+            }
+        }else{
+            for (unsigned int i=0; i<reachingPath.size(); i++){
+                planner->setConfiguration(reachingPath[i]);
+                ofs << robot << std::endl;
+                prob.updateOLV();
+            }
+        }
+        std::cout << "length of the manipulation path:" 
+                  << manipulationPath.size() << std::endl;
+        for (unsigned int i=1; i<manipulationPath.size(); i++){
+            PathPlanner *planner = subproblems[subproblemId]->planner;
+            if (bInterpolate){
+                std::vector<Configuration> interpolatedManipulationPath;
+                planner->getMobility()->getPath(
+                    manipulationPath[i-1], manipulationPath[i],
+                    interpolatedManipulationPath);
+                for (size_t j=1; j<interpolatedManipulationPath.size(); j++){
+                    planner->setConfiguration(interpolatedManipulationPath[j]);
+                    ofs << robot << std::endl;
+                    prob.updateOLV();
+                }
+            }else{
+                planner->setConfiguration(manipulationPath[i]);
+                ofs << robot << std::endl;
+                prob.updateOLV();
+            }
         }
         double time = (tv2.tv_sec - tv1.tv_sec) + ((double)(tv2.tv_usec - tv1.tv_usec))/1e6;
         std::cout << "total time = " << time << "[s]" << std::endl;
@@ -341,6 +466,13 @@ int main(int argc, char *argv[])
         std::cout << "failed to find a path" << std::endl;
         std::cout << "profile of setter for intermediate goal:" << std::endl;
         setterForIntermediateGoal.profile();
+        for (size_t i=0; i<subproblems.size(); i++){
+            PathPlanner *p = subproblems[i]->planner;
+            RRT *rrt = (RRT *)p->getAlgorithm();
+            std::cout << i << " : nnodes = " 
+                      << rrt->getForwardTree()->nNodes() << ","
+                      << rrt->getBackwardTree()->nNodes() << std::endl;
+        }
         std::cout << "nnodes = " << rrt->getForwardTree()->nNodes() << ","
                   << Tg->nNodes() << std::endl;
     }
