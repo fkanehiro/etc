@@ -100,13 +100,16 @@ void loadPath(const char *filename, int dof, int &arm,
 
 int main(int argc, char *argv[])
 {
+    const char *robotURL = NULL;
     bool avoidCollision=true, keepBalance=true, display=true;
     char *cloudf=NULL;
     std::vector<std::string> obstacleURL;
     std::vector<Vector3> obstacleP;
     std::vector<Vector3> obstacleRpy;
     for (int i=0; i<argc; i++){
-        if (strcmp(argv[i], "-no-balance-compensation")==0){
+        if (strcmp(argv[i], "-robot") == 0){
+            robotURL = argv[++i];
+        }else if (strcmp(argv[i], "-no-balance-compensation")==0){
             keepBalance = false;
         }else if (strcmp(argv[i], "-no-collision-avoidance")==0){
             avoidCollision = false;
@@ -127,8 +130,12 @@ int main(int argc, char *argv[])
               << ", balance compensation = " << keepBalance 
               << ", display = " << display << std::endl;
 
+    if (robotURL == NULL){
+        std::cerr << "please specify URL of VRML model by -robot option"
+                  << std::endl;
+        return 1;
+    }
     // load robot
-    const char *robotURL = "file:///home/kanehiro/openhrp3.0/Controller/IOserver/robot/HRP2/model/HRP2main.wrl";
     HumanoidBodyPtr robot = HumanoidBodyPtr(new HumanoidBody());
     loadHumanoidBodyFromModelLoader(robot, robotURL, argc, argv, false);
     
@@ -312,7 +319,7 @@ int main(int argc, char *argv[])
     exit(0);
 #endif
 
-#if 1
+#if 0
     for (unsigned int i=0; i<qPath.size(); i++){
         robot->setPosture(qPath[i], pPath[i], rotFromRpy(rpyPath[i]));
         robot->calcForwardKinematics();
