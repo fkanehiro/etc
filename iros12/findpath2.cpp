@@ -248,9 +248,9 @@ int main(int argc, char *argv[])
                 if (display) prob.updateOLV();
             }
         }else{
-            PathEngine::Roadmap *roadmap = planner->getRoadmap();
+            PathEngine::RoadmapPtr roadmap = planner->getRoadmap();
             for (unsigned int i=0; i<roadmap->nNodes(); i++){
-                PathEngine::RoadmapNode *node = roadmap->node(i);
+                PathEngine::RoadmapNodePtr node = roadmap->node(i);
                 planner->setConfiguration(node->position());
                 if (display) prob.updateOLV();
             }

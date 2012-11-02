@@ -207,7 +207,7 @@ int main(int argc, char *argv[])
             startCfg[4+j*6+i] = armPath[j]->joint(i)->q;
         }
     }
-    rrt->getForwardTree()->addNode(new RoadmapNode(startCfg));
+    rrt->getForwardTree()->addNode(RoadmapNodePtr(new RoadmapNode(startCfg)));
     planner->setApplyConfigFunc(boost::bind(&myCfgSetter2::set, 
                                             &setterForPath, _1, _2));
 
@@ -224,7 +224,7 @@ int main(int argc, char *argv[])
     }
 
     struct timeval tv1, tv2;
-    Roadmap *Tg  = rrt->getBackwardTree();
+    RoadmapPtr Tg  = rrt->getBackwardTree();
     double Psample = 0.1;
     bool ret = false;
     int n=100000;
@@ -232,7 +232,7 @@ int main(int argc, char *argv[])
     for (int i=0; i<n; i++){
         if (!Tg->nNodes() || rand() < Psample*RAND_MAX){
             if (find_a_goal(prob, setterForGoal, CSforGoal, goalCfg, armPath)){
-                Tg->addNode(new RoadmapNode(goalCfg));
+                Tg->addNode(RoadmapNodePtr(new RoadmapNode(goalCfg)));
             }
         }else{
             if (ret = rrt->extendOneStep()) break;

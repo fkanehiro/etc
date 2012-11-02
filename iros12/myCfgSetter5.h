@@ -21,7 +21,7 @@ public:
             m_ikFailCount[i] = 0;
         }
         m_body->getPosture(m_q);
-        std::cout << "arm = " << m_reachingArm << ", yaw = " << m_yaw << std::endl;
+        //std::cout << "arm = " << m_reachingArm << ", yaw = " << m_yaw << std::endl;
     }
     bool set(PathEngine::PathPlanner *i_planner,
              const PathEngine::Configuration &i_cfg){
