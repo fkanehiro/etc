@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
     if (display) prob.initOLV(argc, argv);
 
     PathEngine::ConfigurationSpace cspace(6); 
-    cspace.bounds(0,  0.2, 0.8); // body z
+    cspace.bounds(0,  0.26, 0.705); // body z
     cspace.bounds(1, -0.5, 0.5); // body roll
     cspace.bounds(2, -0.0, M_PI/4); // body pitch
     cspace.bounds(3, -M_PI/4, M_PI/4); // body yaw

@@ -169,7 +169,7 @@ int main(int argc, char *argv[])
 
     ConfigurationSpace* CSforPath = planner->getConfigurationSpace();
 
-    CSforPath->bounds(0,  0.2, 0.8); // body z
+    CSforPath->bounds(0,  0.26, 0.705); // body z
     CSforPath->bounds(1, -0.5, 0.5); // body roll
     CSforPath->bounds(2, -0.0, 0.5); // body pitch
     CSforPath->bounds(3, -0.5, 0.5); // body yaw
@@ -212,7 +212,7 @@ int main(int argc, char *argv[])
                                             &setterForPath, _1, _2));
 
     ConfigurationSpace CSforGoal(7); 
-    CSforGoal.bounds(0,  0.2, 0.8); // body z
+    CSforGoal.bounds(0,  0.26, 0.705); // body z
     CSforGoal.bounds(1, -0.5, 0.5); // body roll
     CSforGoal.bounds(2, -0.0, 0.5); // body pitch
     CSforGoal.bounds(3, -0.5, 0.5); // body yaw
