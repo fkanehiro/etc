@@ -1,7 +1,7 @@
 #!/bin/sh
 
 export NS_OPT='-ORBInitRef NameService=corbaloc:iiop:localhost:2809/NameService'
-export MODEL_URL=file:///home/kanehiro/openrtp/share/OpenHRP-3.1/robot/HRP2/model/HRP2main.wrl
+export MODEL_URL=file://$HOME/openrtp/share/OpenHRP-3.1/robot/HRP2/model/HRP2main.wrl
 #export OBSTACLE_URL=file://$OPENHRPHOME/etc/house/table.main.wrl
 #export OBSTACLE_POS='-1.0 1.0 0.0 0 0 0'   
 export OBSTACLE_URL=file://$PWD/EnvPlant.wrl
