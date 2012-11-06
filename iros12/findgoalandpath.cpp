@@ -43,6 +43,32 @@ bool find_a_goal(problem &prob, myCfgSetter3 &setter,
     return false;
 }
 
+void setHalfConf(HumanoidBodyPtr robot)
+{
+    // set halfconf
+    dvector halfconf;
+    halfconf.setZero(robot->numJoints());
+    halfconf[2] = halfconf[ 8] = ToRad(-40);
+    halfconf[3] = halfconf[ 9] = ToRad( 78);
+    halfconf[4] = halfconf[10] = ToRad(-38);
+    double leg_link_len1=0, leg_link_len2=0; 
+    halfconf[16] = halfconf[23] = ToRad(20);
+    halfconf[17] = ToRad(-10); halfconf[24] = -halfconf[17];
+    halfconf[19] = halfconf[26] = ToRad(-30);
+    halfconf[20] = ToRad(80); halfconf[27] = -halfconf[20];
+    halfconf[22] = halfconf[29] = -1.0;
+    leg_link_len1 = leg_link_len2 = 0.3;
+    double waistHeight = leg_link_len1*cos(halfconf[2])
+        + leg_link_len2*cos(halfconf[4]) 
+        + robot->FootToAnkle()[2];
+    robot->rootLink()->p << 0,0,waistHeight;
+    robot->rootLink()->R.setIdentity();
+    for (int i=0; i<robot->numJoints(); i++){
+        robot->joint(i)->q = halfconf[i];
+    }
+    robot->calcForwardKinematics();
+}
+
 int main(int argc, char *argv[])
 {
     srand((unsigned)time(NULL));
@@ -54,6 +80,7 @@ int main(int argc, char *argv[])
     std::vector<Vector3> obstacleRpy;
     Vector3 p, rpy;
     bool display = true;
+    int ntrial = 1;
     for(int i = 1 ; i < argc; i++){
         if (strcmp(argv[i], "-robot") == 0){
             robotURL = argv[++i];
@@ -67,6 +94,8 @@ int main(int argc, char *argv[])
             goalURL = argv[++i];
         }else if (strcmp(argv[i], "-no-display")==0){
             display = false;
+        }else if (strcmp(argv[i], "-ntrial")==0){
+            ntrial = atoi(argv[++i]);
         }
     }
     // goal position
@@ -126,26 +155,7 @@ int main(int argc, char *argv[])
     }
 
     // set halfconf
-    dvector halfconf;
-    halfconf.setZero(robot->numJoints());
-    halfconf[2] = halfconf[ 8] = ToRad(-40);
-    halfconf[3] = halfconf[ 9] = ToRad( 78);
-    halfconf[4] = halfconf[10] = ToRad(-38);
-    double leg_link_len1=0, leg_link_len2=0; 
-    halfconf[16] = halfconf[23] = ToRad(20);
-    halfconf[17] = ToRad(-10); halfconf[24] = -halfconf[17];
-    halfconf[19] = halfconf[26] = ToRad(-30);
-    halfconf[20] = ToRad(80); halfconf[27] = -halfconf[20];
-    halfconf[22] = halfconf[29] = -1.0;
-    leg_link_len1 = leg_link_len2 = 0.3;
-    double waistHeight = leg_link_len1*cos(halfconf[2])
-        + leg_link_len2*cos(halfconf[4]) 
-        + robot->FootToAnkle()[2];
-    robot->rootLink()->p(2) = waistHeight;
-    for (int i=0; i<robot->numJoints(); i++){
-        robot->joint(i)->q = halfconf[i];
-    }
-    robot->calcForwardKinematics();
+    setHalfConf(robot);
 
     Matrix33 goalR(rotFromRpy(goalRpy));
     if (goal){
@@ -207,7 +217,6 @@ int main(int argc, char *argv[])
             startCfg[4+j*6+i] = armPath[j]->joint(i)->q;
         }
     }
-    rrt->getForwardTree()->addNode(RoadmapNodePtr(new RoadmapNode(startCfg)));
     planner->setApplyConfigFunc(boost::bind(&myCfgSetter2::set, 
                                             &setterForPath, _1, _2));
 
@@ -223,51 +232,66 @@ int main(int argc, char *argv[])
         CSforGoal.weight(i) = 1.0;
     }
 
-    struct timeval tv1, tv2;
-    RoadmapPtr Tg  = rrt->getBackwardTree();
     double Psample = 0.1;
-    bool ret = false;
-    int n=100000;
-    gettimeofday(&tv1, NULL);
-    for (int i=0; i<n; i++){
-        if (!Tg->nNodes() || rand() < Psample*RAND_MAX){
-            if (find_a_goal(prob, setterForGoal, CSforGoal, goalCfg, armPath)){
-                Tg->addNode(RoadmapNodePtr(new RoadmapNode(goalCfg)));
+    RoadmapPtr Tg  = rrt->getBackwardTree();
+    TimeMeasure tm;
+    int ngoal;
+    //
+    std::cout << "#n time ngoal ncfg" << std::endl;
+    for (int j=0; j<ntrial; j++){
+        ngoal = 0;
+        //setHalfConf(robot);
+        rrt->getForwardTree()->clear();
+        rrt->getBackwardTree()->clear();
+        bool ret = false;
+        rrt->getForwardTree()->addNode(RoadmapNodePtr(new RoadmapNode(startCfg)));
+        int n=100000;
+        tm.begin();
+        for (int i=0; i<n; i++){
+            if (!Tg->nNodes() || rand() < Psample*RAND_MAX){
+                if (find_a_goal(prob, setterForGoal, CSforGoal, goalCfg, armPath)){
+                    ngoal++;
+                    Tg->addNode(RoadmapNodePtr(new RoadmapNode(goalCfg)));
+                }
+            }else{
+                if (ret = rrt->extendOneStep()) break;
+            }
+        }
+        std::vector<Configuration> path;
+        if (ret){
+            rrt->extractPath(path);
+            RandomShortcutOptimizer opt1(planner);
+            ShortcutOptimizer       opt2(planner);
+            for (int i=0; i<5; i++) {
+                path = opt1.optimize(path);
+                path = opt2.optimize(path);
+            }
+        }
+        tm.end();
+        if (ret){
+            for (unsigned int i=0; i<path.size(); i++){
+                planner->setConfiguration(path[i]);
+                prob.updateOLV();
             }
         }else{
-            if (ret = rrt->extendOneStep()) break;
+            std::cout << "failed to find a path" << std::endl;
+            std::cout << "nnodes = " << rrt->getForwardTree()->nNodes() << ","
+                      << Tg->nNodes() << std::endl;
         }
+        std::cout << j << " " << tm.time() << " " << ngoal << " " 
+                  << path.size() << std::endl;
     }
-    std::vector<Configuration> path;
-    if (ret){
-        rrt->extractPath(path);
-        RandomShortcutOptimizer opt1(planner);
-        ShortcutOptimizer       opt2(planner);
-        for (int i=0; i<5; i++) {
-            path = opt1.optimize(path);
-            path = opt2.optimize(path);
-        }
-    }
-    gettimeofday(&tv2, NULL);
-    if (ret){
-        for (unsigned int i=0; i<path.size(); i++){
-            planner->setConfiguration(path[i]);
-            prob.updateOLV();
-        }
-        double time = (tv2.tv_sec - tv1.tv_sec) + ((double)(tv2.tv_usec - tv1.tv_usec))/1e6;
-        std::cout << "total time = " << time << "[s]" << std::endl;
-        double cdtime = planner->timeCollisionCheck();
-        std::cout << "time spent in collision detection:"
-                  << cdtime << "[s](" << cdtime/time*100 << "[%])" << std::endl;
-        std::cout << "collision is checked " << planner->countCollisionCheck() << "times(" << cdtime/planner->countCollisionCheck()*1000 << "[ms/call])" << std::endl;
-
-    }else{
-        std::cout << "failed to find a path" << std::endl;
-        std::cout << "profile of setter for goal:" << std::endl;
-        setterForGoal.profile();
-        std::cout << "nnodes = " << rrt->getForwardTree()->nNodes() << ","
-                  << Tg->nNodes() << std::endl;
-    }
+    double ttime = tm.totalTime();
+    std::cout << "total   time = " << ttime << "[s]" << std::endl;
+    std::cout << "average time = " << tm.averageTime() << "[s]" << std::endl;
+    double cdtime = planner->timeCollisionCheck();
+    std::cout << "time spent in collision detection:"
+              << cdtime << "[s](" << cdtime/ttime*100 << "[%])" << std::endl;
+    std::cout << "collision is checked " << planner->countCollisionCheck() << " times(" << cdtime/planner->countCollisionCheck()*1000 << "[ms/call])" << std::endl;
+    std::cout << "profile of setter for goal:";
+    setterForGoal.profile();
+    std::cout << "profile of setter for path:";
+    setterForPath.profile();
 
     return 0;
 }
