@@ -23,7 +23,7 @@ using namespace motion_interpolator;
 using namespace hrp;
 
 Filter::Filter(HumanoidBodyPtr i_body, int i_arm, bool i_balance) : 
-    m_body(i_body), m_arm(i_arm)
+    m_body(i_body), m_arm(i_arm), m_dq(m_body->numJoints()+6)
 {
     m_refBody = HumanoidBodyPtr(new HumanoidBody(*m_body));
     Link *hand = m_body->wristLink[i_arm];
@@ -145,7 +145,7 @@ void Filter::init(const dvector&q, const Vector3& p, const Matrix33& R)
     m_com->referenceCom(com);
 }
 
-void Filter::filter(const dvector& q, const Vector3 &p, const Matrix33 &R)
+bool Filter::filter(const dvector& q, const Vector3 &p, const Matrix33 &R)
 {
     m_refBody->setPosture(q, p, R);
     m_refBody->calcForwardKinematics();
@@ -183,7 +183,7 @@ void Filter::filter(const dvector& q, const Vector3 &p, const Matrix33 &R)
     m_com->update();
 
 #if 1
-    const double maxdq = 0.01;
+    const double maxdq = 0.002;
     double max = 0;
     dvector v(m_body->numJoints());
     for (int i=0; i<m_body->numJoints(); i++){
@@ -201,17 +201,18 @@ void Filter::filter(const dvector& q, const Vector3 &p, const Matrix33 &R)
 #endif
     m_cfg->update();
     
-    dvector dq(m_body->numJoints() + 6); 
     for (int i=0; i<m_body->numJoints(); i++){
-        dq[i] = q[i] - m_body->joint(i)->q;
+        m_dq[i] = q[i] - m_body->joint(i)->q;
     }
     for (int i=0; i<6; i++){
-        dq[m_body->numJoints()+i] = 0;
+        m_dq[m_body->numJoints()+i] = 0;
     }
-    int ret = m_cm->solve(dq);
+    int ret = m_cm->solve(m_dq);
     if (ret){
         std::cerr << "information from QPsolver = " << ret << std::endl;
-        getchar();
+        return false;
+    }else{
+        return true;
     }
 }
 
@@ -223,4 +224,9 @@ void Filter::addSelfCollisionAvoidanceConstraint(DistanceConstraint *i_dc)
 void Filter::setRobotShapes(const std::vector<DistanceGeometry *> i_dg)
 {
     m_shapes = i_dg;
+}
+
+double Filter::error()
+{
+    return m_hand->error(m_dq).norm();
 }

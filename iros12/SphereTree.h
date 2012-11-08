@@ -39,11 +39,39 @@ public:
                double i_radius);
     ~SphereTree();
     SphereTreeNode *root() { return m_root; }
+    /**
+     * @brief collision detection against a sphere
+     * @param i_p position of the sphere
+     * @param i_r radius of the sphere
+     * @return true if colliding
+     */
     bool isColliding(const hrp::Vector3& i_p, double i_r) const;
+    /**
+     * @brief collect spheres in the distance bound of a sphere
+     * @param i_p position of the sphere
+     * @param i_r radius of the sphere
+     * @param i_d thickness of the distance bound
+     * @param o_centers vector of positions of spheres in the distance bound
+     */
     void collectSpheres(const hrp::Vector3& i_p, double i_r, double i_d,
                         std::vector<hrp::Vector3> &o_centers);
+    /**
+     * @brief collision detection against a capsule
+     * @param i_p1 an end point of the line segment in the capsule
+     * @param i_p2 the other end point of the line segment in the capsule
+     * @param i_r radius of the capsule
+     * @return true if colliding
+     */
     bool isColliding(const hrp::Vector3& i_p1, const hrp::Vector3& i_p2, 
                      double i_r) const;
+    /**
+     * @brief collect spheres in the distance bound of a capsule
+     * @param i_p1 an end point of the line segment in the capsule
+     * @param i_p2 the other end point of the line segment in the capsule
+     * @param i_r radius of the capsule
+     * @param i_d thickness of the distance bound
+     * @param o_centers vector of positions of spheres in the distance bound
+     */
     void collectSpheres(const hrp::Vector3& i_p1, const hrp::Vector3& i_p2,
                         double i_r, double i_d,
                         std::vector<hrp::Vector3> &o_centers);

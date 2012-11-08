@@ -65,6 +65,7 @@ void setHalfConf(HumanoidBodyPtr robot)
     robot->rootLink()->R.setIdentity();
     for (int i=0; i<robot->numJoints(); i++){
         robot->joint(i)->q = halfconf[i];
+        robot->joint(i)->defaultJointValue = halfconf[i];
     }
     robot->calcForwardKinematics();
 }
@@ -75,12 +76,15 @@ int main(int argc, char *argv[])
  
     const char *robotURL = NULL;
     const char *goalURL = NULL;
+    const char *cloudf="plant.pc";
+    const char *initposf=NULL;
     std::vector<std::string> obstacleURL;
     std::vector<Vector3> obstacleP;
     std::vector<Vector3> obstacleRpy;
     Vector3 p, rpy;
     bool display = true;
     int ntrial = 1;
+    double timeout = 3.0;
     for(int i = 1 ; i < argc; i++){
         if (strcmp(argv[i], "-robot") == 0){
             robotURL = argv[++i];
@@ -96,6 +100,12 @@ int main(int argc, char *argv[])
             display = false;
         }else if (strcmp(argv[i], "-ntrial")==0){
             ntrial = atoi(argv[++i]);
+        }else if (strcmp(argv[i], "-point-cloud")==0){
+            cloudf = argv[++i];
+        }else if (strcmp(argv[i], "-init-pos")==0){
+            initposf = argv[++i];
+        }else if (strcmp(argv[i], "-timeout")==0){
+            timeout = atof(argv[++i]);
         }
     }
     // goal position
@@ -156,6 +166,24 @@ int main(int argc, char *argv[])
 
     // set halfconf
     setHalfConf(robot);
+    if (initposf){
+        std::ifstream ifs(initposf);
+        if (!ifs.is_open()){
+            std::cerr << "failed to open " << initposf << std::endl;
+            return 1;
+        }
+        Link *root = robot->rootLink();
+        for (int i=0; i<3; i++) ifs >> root->p[i];
+        for (int i=0; i<3; i++){
+            for (int j=0; j<3; j++){
+                ifs >> root->R(i,j);
+            }
+        }
+        for (int i=0; i<robot->numJoints(); i++){
+            ifs >> robot->joint(i)->q;
+        }
+        robot->calcForwardKinematics();
+    }
 
     Matrix33 goalR(rotFromRpy(goalRpy));
     if (goal){
@@ -164,11 +192,12 @@ int main(int argc, char *argv[])
         goal->calcForwardKinematics();
     }
 
+
     myCfgSetter3 setterForGoal(robot, goalP);
     myCfgSetter2 setterForPath(robot);
 
     CustomCD cd(robot, "hrp2.shape", "hrp2.pairs", 
-                obstacles[0], "plant.pc");
+                obstacles[0], cloudf);
     planner->setCollisionDetector(&cd);
     
     JointPathPtr armPath[2];
@@ -211,7 +240,8 @@ int main(int argc, char *argv[])
 
     Configuration startCfg(CSforPath->size()), goalCfg(CSforPath->size());
     startCfg[0] = robot->rootLink()->p[2];
-    startCfg[1] = startCfg[2] = startCfg[3] = 0;
+    rpy = rpyFromRot(robot->rootLink()->R);
+    startCfg[1] = rpy[0]; startCfg[2] = rpy[1]; startCfg[3] = rpy[2];
     for (int j=0; j<2; j++){
         for (int i=0; i<armPath[j]->numJoints(); i++){
             startCfg[4+j*6+i] = armPath[j]->joint(i)->q;
@@ -219,6 +249,13 @@ int main(int argc, char *argv[])
     }
     planner->setApplyConfigFunc(boost::bind(&myCfgSetter2::set, 
                                             &setterForPath, _1, _2));
+
+    planner->setConfiguration(startCfg);
+    //prob.updateOLV();
+    if (planner->checkCollision()){
+        std::cerr << "Error:start configuration is not collision-free" << std::endl;
+        return 1;
+    }
 
     ConfigurationSpace CSforGoal(7); 
     CSforGoal.bounds(0,  0.26, 0.705); // body z
@@ -235,26 +272,34 @@ int main(int argc, char *argv[])
     double Psample = 0.1;
     RoadmapPtr Tg  = rrt->getBackwardTree();
     TimeMeasure tm;
-    int ngoal;
+    int ngoal, ntimeout=0;
+    struct timeval tv1, tv2;
     //
     std::cout << "#n time ngoal ncfg" << std::endl;
     for (int j=0; j<ntrial; j++){
         ngoal = 0;
-        //setHalfConf(robot);
         rrt->getForwardTree()->clear();
         rrt->getBackwardTree()->clear();
         bool ret = false;
         rrt->getForwardTree()->addNode(RoadmapNodePtr(new RoadmapNode(startCfg)));
-        int n=100000;
+        gettimeofday(&tv1, NULL);
         tm.begin();
-        for (int i=0; i<n; i++){
+        while(1){
             if (!Tg->nNodes() || rand() < Psample*RAND_MAX){
                 if (find_a_goal(prob, setterForGoal, CSforGoal, goalCfg, armPath)){
                     ngoal++;
+                    //std::cout << "found a goal" << std::endl;
+                    //prob.updateOLV();
                     Tg->addNode(RoadmapNodePtr(new RoadmapNode(goalCfg)));
                 }
             }else{
                 if (ret = rrt->extendOneStep()) break;
+            }
+            gettimeofday(&tv2, NULL);
+            if (tv2.tv_sec - tv1.tv_sec + (tv2.tv_usec - tv1.tv_usec)/1e6
+                > timeout) {
+                ntimeout++;
+                break;
             }
         }
         std::vector<Configuration> path;
@@ -262,16 +307,33 @@ int main(int argc, char *argv[])
             rrt->extractPath(path);
             RandomShortcutOptimizer opt1(planner);
             ShortcutOptimizer       opt2(planner);
-            for (int i=0; i<5; i++) {
+            for (int i=0; i<50; i++) {
                 path = opt1.optimize(path);
                 path = opt2.optimize(path);
             }
         }
         tm.end();
         if (ret){
+            std::ofstream ofs("path.txt");
+            //ofs << arm << std::endl;
+            ofs << 0 << std::endl;
+
             for (unsigned int i=0; i<path.size(); i++){
                 planner->setConfiguration(path[i]);
                 prob.updateOLV();
+
+                for (int j=0; j<3; j++){
+                    ofs << robot->rootLink()->p[j] << " ";
+                }
+                for (int j=0; j<3; j++){
+                    for (int k=0; k<3; k++){
+                        ofs << robot->rootLink()->R(j,k) << " ";
+                    }
+                }
+                for (int j=0; j<robot->numJoints(); j++){
+                    ofs << robot->joint(j)->q << " ";
+                }
+                ofs << std::endl;
             }
         }else{
             std::cout << "failed to find a path" << std::endl;
@@ -283,7 +345,7 @@ int main(int argc, char *argv[])
     }
     double ttime = tm.totalTime();
     std::cout << "total   time = " << ttime << "[s]" << std::endl;
-    std::cout << "average time = " << tm.averageTime() << "[s]" << std::endl;
+    std::cout << "average time = " << (ttime-timeout*ntimeout)/ntrial << "[s]" << std::endl;
     double cdtime = planner->timeCollisionCheck();
     std::cout << "time spent in collision detection:"
               << cdtime << "[s](" << cdtime/ttime*100 << "[%])" << std::endl;

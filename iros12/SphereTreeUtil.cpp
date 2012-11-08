@@ -10,7 +10,7 @@ void loadPointArray(const char *i_filename, std::vector<hrp::Vector3> &o_points)
         return;
     }
     
-    std::cerr << "loading..." << std::flush;
+    std::cerr << "loading " << i_filename << "..." << std::flush;
     hrp::Vector3 p;
     ifs >> p[0];
     while (!ifs.eof()){

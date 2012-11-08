@@ -16,11 +16,11 @@ public:
     Filter(motion_generator::HumanoidBodyPtr i_body, int i_arm, bool i_balance);
     ~Filter();
     void init(const hrp::dvector&q, const hrp::Vector3& p, const hrp::Matrix33& R);
-    void filter(const hrp::dvector& q, const hrp::Vector3& p, const hrp::Matrix33 &R);
+    bool filter(const hrp::dvector& q, const hrp::Vector3& p, const hrp::Matrix33 &R);
     void setDistanceConstraints(const std::vector<DistanceConstraint *>& i_dists);
     void addSelfCollisionAvoidanceConstraint(DistanceConstraint *i_dc);
     void setRobotShapes(const std::vector<DistanceGeometry *> i_dg);
-
+    double error();
 private:
     void setupDistanceConstraints();
 
@@ -36,5 +36,6 @@ private:
     PrioritizedTaskSetSolver *m_tss;
     motion_generator::HumanoidBodyPtr m_body, m_refBody;
     int m_arm;
+    hrp::dvector m_dq;
 };
 

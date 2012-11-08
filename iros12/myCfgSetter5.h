@@ -25,6 +25,7 @@ public:
     }
     bool set(PathEngine::PathPlanner *i_planner,
              const PathEngine::Configuration &i_cfg){
+        m_nCalls++; 
         // compute trunk horizontal position
         setBase(i_cfg[0], i_cfg[1], i_cfg[2], i_cfg[3]);
         m_trunk->calcForwardKinematics();
@@ -53,6 +54,7 @@ public:
         return true;
     }
     void profile(){
+        std::cout << m_nCalls << ",";
         for (int i=0; i<3; i++) std::cout << m_ikFailCount[i] << " ";
         std::cout << std::endl;
     }

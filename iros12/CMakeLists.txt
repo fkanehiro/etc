@@ -30,6 +30,9 @@ target_link_libraries(findgoal2 ${HMC2_LIBRARIES} )
 add_executable(findgoal3 findgoal3.cpp SphereTree.cpp CdShape.cpp DistUtil.cpp problem.cpp CdShapeUtil.cpp SphereTreeUtil.cpp CustomCD.cpp)
 target_link_libraries(findgoal3 ${HMC2_LIBRARIES} )
 
+add_executable(iktest iktest.cpp problem.cpp)
+target_link_libraries(iktest ${HMC2_LIBRARIES} )
+
 add_executable(findpath2 findpath2.cpp problem.cpp SphereTree.cpp CdShape.cpp DistUtil.cpp problem.cpp CdShapeUtil.cpp SphereTreeUtil.cpp CustomCD.cpp)
 target_link_libraries(findpath2 ${HMC2_LIBRARIES} )
 

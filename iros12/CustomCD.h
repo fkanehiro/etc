@@ -12,10 +12,12 @@ public:
              hrp::BodyPtr i_env,
              const char *i_envpcfile);
     ~CustomCD();
+    bool loadPointCloud(hrp::BodyPtr i_env, const char *i_envpcfile);
     void updatePositions();
     bool checkCollision();
 private:
-    std::vector<CdShape> m_shapes;
+    std::vector<CdShape> m_shapes; ///< shapes of the robot
+    /// self-collision check pairs
     std::vector<std::pair<const CdShape *, const CdShape *> > m_pairs;
-    SphereTree *m_stree;
+    SphereTree *m_stree; ///< sphere tree of the environment 
 };

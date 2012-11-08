@@ -16,6 +16,7 @@ public:
                                             m_body->wristLink[i]);
         }
         m_trunk = m_body->getJointPath(m_body->rootLink(), m_body->chestLink);
+
         for (int i=0; i<4; i++){
             m_ikFailCount[i] = 0;
         }
@@ -23,6 +24,7 @@ public:
     }
     bool set(PathEngine::PathPlanner *i_planner,
              const PathEngine::Configuration &i_cfg){
+        m_nCalls++;
         // compute trunk horizontal position
         setBase(i_cfg[0], i_cfg[1], i_cfg[2], i_cfg[3]);
         m_trunk->calcForwardKinematics();
@@ -50,12 +52,17 @@ public:
         hrp::JointPathPtr path = m_reachedArm == 0 ? m_arm[1] : m_arm[0];
         for (int i=0; i<path->numJoints(); i++){
             hrp::Link *j = path->joint(i);
+#if 0
             j->q = m_q[j->jointId];
+#else
+            j->q = j->defaultJointValue;
+#endif
         }
         m_body->calcForwardKinematics();
         return true;
     }
     void profile(){
+        std::cout << m_nCalls << " calls,";
         for (int i=0; i<4; i++) std::cout << m_ikFailCount[i] << " ";
         std::cout << std::endl;
     }

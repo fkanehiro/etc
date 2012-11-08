@@ -35,9 +35,9 @@ public:
         return true;
     }
     void profile(){
-        std::cout << m_nCalls << " times called( ";
+        std::cout << m_nCalls << " calls,";
         for (int i=0; i<2; i++) std::cout << m_ikFailCount[i] << " ";
-        std::cout << ")" << std::endl;
+        std::cout << std::endl;
     }
 private:
     int m_ikFailCount[2];

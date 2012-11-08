@@ -32,7 +32,7 @@ void createDistanceConstraints(SphereTree &i_stree,
     o_consts.clear();
 
     int nconsts=0;
-    double ds = 0.00;
+    double ds = 0.005;
     for (unsigned int i=0; i<i_shapes.size(); i++){
         std::vector<hrp::Vector3> spheres;
         Sphere *s = dynamic_cast<Sphere *>(i_shapes[i]);
@@ -75,7 +75,8 @@ void loadPath(const char *filename, int dof, int &arm,
               std::vector<hrp::Vector3> &pPath, 
               std::vector<hrp::Vector3> &rpyPath)
 {
-    std::ifstream ifs("path.txt");
+    std::ifstream ifs(filename);
+    std::cout << "loading " << filename << "..." << std::flush;
     hrp::dvector q(dof);
     hrp::Vector3 p, rpy;
     hrp::Matrix33 R;
@@ -96,13 +97,15 @@ void loadPath(const char *filename, int dof, int &arm,
         rpyPath.push_back(rpy);
         ifs >> p[0];
     }
+    std::cout << "done." << std::endl;
 }
 
 int main(int argc, char *argv[])
 {
     const char *robotURL = NULL;
     bool avoidCollision=true, keepBalance=true, display=true;
-    char *cloudf=NULL;
+    const char *cloudf=NULL;
+    const char *pathf="path.txt"; 
     std::vector<std::string> obstacleURL;
     std::vector<Vector3> obstacleP;
     std::vector<Vector3> obstacleRpy;
@@ -117,6 +120,8 @@ int main(int argc, char *argv[])
             display = false;
         }else if (strcmp(argv[i], "-point-cloud")==0){
             cloudf = argv[++i];
+        }else if (strcmp(argv[i], "-path")==0){
+            pathf = argv[++i];
         }else if (strcmp(argv[i], "-obstacle") == 0){
             obstacleURL.push_back(argv[++i]);
             Vector3 p, rpy;
@@ -144,7 +149,7 @@ int main(int argc, char *argv[])
     std::vector<hrp::dvector> qPath;
     std::vector<hrp::Vector3> pPath;
     std::vector<hrp::Vector3> rpyPath;
-    loadPath("path.txt", robot->numJoints(), arm, qPath, pPath, rpyPath);
+    loadPath(pathf, robot->numJoints(), arm, qPath, pPath, rpyPath);
 
     Filter *filter = new Filter(robot, arm, keepBalance);
     filter->init(qPath[0], pPath[0], rotFromRpy(rpyPath[0]));
@@ -278,12 +283,11 @@ int main(int argc, char *argv[])
     pTrj->update();
     rpyTrj->update();
     std::cout << "duration of the motion:" << totalFrames*DT << std::endl;
-    int frames = totalFrames;
 
     // viewer
     problem prob(0);
     std::vector<BodyPtr> obstacles;
-    if (display){
+    if (1/*display*/){
         prob.addRobot("robot", robotURL, robot);
         for (unsigned int i=0; i<obstacleURL.size(); i++){
             char buf[20];
@@ -338,13 +342,15 @@ int main(int argc, char *argv[])
     hrp::Vector3 p, rpy;
     std::vector<DistanceConstraint *> consts;
     TimeMeasure disttm, qptm;
-    while (frames > 0){
-        printf("%6.3f/%6.3f\r", tm, totalFrames*DT);
+    int frames = 0;
+    while (frames < totalFrames){
+        fprintf(stderr, "%6.3f/%6.3f\r", tm, totalFrames*DT);
         // compute reference motion
-        qTrj->get(totalFrames-frames, q);
-        pTrj->get(totalFrames-frames, p);
-        rpyTrj->get(totalFrames-frames, rpy);
-        frames--;
+        int pos = frames >= totalFrames ? totalFrames-1 : frames;
+        qTrj->get(pos, q);
+        pTrj->get(pos, p);
+        rpyTrj->get(pos, rpy);
+        frames++;
 
         disttm.begin();
         createDistanceConstraints(stree, shapes, consts);
@@ -354,7 +360,7 @@ int main(int argc, char *argv[])
 
         // compute feasible motion
         qptm.begin();
-        filter->filter(q, p, rotFromRpy(rpy));
+        if (!filter->filter(q, p, rotFromRpy(rpy))) break;
         qptm.end();
         
         hrp::Vector3 com = robot->calcCM();
@@ -406,6 +412,20 @@ int main(int argc, char *argv[])
     std::cout << "time for solving QP(avg/max):"
               << qptm.averageTime()*1000 << ","
               << qptm.maxTime()*1000 << "[ms]" << std::endl;
+
+    std::ofstream ofs("initcfg.txt");
+    for (int i=0; i<3; i++){
+        ofs << robot->rootLink()->p[i] << " "; 
+    }
+    for (int i=0; i<3; i++){
+        for (int j=0; j<3; j++){
+            ofs << robot->rootLink()->R(i,j) << " ";
+        }
+    }
+    for (int i=0; i<robot->numJoints(); i++){
+        ofs << robot->joint(i)->q << " ";
+    }
+    ofs << std::endl;
 
     return 0;
 }

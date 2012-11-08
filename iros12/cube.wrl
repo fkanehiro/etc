@@ -294,7 +294,7 @@ DEF box2 Humanoid {
               }
               appearance Appearance {
                   material Material {
-                      diffuseColor 1.0 1.0 0.0
+                      diffuseColor 0.0 1.0 0.0
                   }
               }
             }

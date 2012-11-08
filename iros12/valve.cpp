@@ -81,14 +81,18 @@ public:
 
         // configuration space for goal search
 #if 1
-        for (int i=0; i<4; i++) CSforGoal.bounds(i, startCfg[i]-0.1, startCfg[i]+0.1);
 #if 1
-        CSforGoal.bounds(4, -M_PI/2, M_PI/2); // hand roll
-        CSforGoal.bounds(5, -M_PI/2, M_PI/2); // hand pitch
+        CSforGoal.bounds(0,  0.26, 0.705); // body z
+        CSforGoal.bounds(1, -0.5, 0.5); // body roll
+        CSforGoal.bounds(2, -0.0, 0.5); // body pitch
+        CSforGoal.bounds(3, -0.5, 0.5); // body yaw
 #else
-        CSforGoal.bounds(4, startCfg[4], startCfg[4]);
-        CSforGoal.bounds(5, startCfg[5], startCfg[5]);
+        for (int i=0; i<4; i++) CSforGoal.bounds(i, startCfg[i]-0.1, startCfg[i]+0.1);
 #endif
+        //CSforGoal.bounds(4, -M_PI/2, M_PI/2); // hand roll
+        CSforGoal.bounds(4, startCfg[4], startCfg[4]);
+        //CSforGoal.bounds(5, -M_PI/2, M_PI/2); // hand pitch
+        CSforGoal.bounds(5, startCfg[5], startCfg[5]);
 #else
         for (int i=0; i<CSforGoal.size(); i++) CSforGoal.bounds(i, startCfg[i], startCfg[i]);
 #endif
@@ -103,14 +107,12 @@ public:
 #else
         for (int i=0; i<4; i++) CSforPath->bounds(i, startCfg[i]-0.1, startCfg[i]+0.1);
 #endif
-#if 1
-        CSforPath->bounds(4, -M_PI/2, M_PI/2); // hand roll
-        CSforPath->bounds(5, -M_PI/2, M_PI/2); // hand pitch
-#else
+        //CSforPath->bounds(4, -M_PI/2, M_PI/2); // hand roll
         CSforPath->bounds(4, startCfg[4], startCfg[4]);
+        //CSforPath->bounds(5, -M_PI/2, M_PI/2); // hand pitch
         CSforPath->bounds(5, startCfg[5], startCfg[5]);
-#endif
-        CSforPath->bounds(6, -M_PI, M_PI);   // hand yaw
+        //CSforPath->bounds(6, -M_PI, M_PI);   // hand yaw
+        CSforPath->bounds(6, startCfg[6], goalCfg[6]);   // hand yaw
     }
     bool oneStep(){
         RRT *rrt = (RRT *)planner->getAlgorithm();
@@ -352,7 +354,7 @@ int main(int argc, char *argv[])
     std::vector<Configuration> manipulationPath;
     gettimeofday(&tv1, NULL);
     for (n=0;;n++){
-        if (n%100==0) gettimeofday(&tv2, NULL);
+        gettimeofday(&tv2, NULL);
         if (tv2.tv_sec - tv1.tv_sec > 10) break;
         // reaching planning
         for (size_t i=0; i<rrts.size(); i++){
@@ -364,7 +366,7 @@ int main(int argc, char *argv[])
                 // try to generate a goal
                 if (testRandomConfig(planner, setterForIntermediateGoal, 
                                      CSforGoal, intermediateGoal)){
-                    //std::cout << "found an intermediate goal(" << cnt << "/" << n << "):" << intermediateGoal << std::endl;
+                    //std::cout << "found an intermediate goal:" << intermediateGoal << std::endl;
                     for (int i=0; i<4; i++) goalForPP[i] = intermediateGoal[i];
                     for (int i=0; i<2; i++){
                         for (int j=0; j<armPath[i]->numJoints(); j++){
@@ -417,9 +419,9 @@ int main(int argc, char *argv[])
         }
         if (ret) break;
     }
+    std::cout << "subproblemId:" << subproblemId << std::endl;
+    std::cout << "rrts.size() = " << rrts.size() << ", subproblems.size() = " << subproblems.size() << std::endl;
     if (ret){
-        std::cout << "subproblemId:" << subproblemId << std::endl;
-        std::cout << "rrts.size() = " << rrts.size() << ", subproblems.size() = " << subproblems.size() << std::endl;
         {
             reachingPath = rrts[subproblemId].path;
             RandomShortcutOptimizer opt1(planner);
@@ -496,14 +498,19 @@ int main(int argc, char *argv[])
         std::cout << "collision is checked " << planner->countCollisionCheck() << "times(" << cdtime/planner->countCollisionCheck()*1000 << "[ms/call])" << std::endl;
     }else{
         std::cout << "failed to find a path" << std::endl;
-        std::cout << "profile of setter for intermediate goal:" << std::endl;
+        std::cout << "profile of setter for intermediate goal:";
         setterForIntermediateGoal.profile();
+        std::cout << "nodes from start:" << rrt->getForwardTree()->nNodes()
+                  << std::endl;
         for (size_t i=0; i<subproblems.size(); i++){
+            std::cout << i << " : nnodes = "
+                      << rrts[i].rrt->getBackwardTree()->nNodes() << "("
+                      << rrts[i].isSolved << "),";
             PathPlanner *p = subproblems[i]->planner;
             RRT *rrt = (RRT *)p->getAlgorithm();
-            std::cout << i << " : nnodes = " 
-                      << rrt->getForwardTree()->nNodes() << ","
-                      << rrt->getBackwardTree()->nNodes() << std::endl;
+            std ::cout << rrt->getForwardTree()->nNodes() << ","
+                       << rrt->getBackwardTree()->nNodes() << ", profile=";
+            subproblems[i]->setterForGoal.profile();
         }
 #if 0
         std::cout << "nnodes = " << rrt->getForwardTree()->nNodes() << ","
