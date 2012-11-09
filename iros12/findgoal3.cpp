@@ -20,6 +20,7 @@
 #include "myCfgSetter3.h"
 #include <Math/Physics.h>
 #include "CustomCD.h"
+#include "RobotUtil.h"
 
 using namespace motion_generator;
 using namespace hrp;
@@ -115,26 +116,7 @@ int main(int argc, char *argv[])
     }
 
     // set halfconf
-    dvector halfconf;
-    halfconf.setZero(robot->numJoints());
-    halfconf[2] = halfconf[ 8] = ToRad(-34);
-    halfconf[3] = halfconf[ 9] = ToRad( 66);
-    halfconf[4] = halfconf[10] = ToRad(-32);
-    double leg_link_len1=0, leg_link_len2=0; 
-    halfconf[16] = halfconf[23] = ToRad(20);
-    halfconf[17] = ToRad(-10); halfconf[24] = -halfconf[17];
-    halfconf[19] = halfconf[26] = ToRad(-30);
-    halfconf[20] = ToRad(80); halfconf[27] = -halfconf[20];
-    halfconf[22] = halfconf[29] = -1.0;
-    leg_link_len1 = leg_link_len2 = 0.3;
-    double waistHeight = leg_link_len1*cos(halfconf[2])
-        + leg_link_len2*cos(halfconf[4]) 
-        + robot->FootToAnkle()[2];
-    robot->rootLink()->p(2) = waistHeight;
-    for (int i=0; i<robot->numJoints(); i++){
-        robot->joint(i)->q = halfconf[i];
-    }
-    robot->calcForwardKinematics();
+    setHalfConf(robot);
 
     Matrix33 goalR(rotFromRpy(goalRpy));
     if (goal){

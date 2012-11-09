@@ -14,8 +14,6 @@ export OBSTACLE2_POS='0 0 -1 0 0 0'
 export DYLD_LIBRARY_PATH=$LD_LIBRARY_PATH
 #
 export PC_FILE=plant.pc
-#export PC_FILE=plant-with-cube.pc
-#export PC_FILE=plant-with-cube2.pc
 
 echo ./execpath $NS_OPT -robot $MODEL_URL -obstacle $OBSTACLE_URL $OBSTACLE_POS  -point-cloud $PC_FILE -obstacle $OBSTACLE2_URL $OBSTACLE2_POS $*
 ./execpath $NS_OPT -robot $MODEL_URL -obstacle $OBSTACLE_URL $OBSTACLE_POS -point-cloud $PC_FILE -obstacle $OBSTACLE2_URL $OBSTACLE2_POS $*

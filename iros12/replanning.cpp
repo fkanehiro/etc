@@ -8,6 +8,7 @@
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
 #include <Model/HumanoidBodyUtil.h>
+#include <Solver/DistanceConstraint.h>
 #include <hrpModel/JointPath.h>
 #include <hrpModel/Link.h>
 #include <hrpPlanner/RRT.h>
@@ -16,12 +17,19 @@
 #include <hrpPlanner/RandomShortcutOptimizer.h>
 #include <hrpPlanner/ShortcutOptimizer.h>
 #include <hrpPlanner/ConfigurationSpace.h>
+#include <Math/Physics.h>
 #include "problem.h"
 #include "myCfgSetter2.h"
 #include "myCfgSetter3.h"
-#include <Math/Physics.h>
+#include "ExecUtil.h"
+#include "SphereTreeUtil.h"
+#include "SphereTree.h"
+#include "Filter.h"
 #include "CustomCD.h"
 #include "RobotUtil.h"
+
+#define SHAPE_FILE "hrp2.shape"
+#define PAIR_FILE  "hrp2.pairs"
 
 using namespace motion_generator;
 using namespace hrp;
@@ -44,20 +52,31 @@ bool find_a_goal(problem &prob, myCfgSetter3 &setter,
     return false;
 }
 
+void extractCfg(HumanoidBodyPtr robot, JointPathPtr armPath[2], 
+                Configuration& cfg)
+{
+    cfg[0] = robot->rootLink()->p[2];
+    Vector3 rpy = rpyFromRot(robot->rootLink()->R);
+    cfg[1] = rpy[0]; cfg[2] = rpy[1]; cfg[3] = rpy[2];
+    for (int j=0; j<2; j++){
+        for (int i=0; i<armPath[j]->numJoints(); i++){
+            cfg[4+j*6+i] = armPath[j]->joint(i)->q;
+        }
+    }
+}
+
 int main(int argc, char *argv[])
 {
     srand((unsigned)time(NULL));
  
     const char *robotURL = NULL;
     const char *goalURL = NULL;
-    const char *cloudf="plant.pc";
     const char *initposf=NULL;
     std::vector<std::string> obstacleURL;
     std::vector<Vector3> obstacleP;
     std::vector<Vector3> obstacleRpy;
     Vector3 p, rpy;
     bool display = true;
-    int ntrial = 1;
     double timeout = 3.0;
     for(int i = 1 ; i < argc; i++){
         if (strcmp(argv[i], "-robot") == 0){
@@ -72,10 +91,6 @@ int main(int argc, char *argv[])
             goalURL = argv[++i];
         }else if (strcmp(argv[i], "-no-display")==0){
             display = false;
-        }else if (strcmp(argv[i], "-ntrial")==0){
-            ntrial = atoi(argv[++i]);
-        }else if (strcmp(argv[i], "-point-cloud")==0){
-            cloudf = argv[++i];
         }else if (strcmp(argv[i], "-init-pos")==0){
             initposf = argv[++i];
         }else if (strcmp(argv[i], "-timeout")==0){
@@ -160,8 +175,15 @@ int main(int argc, char *argv[])
     myCfgSetter3 setterForGoal(robot, goalP);
     myCfgSetter2 setterForPath(robot);
 
-    CustomCD cd(robot, "hrp2.shape", "hrp2.pairs", 
-                obstacles[0], cloudf);
+    // sphere tree of environment
+    const char *cloudf = "plant.pc";
+    std::vector<hrp::Vector3> points;
+    loadPointArray(cloudf, points);
+
+    SphereTree stree(obstacles[0]->rootLink(), points, 0.01);
+    stree.updatePosition();
+
+    CustomCD cd(robot, SHAPE_FILE, PAIR_FILE, obstacles[0], &stree);
     planner->setCollisionDetector(&cd);
     
     JointPathPtr armPath[2];
@@ -233,27 +255,78 @@ int main(int argc, char *argv[])
         CSforGoal.weight(i) = 1.0;
     }
 
+    // load shapes
+    std::vector<DistanceGeometry *> shapes;
+    loadShape(SHAPE_FILE, robot, shapes);
+
+    Filter *filter = new Filter(robot);
+    filter->setRobotShapes(shapes);
+
     double Psample = 0.1;
     RoadmapPtr Tg  = rrt->getBackwardTree();
     TimeMeasure tm;
     int ntimeout=0;
+    bool initialPlan=true;
     struct timeval tv1, tv2;
     //
-    std::cout << "#n time ngoal ncfg" << std::endl;
-    for (int j=0; j<ntrial; j++){
+    while(1){
+        // plan
+        std::cout << "planning" << std::endl;
         std::vector<RoadmapNodePtr> goals;
         std::vector<int> arms;
         rrt->getForwardTree()->clear();
         rrt->getBackwardTree()->clear();
         bool ret = false;
         int arm=-1;
+        extractCfg(robot, armPath, startCfg);
+        setterForGoal.resetCog();
+        setterForPath.resetCog();
+#if 1
+        planner->setConfiguration(startCfg);
+        //prob.updateOLV();
+        if (planner->checkCollision()){
+            std::cerr << "Error:start configuration is not collision-free" << std::endl;
+            const std::vector<CdShape>& shapes = cd.shapes();
+            for (unsigned int i=0; i<shapes.size(); i++){
+#if 1
+                double d;
+                if (shapes[i].type() == CdShape::SPHERE){
+                    d = stree.distance(shapes[i].center(), shapes[i].radius());
+                }else{
+                    d = stree.distance(shapes[i].center(0),
+                                       shapes[i].center(1),
+                                       shapes[i].radius());
+                }
+                if (d < 0){
+                    std::cout << shapes[i].link()->name << " is colliding(" << d << ")" << std::endl;
+                }
+#else
+                if (shapes[i].type() == CdShape::SPHERE){
+                    std::cout << stree.isColliding(shapes[i].center(), shapes[i].radius()) << ","
+                              << stree.distance(shapes[i].center(), shapes[i].radius()) << std::endl;
+                }else{
+                    std::cout << stree.isColliding(shapes[i].center(0),
+                                                   shapes[i].center(1),
+                                                   shapes[i].radius())
+                              << ","
+                              << stree.distance(shapes[i].center(0),
+                                                shapes[i].center(1),
+                                                shapes[i].radius())
+                              << std::endl;
+                }
+#endif
+            }
+
+            return 1;
+        }
+#endif
         rrt->getForwardTree()->addNode(RoadmapNodePtr(new RoadmapNode(startCfg)));
         gettimeofday(&tv1, NULL);
         tm.begin();
         while(1){
             if (!Tg->nNodes() || rand() < Psample*RAND_MAX){
                 if (find_a_goal(prob, setterForGoal, CSforGoal, goalCfg, armPath)){
-                    //std::cout << "found a goal" << std::endl;
+                    std::cout << "found a goal" << std::endl;
                     //prob.updateOLV();
                     RoadmapNodePtr goal = RoadmapNodePtr(new RoadmapNode(goalCfg));
                     Tg->addNode(goal);
@@ -268,6 +341,7 @@ int main(int argc, char *argv[])
                     for (size_t i=0; i<goals.size(); i++){
                         if (goals[i] == node){
                             arm = arms[i];
+                            std::cout << "used arm is " << arm << std::endl;
                             break;
                         }
                     }
@@ -283,6 +357,8 @@ int main(int argc, char *argv[])
         }
         std::vector<Configuration> path;
         if (ret){
+            // smoothing
+            std::cout << "smoothing" << std::endl;
             rrt->extractPath(path);
             RandomShortcutOptimizer opt1(planner);
             ShortcutOptimizer       opt2(planner);
@@ -293,34 +369,88 @@ int main(int argc, char *argv[])
         }
         tm.end();
         if (ret){
+            if (initialPlan && obstacleP.size()>=2){
+                addObstaclePoints(points, obstacleP[1]);
+                stree.build(points, 0.01);
+                initialPlan = false;
+            }
             std::ofstream ofs("path.txt");
             ofs << arm << std::endl;
 
+            // extract the initial path
+            std::vector<hrp::dvector> qPath;
+            std::vector<hrp::Vector3> pPath;
+            std::vector<hrp::Vector3> rpyPath;
+            Link *root = robot->rootLink();
+            dvector q;
             for (unsigned int i=0; i<path.size(); i++){
                 planner->setConfiguration(path[i]);
-                prob.updateOLV();
-
+                //prob.updateOLV();
+                robot->getPosture(q);
+                qPath.push_back(q);
+                pPath.push_back(root->p);
+                rpyPath.push_back(rpyFromRot(root->R));
                 ofs << robot << std::endl;
             }
+            // transform the path into a trajectory
+            dvInterpolator *qTrj = new dvInterpolator(robot->numJoints());
+            v3Interpolator *pTrj = new v3Interpolator(3);
+            v3Interpolator *rpyTrj = new v3Interpolator(3);
+            int totalFrames 
+                = setupInterpolator(qPath, pPath, rpyPath, qTrj, pTrj, rpyTrj);
+            // execute the trajectory
+            std::cout << "executing" << std::endl;
+            int extraFrames = 1.0/DT;
+            int frames = 0;
+            filter->selectArm(arm);
+            filter->duration(totalFrames*DT);
+            setupSelfCollisionCheckPairs(PAIR_FILE, shapes, filter);
+            filter->init(qPath[0], pPath[0], rotFromRpy(rpyPath[0]));
+            while (frames < totalFrames+extraFrames){
+                //fprintf(stderr, "%6.3f/%6.3f\r", tm, totalFrames*DT);
+                // compute reference motion
+                int pos = frames >= totalFrames ? totalFrames-1 : frames;
+                qTrj->get(pos, q);
+                pTrj->get(pos, p);
+                rpyTrj->get(pos, rpy);
+                frames++;
+
+                std::vector<DistanceConstraint *> consts;
+                createDistanceConstraints(stree, shapes, consts);
+                filter->setDistanceConstraints(consts);
+
+                // compute feasible motion
+                if (!filter->filter(q, p, rotFromRpy(rpy))) {
+                    std::cerr << "execution failed" << std::endl;
+                    break;
+                }
+                std::vector<hrp::Vector3> starts, ends;
+                for (unsigned int i=0; i<consts.size(); i++){
+                    hrp::Vector3 s, e;
+                    consts[i]->computeDistance();
+                    double d = consts[i]->distance();
+                    consts[i]->closestPoints(s,e);
+                    starts.push_back(s);
+                    ends.push_back(e);
+                }
+                prob.updateOLV(starts, ends);
+            }
+            // check hand position
+            Vector3 curP;
+            robot->calcGraspPosition(arm, curP);
+            Vector3 err = goalP - curP;
+            std::cout << "err = " << err.norm() << std::endl;
+            if (err.norm() < 0.01) break; // reached
         }else{
             std::cout << "failed to find a path" << std::endl;
             std::cout << "nnodes = " << rrt->getForwardTree()->nNodes() << ","
                       << Tg->nNodes() << std::endl;
+            break;
         }
-        std::cout << j << " " << tm.time() << " " << goals.size() << " " 
-                  << path.size() << std::endl;
+#if 0 // only once
+        break;
+#endif
     }
-    double ttime = tm.totalTime();
-    std::cout << "total   time = " << ttime << "[s]" << std::endl;
-    std::cout << "average time = " << (ttime-timeout*ntimeout)/ntrial << "[s]" << std::endl;
-    double cdtime = planner->timeCollisionCheck();
-    std::cout << "time spent in collision detection:"
-              << cdtime << "[s](" << cdtime/ttime*100 << "[%])" << std::endl;
-    std::cout << "collision is checked " << planner->countCollisionCheck() << " times(" << cdtime/planner->countCollisionCheck()*1000 << "[ms/call])" << std::endl;
-    std::cout << "profile of setter for goal:";
-    setterForGoal.profile();
-    std::cout << "profile of setter for path:";
-    setterForPath.profile();
 
     return 0;
 }

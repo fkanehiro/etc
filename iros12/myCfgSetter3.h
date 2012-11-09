@@ -33,7 +33,8 @@ public:
         hrp::Matrix33 R = hrp::rotFromRpy(i_cfg[4], i_cfg[5], i_cfg[6]); 
         hrp::Matrix33 wristR(bulbR*R);
 
-        hrp::Vector3 wristP(m_goalP + wristR*hrp::Vector3(-0.03,0,0.18));
+        // assuming getGraspLocalPosition(0) and (1) are same
+        hrp::Vector3 wristP(m_goalP - wristR*m_body->getGraspLocalPosition(0));
         m_reachedArm=0;
         if (!calcIKwithLimitCheck(m_arm[0],wristP, wristR)) {
             m_ikFailCount[0]++;

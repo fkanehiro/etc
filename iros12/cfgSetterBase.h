@@ -80,6 +80,14 @@ public:
             m_footP[i] = m_body->ankleLink[i]->p;
             m_footR[i] = m_body->ankleLink[i]->R;
         }
+        resetCog();
+    }
+    void setBase(double z, double r, double p, double y){
+        m_body->rootLink()->R = hrp::rotFromRpy(r,p,y);
+        m_body->rootLink()->p = m_cog + m_body->rootLink()->R*m_cog2waist;
+        m_body->rootLink()->p[2] = z;
+    }
+    void resetCog(){
         m_body->calcCM();
         m_body->rootLink()->calcSubMassCM();
         double ubm = m_body->rootLink()->m + m_body->waistYjoint->subm;
@@ -87,12 +95,8 @@ public:
                  + m_body->waistYjoint->submwc)/ubm;
         hrp::Link *base = m_body->rootLink();
         m_cog2waist = base->R.transpose()*(base->p - m_cog);
-        //std::cout << "cog2waist:" << m_cog2waist << std::endl;
-    }
-    void setBase(double z, double r, double p, double y){
-        m_body->rootLink()->R = hrp::rotFromRpy(r,p,y);
-        m_body->rootLink()->p = m_cog + m_body->rootLink()->R*m_cog2waist;
-        m_body->rootLink()->p[2] = z;
+        //std::cout << "cog:" << m_cog.transpose() << std::endl;
+        //std::cout << "cog2waist:" << m_cog2waist.transpose() << std::endl;
     }
 protected:
     motion_generator::HumanoidBodyPtr m_body;

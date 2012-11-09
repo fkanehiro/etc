@@ -97,8 +97,21 @@ SphereTreeNode::~SphereTreeNode()
 SphereTree::SphereTree(hrp::Link *i_link, 
                        const std::vector<hrp::Vector3> &i_points,
                        double i_radius)
-    : m_link(i_link), m_radius(i_radius)
+    : m_link(i_link), m_radius(i_radius), m_root(NULL)
 {
+    build(i_points, i_radius);
+}
+
+SphereTree::~SphereTree()
+{
+    delete m_root;
+}
+
+void SphereTree::build(const std::vector<hrp::Vector3> &i_points,
+                       double i_radius)
+{
+    if (m_root) delete m_root;
+
     std::vector<const hrp::Vector3 *> points;
     for (unsigned int i=0; i<i_points.size(); i++){
         const hrp::Vector3 &v = i_points[i];
@@ -116,31 +129,45 @@ SphereTree::SphereTree(hrp::Link *i_link,
     }
 }
 
-SphereTree::~SphereTree()
-{
-    delete m_root;
-}
-
 bool SphereTree::isColliding(const hrp::Vector3 &i_p, double i_r) const
 {
     hrp::Vector3 p(m_R.transpose()*(i_p - m_p));
     return m_root->isColliding(p, i_r);
 }
 
+double SphereTree::distance(const hrp::Vector3 &i_p, double i_r) const
+{
+    hrp::Vector3 p(m_R.transpose()*(i_p - m_p));
+    double minD = std::numeric_limits<double>::max();
+    m_root->distance(p, i_r, minD);
+    return minD;
+}
+
 bool SphereTreeNode::isColliding(const hrp::Vector3 &i_p, double i_r)
 {
-    hrp::Vector3 dv(i_p - m_center);
-    double d = dv.norm();
+    double d = (i_p - m_center).norm();
     if (d < i_r + m_radius){
         if (m_isLeaf){
             return true;
         }else{
             if (m_child[0]->isColliding(i_p, i_r)) return true;
             if (m_child[1]->isColliding(i_p, i_r)) return true;
-            return false;
         }
-    }else{
-        return false;
+    }
+    return false;
+}
+
+void SphereTreeNode::distance(const hrp::Vector3 &i_p, double i_r, 
+                              double &io_minD)
+{
+    double d = (i_p - m_center).norm() - (i_r + m_radius);
+    if (io_minD > d){
+        if (m_isLeaf){
+            io_minD = d;
+        }else{
+            m_child[0]->distance(i_p, i_r, io_minD);
+            m_child[1]->distance(i_p, i_r, io_minD);
+        }
     }
 }
 
@@ -162,8 +189,7 @@ void SphereTreeNode::collectSpheres(const hrp::Vector3 &i_p,
                                     double i_r, double i_d,
                                     std::vector<SphereTreeNode *> &o_spheres)
 {
-    hrp::Vector3 dv(i_p - m_center);
-    double d = dv.norm();
+    double d = (i_p - m_center).norm();
     if (d < i_r + m_radius + i_d){
         if (m_isLeaf){
             o_spheres.push_back(this);
@@ -184,6 +210,17 @@ bool SphereTree::isColliding(const hrp::Vector3 &i_p1,
     return m_root->isColliding(p1, p2, i_r);
 }
 
+double SphereTree::distance(const hrp::Vector3 &i_p1,
+                            const hrp::Vector3 &i_p2,
+                            double i_r) const
+{
+    hrp::Vector3 p1(m_R.transpose()*(i_p1 - m_p));
+    hrp::Vector3 p2(m_R.transpose()*(i_p2 - m_p));
+    double minD = std::numeric_limits<double>::max();
+    m_root->distance(p1, p2, i_r, minD);
+    return minD;
+}
+
 bool SphereTreeNode::isColliding(const hrp::Vector3 &i_p1,
                                  const hrp::Vector3 &i_p2,
                                  double i_r)
@@ -195,10 +232,24 @@ bool SphereTreeNode::isColliding(const hrp::Vector3 &i_p1,
         }else{
             if (m_child[0]->isColliding(i_p1, i_p2, i_r)) return true;
             if (m_child[1]->isColliding(i_p1, i_p2, i_r)) return true;
-            return false;
         }
-    }else{
-        return false;
+    }
+    return false;
+}
+
+void SphereTreeNode::distance(const hrp::Vector3 &i_p1,
+                              const hrp::Vector3 &i_p2,
+                              double i_r, double& io_minD)
+{
+    double d = pointLineSegmentDistance(m_center, i_p1, i_p2)
+        - (i_r + m_radius);
+    if (io_minD > d){
+        if (m_isLeaf){
+            io_minD = d;
+        }else{
+            m_child[0]->distance(i_p1, i_p2, i_r, io_minD);
+            m_child[1]->distance(i_p1, i_p2, i_r, io_minD);
+        }
     }
 }
 

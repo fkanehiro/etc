@@ -19,7 +19,7 @@ CdShape::CdShape(hrp::Link *i_link,
 }
 
 
-bool CdShape::isColliding(const CdShape *i_shape) const
+double CdShape::distance(const CdShape *i_shape) const
 {
     double d=0;
     if (m_type == SPHERE && i_shape->type() == SPHERE){
@@ -34,7 +34,12 @@ bool CdShape::isColliding(const CdShape *i_shape) const
         std::cerr << "unknown type of pair:" << m_type << "," 
                   << i_shape->type() << std::endl;
     }
-    return d < m_radius + i_shape->radius();
+    return d - (m_radius + i_shape->radius());
+}
+
+bool CdShape::isColliding(const CdShape *i_shape) const
+{
+    return distance(i_shape) < 0;
 }
 
 void CdShape::updatePosition()

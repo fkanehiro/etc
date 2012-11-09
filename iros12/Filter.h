@@ -13,18 +13,21 @@ class DistanceGeometry;
 class Filter
 {
 public:
-    Filter(motion_generator::HumanoidBodyPtr i_body, int i_arm, bool i_balance);
+    Filter(motion_generator::HumanoidBodyPtr i_body);
     ~Filter();
     void init(const hrp::dvector&q, const hrp::Vector3& p, const hrp::Matrix33& R);
     bool filter(const hrp::dvector& q, const hrp::Vector3& p, const hrp::Matrix33 &R);
     void setDistanceConstraints(const std::vector<DistanceConstraint *>& i_dists);
     void addSelfCollisionAvoidanceConstraint(DistanceConstraint *i_dc);
     void setRobotShapes(const std::vector<DistanceGeometry *> i_dg);
+    void considerBalance(bool flag);
+    void selectArm(int i);
     double error();
+    void duration(double i_tm) { m_duration = i_tm; }
 private:
     void setupDistanceConstraints();
 
-    TransformationConstraint *m_hand, *m_foot[2];
+    TransformationConstraint *m_hand[2], *m_foot[2];
     ComConstraint *m_com;
     ConfigurationConstraint *m_cfg;
     std::vector<DistanceConstraint *> m_dists;
@@ -37,5 +40,6 @@ private:
     motion_generator::HumanoidBodyPtr m_body, m_refBody;
     int m_arm;
     hrp::dvector m_dq;
+    double m_time, m_duration;
 };
 

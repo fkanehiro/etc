@@ -24,22 +24,6 @@ using namespace motion_generator;
 using namespace hrp;
 using namespace PathEngine;
 
-std::ostream& operator<<(std::ostream &ost, HumanoidBodyPtr robot)
-{
-    for (int j=0; j<3; j++){
-        ost << robot->rootLink()->p[j] << " ";
-    }
-    for (int j=0; j<3; j++){
-        for (int k=0; k<3; k++){
-            ost << robot->rootLink()->R(j,k) << " ";
-        }
-    }
-    for (int j=0; j<robot->numJoints(); j++){
-        ost << robot->joint(j)->q << " ";
-    }
-    return ost;
-}
-
 template<class T>
 bool testRandomConfig(PathPlanner *planner, T &setter, 
                       ConfigurationSpace& cspace, 

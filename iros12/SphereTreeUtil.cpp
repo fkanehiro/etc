@@ -3,6 +3,8 @@
 #include "SphereTreeUtil.h"
 #include "SphereTree.h"
 
+using namespace hrp;
+
 void loadPointArray(const char *i_filename, std::vector<hrp::Vector3> &o_points){
     std::ifstream ifs(i_filename);
     if (!ifs.is_open()) {
@@ -21,4 +23,15 @@ void loadPointArray(const char *i_filename, std::vector<hrp::Vector3> &o_points)
     std::cerr << "done(" << o_points.size() << " points)." << std::endl;
 }
 
-
+void addObstaclePoints(std::vector<Vector3>& points,
+                       const Vector3& p)
+{
+    points.push_back(Vector3(p[0]+0.02, p[1]+0.02, p[2]+0.02));
+    points.push_back(Vector3(p[0]-0.02, p[1]+0.02, p[2]+0.02));
+    points.push_back(Vector3(p[0]+0.02, p[1]-0.02, p[2]+0.02));
+    points.push_back(Vector3(p[0]+0.02, p[1]+0.02, p[2]-0.02));
+    points.push_back(Vector3(p[0]-0.02, p[1]-0.02, p[2]+0.02));
+    points.push_back(Vector3(p[0]+0.02, p[1]-0.02, p[2]-0.02));
+    points.push_back(Vector3(p[0]-0.02, p[1]+0.02, p[2]-0.02));
+    points.push_back(Vector3(p[0]-0.02, p[1]-0.02, p[2]-0.02));
+} 

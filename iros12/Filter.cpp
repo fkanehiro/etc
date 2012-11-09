@@ -22,14 +22,22 @@ using namespace motion_generator;
 using namespace motion_interpolator;
 using namespace hrp;
 
-Filter::Filter(HumanoidBodyPtr i_body, int i_arm, bool i_balance) : 
-    m_body(i_body), m_arm(i_arm), m_dq(m_body->numJoints()+6)
+#define PRIO_CA   0
+#define PRIO_COM  1
+#define PRIO_FOOT 1
+#define PRIO_HAND 2
+#define PRIO_CFG  2
+
+Filter::Filter(HumanoidBodyPtr i_body) : 
+    m_body(i_body), m_arm(-1), m_dq(m_body->numJoints()+6), m_duration(0)
 {
     m_refBody = HumanoidBodyPtr(new HumanoidBody(*m_body));
-    Link *hand = m_body->wristLink[i_arm];
-
+    
     // constraint for right hand
-    m_hand = new TransformationConstraint(NULL, hand);
+    for (int i=0; i<2; i++){
+        m_hand[i] = new TransformationConstraint(NULL, m_body->wristLink[i]);
+        m_hand[i]->setLocalPoint(m_body->getGraspLocalPosition(i));
+    }
 
     // transformation constraint for feet
     m_foot[0] = new TransformationConstraint(NULL, m_body->ankleLink[RIGHT]);
@@ -43,7 +51,7 @@ Filter::Filter(HumanoidBodyPtr i_body, int i_arm, bool i_balance) :
     m_cfg = new ConfigurationConstraint(m_body);
 
     m_tss = new PrioritizedTaskSetSolver(m_body->numJoints()+6);
-    m_tss->setLambda(1e-1);
+    m_tss->setLambda(1e-3);
 
     m_cm = new ConstraintManager(m_tss, m_body, NULL);
 
@@ -78,38 +86,44 @@ Filter::Filter(HumanoidBodyPtr i_body, int i_arm, bool i_balance) :
     for (int i=0;i<m_body->numJoints()+6; i++){
         usedJoints[i] = 1;
     }
+    //usedJoints[12] = usedJoints[13] = 0.0; // waist
     usedJoints[22] = usedJoints[29] = 0.0; // fingers
 #endif
 
     m_cm->constrainedJoints(usedJoints);
     //cm.enableJointLimits(false);
 
-    m_tss->addEqTask(0, m_foot[0]);
-    m_tss->addEqTask(0, m_foot[1]);
-    if (i_balance) m_tss->addEqTask(0, m_com);
-    // 1 is for distance constraints
-    m_tss->addEqTask(2, m_hand);
-    m_tss->addEqTask(3, m_cfg);
+    m_tss->addEqTask(PRIO_FOOT, m_foot[0]);
+    m_tss->addEqTask(PRIO_FOOT, m_foot[1]);
+    m_tss->addEqTask(PRIO_COM, m_com);
+    m_tss->addEqTask(PRIO_CFG, m_cfg);
+    //m_tss->addEqTask(PRIO_CFG, m_cfg);
 }
 
 void Filter::setupDistanceConstraints()
 {
     // clear old tasks
-    m_tss->clearTasks(1);
+    m_tss->clearTasks(PRIO_CA);
     
     // set active tasks
     for (unsigned int i=0; i<m_dists.size(); i++){
         m_dists[i]->computeDistance();
         if (m_dists[i]->isActive()){
             m_dists[i]->update();
-            m_tss->addIneqTask(1, m_dists[i]);
+            m_tss->addIneqTask(PRIO_CA, m_dists[i]);
         }
+#if 0
+        if (m_dists[i]->distance() < m_dists[i]->securityDistance()-0.001){
+            std::cout << "Warning: distance is smaller than Ds("
+                      << m_dists[i]->distance() << ")" << std::endl;
+        }
+#endif
     }
     for (unsigned int i=0; i<m_selfCAconsts.size(); i++){
         m_selfCAconsts[i]->computeDistance();
         if (m_selfCAconsts[i]->isActive()){
             m_selfCAconsts[i]->update();
-            m_tss->addIneqTask(1, m_selfCAconsts[i]);
+            m_tss->addIneqTask(PRIO_CA, m_selfCAconsts[i]);
         }
     }
     //std::cout << m_tss->taskSet()[1].nIneqTasks() << " tasks" << std::endl;
@@ -131,6 +145,7 @@ Filter::~Filter()
 
 void Filter::init(const dvector&q, const Vector3& p, const Matrix33& R)
 {
+    m_time = 0;
     m_body->setPosture(q, p, R);
     m_body->calcForwardKinematics();
     m_refBody->setPosture(q, p, R);
@@ -147,43 +162,54 @@ void Filter::init(const dvector&q, const Vector3& p, const Matrix33& R)
 
 bool Filter::filter(const dvector& q, const Vector3 &p, const Matrix33 &R)
 {
+    dvector weight(6);
+    double w = 1.0;
+    if (m_time > m_duration) w += (m_time - m_duration)*3;
+    for (int i=0; i<6; i++) weight[i] = w;
+    m_time += DT;
+
     m_refBody->setPosture(q, p, R);
     m_refBody->calcForwardKinematics();
     
     // update reference
-    Vector3 currentP;
-    m_body->calcGraspPosition(m_arm, currentP);
-    Vector3 refP;
-    m_refBody->calcGraspPosition(m_arm, refP);
-    Vector3 dv(refP - currentP);
-    double l = dv.norm();
+    if (m_arm==0||m_arm==1){
+        Vector3 currentP;
+        m_body->calcGraspPosition(m_arm, currentP);
+        Vector3 refP;
+        m_refBody->calcGraspPosition(m_arm, refP);
+        Vector3 dv(refP - currentP);
+        double l = dv.norm();
+        //std::cout << m_time << ":l=" << l << ",w=" << weight[0] << std::endl;
 #define PLIMIT 0.005
-    if (l > PLIMIT){
-        //std::cout << "p limit" << std::endl;
-        refP = currentP + PLIMIT/l*dv;
-    } 
-    Matrix33 &currentR = m_body->wristLink[m_arm]->R;
-    Matrix33 currentRt(currentR.transpose());
-    Matrix33 refR(m_refBody->wristLink[m_arm]->R); 
-    Matrix33 dR(currentRt*refR);
-    Vector3 omega(omegaFromRot(dR));
-    double w = omega.norm();
+        if (l > PLIMIT){
+            //std::cout << "p limit" << std::endl;
+            refP = currentP + PLIMIT/l*dv;
+        } 
+        Matrix33 &currentR = m_body->wristLink[m_arm]->R;
+        Matrix33 currentRt(currentR.transpose());
+        Matrix33 refR(m_refBody->wristLink[m_arm]->R); 
+        Matrix33 dR(currentRt*refR);
+        Vector3 omega(omegaFromRot(dR));
+        double w = omega.norm();
 #define RLIMIT 0.005
-    if (w > RLIMIT){
-        //std::cout << "r limit" << std::endl;
-        calcRodrigues(dR, Vector3(omega/w), RLIMIT);
-        refR = currentR*dR;
+        if (w > RLIMIT){
+            //std::cout << "r limit" << std::endl;
+            calcRodrigues(dR, Vector3(omega/w), RLIMIT);
+            refR = currentR*dR;
+        }
+        m_hand[m_arm]->referenceTransformation(refP, refR);
+        m_hand[m_arm]->stiffness(weight);
+        m_hand[m_arm]->update();
     }
-    m_hand->referenceTransformation(refP, refR);
 
     setupDistanceConstraints();
 
     for (int i=0; i<2; i++) m_foot[i]->update();
-    m_hand->update();
     m_com->update();
 
 #if 1
-    const double maxdq = 0.002;
+    const double maxdq = 0.002; // AR
+    //const double maxdq = 0.01;
     double max = 0;
     dvector v(m_body->numJoints());
     for (int i=0; i<m_body->numJoints(); i++){
@@ -228,5 +254,26 @@ void Filter::setRobotShapes(const std::vector<DistanceGeometry *> i_dg)
 
 double Filter::error()
 {
-    return m_hand->error(m_dq).norm();
+    if (m_arm == 0 || m_arm == 1){
+        return m_hand[m_arm]->error(m_dq).norm();
+    }else{
+        return 0;
+    }
+}
+
+void Filter::considerBalance(bool flag)
+{
+    if (flag){
+        m_tss->addEqTask(PRIO_COM, m_com);
+    }else{
+        m_tss->removeEqTask(PRIO_COM, m_com);
+    }
+}
+
+void Filter::selectArm(int i)
+{
+    m_arm = i;
+    m_tss->removeEqTask(PRIO_HAND, m_hand[0]);
+    m_tss->removeEqTask(PRIO_HAND, m_hand[1]);
+    if (i==0||i==1) m_tss->addEqTask(PRIO_HAND, m_hand[i]);
 }

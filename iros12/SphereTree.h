@@ -18,10 +18,13 @@ public:
     const hrp::Vector3 &center() { return m_center; }
     SphereTreeNode *child(int i){ return m_child[i]; }
     bool isColliding(const hrp::Vector3& i_p, double i_r);
+    void distance(const hrp::Vector3& i_p, double i_r, double& io_minD);
     void collectSpheres(const hrp::Vector3& i_p, double i_r, double i_d,
                         std::vector<SphereTreeNode *> &o_spheres);
     bool isColliding(const hrp::Vector3& i_p1, 
                      const hrp::Vector3& i_p2, double i_r);
+    void distance(const hrp::Vector3& i_p1, 
+                  const hrp::Vector3& i_p2, double i_r, double& io_minD);
     void collectSpheres(const hrp::Vector3& i_p1, const hrp::Vector3& i_p2,
                         double i_r, double i_d,
                         std::vector<SphereTreeNode *> &o_spheres);
@@ -38,6 +41,16 @@ public:
                const std::vector<hrp::Vector3> &i_points,
                double i_radius);
     ~SphereTree();
+    /**
+     * @brief build a sphere tree
+     * @param i_points point cloud
+     * @param i_radius radius of leaf spheres
+     */
+    void build(const std::vector<hrp::Vector3> &i_points, double i_radius);
+    /**
+     * @brief get the root node
+     * @return the root node
+     */
     SphereTreeNode *root() { return m_root; }
     /**
      * @brief collision detection against a sphere
@@ -46,6 +59,20 @@ public:
      * @return true if colliding
      */
     bool isColliding(const hrp::Vector3& i_p, double i_r) const;
+    /**
+     * @brief collect spheres in the distance bound of a sphere
+     * @param i_p position of the sphere
+     * @param i_r radius of the sphere
+     * @param i_d thickness of the distance bound
+     * @param o_centers vector of positions of spheres in the distance bound
+     */
+    /**
+     * @brief compute distance with a sphere
+     * @param i_p position of the sphere
+     * @param i_r radius of the sphere
+     * @return distance 
+     */
+    double distance(const hrp::Vector3& i_p, double i_r) const;
     /**
      * @brief collect spheres in the distance bound of a sphere
      * @param i_p position of the sphere
@@ -64,6 +91,15 @@ public:
      */
     bool isColliding(const hrp::Vector3& i_p1, const hrp::Vector3& i_p2, 
                      double i_r) const;
+    /**
+     * @brief compute distance with a capsule
+     * @param i_p1 an end point of the line segment in the capsule
+     * @param i_p2 the other end point of the line segment in the capsule
+     * @param i_r radius of the capsule
+     * @return distance
+     */
+    double distance(const hrp::Vector3& i_p1, const hrp::Vector3& i_p2, 
+                    double i_r) const;
     /**
      * @brief collect spheres in the distance bound of a capsule
      * @param i_p1 an end point of the line segment in the capsule
