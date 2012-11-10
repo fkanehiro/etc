@@ -169,6 +169,7 @@ int main(int argc, char *argv[])
 
     CustomCD cd(robot, "hrp2.shape", "hrp2.pairs", 
                 obstacles[0], "plant.pc");
+    cd.tolerance(0.005);
     prob.planner()->setCollisionDetector(&cd);
     
     struct timeval tv1, tv2;

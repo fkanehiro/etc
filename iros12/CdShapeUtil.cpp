@@ -64,31 +64,33 @@ void loadCdPairs(const std::vector<CdShape> &i_shapes,
     std::cout << o_pairs.size() << " pairs are defined" << std::endl;
 }
 
-bool checkCollision(const std::vector<std::pair<const CdShape *, const CdShape *> > &i_pairs)
+bool checkCollision(const std::vector<std::pair<const CdShape *, const CdShape *> > &i_pairs, double i_tolerance)
 {
     for (unsigned int i=0; i<i_pairs.size(); i++){
         const CdShape *s1 = i_pairs[i].first;
         const CdShape *s2 = i_pairs[i].second;
-        if (s1->isColliding(s2)){
+        if (s1->isColliding(s2, i_tolerance)){
             return true;
         }
     }
     return false;
 }
 
-bool checkCollision(const SphereTree &i_st, const std::vector<CdShape>& i_shapes)
+bool checkCollision(const SphereTree &i_st, const std::vector<CdShape>& i_shapes, double i_tolerance)
 {
     for (unsigned int i=0; i<i_shapes.size(); i++){
         if (i_shapes[i].type() == CdShape::SPHERE){
             if (i_st.isColliding(i_shapes[i].center(), 
-                                 i_shapes[i].radius())){
+                                 i_shapes[i].radius(),
+                                 i_tolerance)){
                 //std::cout << i_shapes[i].link()->name << " is colliding" << std::endl;
                 return true;
             }
         }else{
             if (i_st.isColliding(i_shapes[i].center(0),
                                  i_shapes[i].center(1),
-                                 i_shapes[i].radius())){
+                                 i_shapes[i].radius(),
+                                 i_tolerance)){
                 //std::cout << i_shapes[i].link()->name << " is colliding" << std::endl;
                 return true;
             }
@@ -98,8 +100,8 @@ bool checkCollision(const SphereTree &i_st, const std::vector<CdShape>& i_shapes
 }
 
 bool checkCollision(const SphereTree &i_st, const std::vector<CdShape>& i_shapes,
-                    const std::vector<std::pair<const CdShape *, const CdShape *> > &i_pairs)
+                    const std::vector<std::pair<const CdShape *, const CdShape *> > &i_pairs, double i_tolerance)
 {
-    if (checkCollision(i_st, i_shapes)) return true;
-    return checkCollision(i_pairs);
+    if (checkCollision(i_st, i_shapes, i_tolerance)) return true;
+    return checkCollision(i_pairs, i_tolerance);
 }

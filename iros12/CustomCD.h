@@ -20,10 +20,12 @@ public:
     void updatePositions();
     bool checkCollision();
     std::vector<CdShape>& shapes() { return m_shapes; }
+    void tolerance(double i_d) { m_tolerance = i_d; }
 private:
     std::vector<CdShape> m_shapes; ///< shapes of the robot
     /// self-collision check pairs
     std::vector<std::pair<const CdShape *, const CdShape *> > m_pairs;
     SphereTree *m_stree; ///< sphere tree of the environment 
     bool m_outerTree;
+    double m_tolerance;
 };

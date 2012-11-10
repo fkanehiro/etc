@@ -129,10 +129,11 @@ void SphereTree::build(const std::vector<hrp::Vector3> &i_points,
     }
 }
 
-bool SphereTree::isColliding(const hrp::Vector3 &i_p, double i_r) const
+bool SphereTree::isColliding(const hrp::Vector3 &i_p, double i_r,
+                             double i_tolerance) const
 {
     hrp::Vector3 p(m_R.transpose()*(i_p - m_p));
-    return m_root->isColliding(p, i_r);
+    return m_root->isColliding(p, i_r, i_tolerance);
 }
 
 double SphereTree::distance(const hrp::Vector3 &i_p, double i_r) const
@@ -143,10 +144,11 @@ double SphereTree::distance(const hrp::Vector3 &i_p, double i_r) const
     return minD;
 }
 
-bool SphereTreeNode::isColliding(const hrp::Vector3 &i_p, double i_r)
+bool SphereTreeNode::isColliding(const hrp::Vector3 &i_p, double i_r,
+                                 double i_tolerance)
 {
     double d = (i_p - m_center).norm();
-    if (d < i_r + m_radius){
+    if (d < i_r + m_radius + i_tolerance){
         if (m_isLeaf){
             return true;
         }else{
@@ -203,11 +205,11 @@ void SphereTreeNode::collectSpheres(const hrp::Vector3 &i_p,
 
 bool SphereTree::isColliding(const hrp::Vector3 &i_p1,
                              const hrp::Vector3 &i_p2,
-                             double i_r) const
+                             double i_r, double i_tolerance) const
 {
     hrp::Vector3 p1(m_R.transpose()*(i_p1 - m_p));
     hrp::Vector3 p2(m_R.transpose()*(i_p2 - m_p));
-    return m_root->isColliding(p1, p2, i_r);
+    return m_root->isColliding(p1, p2, i_r, i_tolerance);
 }
 
 double SphereTree::distance(const hrp::Vector3 &i_p1,
@@ -223,10 +225,10 @@ double SphereTree::distance(const hrp::Vector3 &i_p1,
 
 bool SphereTreeNode::isColliding(const hrp::Vector3 &i_p1,
                                  const hrp::Vector3 &i_p2,
-                                 double i_r)
+                                 double i_r, double i_tolerance)
 {
     double d = pointLineSegmentDistance(m_center, i_p1, i_p2);
-    if (d < i_r + m_radius){
+    if (d < i_r + m_radius + i_tolerance){
         if (m_isLeaf){
             return true;
         }else{

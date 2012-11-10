@@ -184,6 +184,7 @@ int main(int argc, char *argv[])
     stree.updatePosition();
 
     CustomCD cd(robot, SHAPE_FILE, PAIR_FILE, obstacles[0], &stree);
+    cd.tolerance(0.005);
     planner->setCollisionDetector(&cd);
     
     JointPathPtr armPath[2];

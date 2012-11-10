@@ -51,7 +51,7 @@ target_link_libraries(findgoalandpath ${HMC2_LIBRARIES} )
 add_executable(replanning replanning.cpp problem.cpp SphereTree.cpp CdShape.cpp DistUtil.cpp problem.cpp CdShapeUtil.cpp SphereTreeUtil.cpp CustomCD.cpp Filter.cpp ExecUtil.cpp RobotUtil.cpp)
 target_link_libraries(replanning ${HMC2_LIBRARIES} )
 
-add_executable(valve valve.cpp problem.cpp SphereTree.cpp CdShape.cpp DistUtil.cpp problem.cpp CdShapeUtil.cpp SphereTreeUtil.cpp CustomCD.cpp)
+add_executable(valve valve.cpp problem.cpp SphereTree.cpp CdShape.cpp DistUtil.cpp problem.cpp CdShapeUtil.cpp SphereTreeUtil.cpp CustomCD.cpp RobotUtil.cpp)
 target_link_libraries(valve ${HMC2_LIBRARIES} )
 
 

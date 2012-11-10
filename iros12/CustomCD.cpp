@@ -7,7 +7,8 @@
 CustomCD::CustomCD(hrp::BodyPtr i_robot, 
                    const char *i_shapefile, const char *i_pairfile,
                    hrp::BodyPtr i_env,
-                   const char *i_envpcfile) : m_stree(NULL), m_outerTree(false)
+                   const char *i_envpcfile) : 
+    m_stree(NULL), m_outerTree(false), m_tolerance(0)
 {
     loadCdShapes(i_robot, i_shapefile, m_shapes);
     loadCdPairs(m_shapes, i_pairfile, m_pairs);
@@ -17,7 +18,8 @@ CustomCD::CustomCD(hrp::BodyPtr i_robot,
 CustomCD::CustomCD(hrp::BodyPtr i_robot, 
                    const char *i_shapefile, const char *i_pairfile,
                    hrp::BodyPtr i_env,
-                   SphereTree *i_stree) : m_stree(i_stree), m_outerTree(true)
+                   SphereTree *i_stree) : 
+    m_stree(i_stree), m_outerTree(true), m_tolerance(0)
 {
     loadCdShapes(i_robot, i_shapefile, m_shapes);
     loadCdPairs(m_shapes, i_pairfile, m_pairs);
@@ -38,7 +40,7 @@ void CustomCD::updatePositions()
 
 bool CustomCD::checkCollision()
 {
-    return ::checkCollision(*m_stree, m_shapes, m_pairs);
+    return ::checkCollision(*m_stree, m_shapes, m_pairs, m_tolerance);
 }
 
 bool CustomCD::loadPointCloud(hrp::BodyPtr i_env, const char *i_envpcfile)

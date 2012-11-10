@@ -162,6 +162,7 @@ int main(int argc, char *argv[])
 
     CustomCD cd(robot, "hrp2.shape", "hrp2.pairs", 
                 obstacles[0], cloudf);
+    cd.tolerance(0.005);
     planner->setCollisionDetector(&cd);
     
     JointPathPtr armPath[2];

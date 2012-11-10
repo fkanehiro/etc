@@ -165,7 +165,10 @@ bool Filter::filter(const dvector& q, const Vector3 &p, const Matrix33 &R)
     dvector weight(6);
     double w = 1.0;
     if (m_time > m_duration) w += (m_time - m_duration)*3;
-    for (int i=0; i<6; i++) weight[i] = w;
+    for (int i=0; i<3; i++){
+        weight[i] = w;
+        weight[i+3] = w*0.1;
+    }
     m_time += DT;
 
     m_refBody->setPosture(q, p, R);

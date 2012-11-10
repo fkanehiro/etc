@@ -17,12 +17,14 @@ public:
     double radius() { return m_radius; }
     const hrp::Vector3 &center() { return m_center; }
     SphereTreeNode *child(int i){ return m_child[i]; }
-    bool isColliding(const hrp::Vector3& i_p, double i_r);
+    bool isColliding(const hrp::Vector3& i_p, double i_r, 
+                     double i_tolerance=0);
     void distance(const hrp::Vector3& i_p, double i_r, double& io_minD);
     void collectSpheres(const hrp::Vector3& i_p, double i_r, double i_d,
                         std::vector<SphereTreeNode *> &o_spheres);
     bool isColliding(const hrp::Vector3& i_p1, 
-                     const hrp::Vector3& i_p2, double i_r);
+                     const hrp::Vector3& i_p2, double i_r, 
+                     double i_tolerance=0);
     void distance(const hrp::Vector3& i_p1, 
                   const hrp::Vector3& i_p2, double i_r, double& io_minD);
     void collectSpheres(const hrp::Vector3& i_p1, const hrp::Vector3& i_p2,
@@ -56,9 +58,10 @@ public:
      * @brief collision detection against a sphere
      * @param i_p position of the sphere
      * @param i_r radius of the sphere
+     * @param i_toelerance tolerance
      * @return true if colliding
      */
-    bool isColliding(const hrp::Vector3& i_p, double i_r) const;
+    bool isColliding(const hrp::Vector3& i_p, double i_r, double i_tolerance=0) const;
     /**
      * @brief collect spheres in the distance bound of a sphere
      * @param i_p position of the sphere
@@ -87,10 +90,11 @@ public:
      * @param i_p1 an end point of the line segment in the capsule
      * @param i_p2 the other end point of the line segment in the capsule
      * @param i_r radius of the capsule
+     * @param i_toelerance tolerance
      * @return true if colliding
      */
     bool isColliding(const hrp::Vector3& i_p1, const hrp::Vector3& i_p2, 
-                     double i_r) const;
+                     double i_r, double i_tolerance=0) const;
     /**
      * @brief compute distance with a capsule
      * @param i_p1 an end point of the line segment in the capsule

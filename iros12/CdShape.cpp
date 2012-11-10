@@ -37,9 +37,9 @@ double CdShape::distance(const CdShape *i_shape) const
     return d - (m_radius + i_shape->radius());
 }
 
-bool CdShape::isColliding(const CdShape *i_shape) const
+bool CdShape::isColliding(const CdShape *i_shape, double i_tolerance) const
 {
-    return distance(i_shape) < 0;
+    return distance(i_shape) < i_tolerance;
 }
 
 void CdShape::updatePosition()

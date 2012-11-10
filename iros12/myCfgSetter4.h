@@ -37,14 +37,14 @@ public:
         hrp::Matrix33 bulbR(Rp*hrp::rotFromYaw(M_PI/2));
         //hrp::Matrix33 bulbR(Rp);
         hrp::Matrix33 wristR(bulbR*R);
-        hrp::Vector3 wristP(goalP + wristR*hrp::Vector3(-0.03,0,0.18));
+        hrp::Vector3 wristP(goalP - wristR*m_body->getGraspLocalPosition(0));
         if (!calcIKwithLimitCheck(m_arm[0],wristP, wristR)) {
             m_ikFailCount[0]++;
             m_reachedArm = 1;
             hrp::Matrix33 bulbR(Rp*hrp::rotFromYaw(-M_PI/2));
             //hrp::Matrix33 bulbR(Rp);
             hrp::Matrix33 wristR(bulbR*R);
-            hrp::Vector3 wristP(goalP + wristR*hrp::Vector3(-0.03,0,0.18));
+            hrp::Vector3 wristP(goalP - wristR*m_body->getGraspLocalPosition(1));
             if (!calcIKwithLimitCheck(m_arm[1], wristP, wristR)){
                 m_ikFailCount[1]++;
                 return false;

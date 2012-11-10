@@ -19,7 +19,7 @@ public:
     ShapeType type() const { return m_type; };
     hrp::Vector3 center(int i=0) const { return m_absP[i]; }
     double radius() const { return m_radius; }
-    bool isColliding(const CdShape *i_shape) const;
+    bool isColliding(const CdShape *i_shape, double i_tolerance=0) const;
     double distance(const CdShape *i_shape) const;
     void updatePosition();
     hrp::Link *link() const { return m_link; }
