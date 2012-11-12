@@ -16,6 +16,7 @@
 #include <Solver/CappedCylinderSpherePair.h>
 #include <Solver/SphereSpherePair.h>
 #include <Solver/DistanceConstraint.h>
+#include <Solver/QPsolverQuadProg.h>
 #include "Filter.h"
 
 using namespace motion_generator;
@@ -52,6 +53,8 @@ Filter::Filter(HumanoidBodyPtr i_body) :
 
     m_tss = new PrioritizedTaskSetSolver(m_body->numJoints()+6);
     m_tss->setLambda(1e-3);
+    QPsolverQuadProg *solver = dynamic_cast<QPsolverQuadProg *>(m_tss->solver());
+    if (solver) solver->setStrictErrorCheck(true);
 
     m_cm = new ConstraintManager(m_tss, m_body, NULL);
 
