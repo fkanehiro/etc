@@ -6,6 +6,10 @@ export MODEL_URL=file://$HOME/openrtp/share/OpenHRP-3.1/robot/HRP2/model/HRP2mai
 #export OBSTACLE_POS='-1.0 1.0 0.0 0 0 0'   
 export OBSTACLE_URL=file://$PWD/EnvPlant.wrl
 export OBSTACLE_POS='0.0 0.0 0 0 0 0'
+export OBSTACLE2_URL=file://$PWD/cube.wrl
+#export OBSTACLE2_POS='0 0 -1 0 0 0'
+#export OBSTACLE2_POS='0.3 0.45 0.65 0 0 0'
+export OBSTACLE2_POS='0.5 0.15 0.85 0 0 0'
 export GOAL_URL=file://$PWD/arrow.wrl
 export GOAL_POS='0.71 0.03 0.9 0 -1.5708 0' 
 #export GOAL_POS='0.75 0.03 1.0 0 -1.5708 0' 
@@ -13,5 +17,5 @@ export GOAL_POS='0.71 0.03 0.9 0 -1.5708 0'
 export LD_LIBRARY_PATH=$OPENHRPHOME/client/gui/corba:$LD_LIBRARY_PATH
 export DYLD_LIBRARY_PATH=$LD_LIBRARY_PATH
 
-echo ./findgoalandpath $NS_OPT -robot $MODEL_URL -obstacle $OBSTACLE_URL $OBSTACLE_POS -goal $GOAL_URL -goalpos $GOAL_POS $*
-./findgoalandpath $NS_OPT -robot $MODEL_URL -obstacle $OBSTACLE_URL $OBSTACLE_POS -goal $GOAL_URL -goalpos $GOAL_POS $*
+echo ./findgoalandpath $NS_OPT -robot $MODEL_URL -obstacle $OBSTACLE_URL $OBSTACLE_POS -obstacle $OBSTACLE2_URL $OBSTACLE2_POS -goal $GOAL_URL -goalpos $GOAL_POS $*
+./findgoalandpath $NS_OPT -robot $MODEL_URL -obstacle $OBSTACLE_URL $OBSTACLE_POS -obstacle $OBSTACLE2_URL $OBSTACLE2_POS -goal $GOAL_URL -goalpos $GOAL_POS $*

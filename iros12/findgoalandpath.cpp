@@ -19,6 +19,8 @@
 #include "problem.h"
 #include "myCfgSetter2.h"
 #include "myCfgSetter3.h"
+#include "SphereTreeUtil.h"
+#include "SphereTree.h"
 #include <Math/Physics.h>
 #include "CustomCD.h"
 #include "RobotUtil.h"
@@ -74,8 +76,6 @@ int main(int argc, char *argv[])
             display = false;
         }else if (strcmp(argv[i], "-ntrial")==0){
             ntrial = atoi(argv[++i]);
-        }else if (strcmp(argv[i], "-point-cloud")==0){
-            cloudf = argv[++i];
         }else if (strcmp(argv[i], "-init-pos")==0){
             initposf = argv[++i];
         }else if (strcmp(argv[i], "-timeout")==0){
@@ -160,8 +160,12 @@ int main(int argc, char *argv[])
     myCfgSetter3 setterForGoal(robot, goalP);
     myCfgSetter2 setterForPath(robot);
 
+    std::vector<hrp::Vector3> points;
+    loadPointArray(cloudf, points);
+    if (obstacleP.size() >= 2) addObstaclePoints(points, obstacleP[1]);
+    SphereTree stree(obstacles[0]->rootLink(), points, 0.01);
     CustomCD cd(robot, "hrp2.shape", "hrp2.pairs", 
-                obstacles[0], cloudf);
+                obstacles[0], &stree);
     cd.tolerance(0.005);
     planner->setCollisionDetector(&cd);
     
