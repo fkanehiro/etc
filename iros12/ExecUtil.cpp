@@ -121,9 +121,8 @@ void loadShape(const char *filename, HumanoidBodyPtr robot,
             }
         }else if (stype == CdShape::CAPSULE){
             ifs >> p[0] >> p[1] >> p[2] >> p2[0] >> p2[1] >> p2[2] >> r;
-            v = p2 - p;
             if (l) {
-                CappedCylinder *s = new CappedCylinder(l, p, v, r);
+                CappedCylinder *s = new CappedCylinder(l, p, p2, r);
                 shapes.push_back(s);
             }
         }
