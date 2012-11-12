@@ -21,6 +21,7 @@ public:
     bool checkCollision();
     std::vector<CdShape>& shapes() { return m_shapes; }
     void tolerance(double i_d) { m_tolerance = i_d; }
+    double tolerance() const { return m_tolerance; }
 private:
     std::vector<CdShape> m_shapes; ///< shapes of the robot
     /// self-collision check pairs
