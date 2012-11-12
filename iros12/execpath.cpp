@@ -3,6 +3,7 @@
 #include <hrpModel/Link.h>
 #include <Math/Physics.h>
 #include <Solver/DistanceConstraint.h>
+#include <Solver/DistancePair.h>
 #include "SphereTreeUtil.h"
 #include "SphereTree.h"
 #include "problem.h"
@@ -175,14 +176,19 @@ int main(int argc, char *argv[])
         tmf << tm << " " << disttm.time() << " " << qptm.time() << std::endl; 
 
         double minD;
+        std::string name;
         for (unsigned int i=0; i<consts.size(); i++){
             hrp::Vector3 s, e;
             consts[i]->computeDistance();
             double d = consts[i]->distance();
-            if (i==0 || d < minD) minD = d;
+            if (i==0 || d < minD) {
+                minD = d;
+                name = consts[i]->pair()->link(0)->name;
+            }
         }
         if (consts.size()){
-            constf << tm << " " << consts.size() << " " << minD << std::endl;
+            constf << tm << " " << consts.size() << " " << minD 
+                   << " " << name << std::endl;
         }else{
             constf << std::endl << std::endl;
         }
@@ -207,12 +213,6 @@ int main(int argc, char *argv[])
         }
         tm += DT;
         if (!ret) {
-#if 0
-            for (unsigned int i=0; i<consts.size(); i++){
-                consts[i]->computeDistance();
-                std::cout << "d=" << consts[i]->distance() << std::endl;
-            }
-#endif
             break;
         }
     }
