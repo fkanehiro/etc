@@ -95,7 +95,9 @@ int main(int argc, char *argv[])
     // This must be called after all bodies are added
     if (display) prob.initOLV(argc, argv);
 
-    PathEngine::ConfigurationSpace cspace(7); 
+    JointPathPtr jp = robot->getJointPath(robot->chestLink, robot->wristLink[RIGHT]);
+    int dim = jp->numJoints() == 7 ? 8 : 7;
+    PathEngine::ConfigurationSpace cspace(dim); 
     cspace.bounds(0,  0.26, 0.705); // body z
     cspace.bounds(1, -0.5, 0.5); // body roll
     cspace.bounds(2, -0.0, 0.5); // body pitch
@@ -103,6 +105,11 @@ int main(int argc, char *argv[])
     cspace.bounds(4, -M_PI/2, M_PI/2);   // hand roll
     cspace.bounds(5, -M_PI/2, M_PI/2); // hand pitch
     cspace.bounds(6, -M_PI, M_PI);   // hand yaw
+    if (dim == 8){
+        cspace.bounds(7,
+                      robot->wristLink[RIGHT]->llimit,
+                      robot->wristLink[RIGHT]->ulimit);
+    }
 
     prob.initCollisionCheckPairs();
     prob.initPlanner();

@@ -14,6 +14,10 @@ public:
         for (int i=0; i<2; i++){
             m_arm[i] = m_body->getJointPath(m_body->chestLink,
                                             m_body->wristLink[i]);
+            if (m_arm[i]->numJoints() ==7){
+                m_arm[i] = m_body->getJointPath(m_body->chestLink,
+                                                m_body->wristLink[i]->parent);
+            }
         }
         m_trunk = m_body->getJointPath(m_body->rootLink(), m_body->chestLink);
 
@@ -32,9 +36,12 @@ public:
         hrp::Matrix33 bulbR = hrp::rotFromPitch(-M_PI/2);
         hrp::Matrix33 R = hrp::rotFromRpy(i_cfg[4], i_cfg[5], i_cfg[6]); 
         hrp::Matrix33 wristR(bulbR*R);
-
         // assuming getGraspLocalPosition(0) and (1) are same
         hrp::Vector3 wristP(m_goalP - wristR*m_body->getGraspLocalPosition(0));
+        if (i_cfg.size() == 8){
+            wristR = wristR*hrp::rotFromPitch(-i_cfg[7]);
+        }
+
         m_reachedArm=0;
         if (!calcIKwithLimitCheck(m_arm[0],wristP, wristR)) {
             m_ikFailCount[0]++;
@@ -50,7 +57,8 @@ public:
                 return false;
             }
         }
-        hrp::JointPathPtr path = m_reachedArm == 0 ? m_arm[1] : m_arm[0];
+        int freeArm = m_reachedArm == 0 ? 1 : 0;
+        hrp::JointPathPtr path = m_arm[freeArm];
         for (int i=0; i<path->numJoints(); i++){
             hrp::Link *j = path->joint(i);
 #if 0
@@ -58,6 +66,11 @@ public:
 #else
             j->q = j->defaultJointValue;
 #endif
+        }
+        if (i_cfg.size() == 8){
+            m_body->wristLink[freeArm]->q 
+                = m_body->wristLink[freeArm]->defaultJointValue;
+            m_body->wristLink[m_reachedArm]->q = i_cfg[7];
         }
         m_body->calcForwardKinematics();
         return true;

@@ -25,10 +25,11 @@ public:
                 return false;
             }
         }
+        int armDof = m_arm[0]->numJoints();
         for (int k=0; k<2; k++){
-            for (int i=0; i<m_arm[k]->numJoints(); i++){
+            for (int i=0; i<armDof; i++){
                 hrp::Link *j = m_arm[k]->joint(i);
-                j->q = i_cfg[4+k*6+i];
+                j->q = i_cfg[4+k*armDof+i];
             }
         }
         m_body->calcForwardKinematics();

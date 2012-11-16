@@ -4,6 +4,7 @@
 #include <hrpUtil/MatrixSolvers.h>
 #include "problem.h"
 #include <Math/Physics.h>
+#include "RobotUtil.h"
 
 using namespace motion_generator;
 using namespace hrp;
@@ -69,6 +70,8 @@ bool calcInverseKinematics(JointPathPtr jpath, const Vector3& end_p, const Matri
 
 int main(int argc, char *argv[])
 {
+    srand((unsigned)time(NULL));
+
     const char *robotURL = NULL;
     const char *goalURL = NULL;
     Vector3 p, rpy;
@@ -112,26 +115,7 @@ int main(int argc, char *argv[])
     prob.initPlanner();
 
     // set halfconf
-    dvector halfconf;
-    halfconf.setZero(robot->numJoints());
-    halfconf[2] = halfconf[ 8] = ToRad(-34);
-    halfconf[3] = halfconf[ 9] = ToRad( 66);
-    halfconf[4] = halfconf[10] = ToRad(-32);
-    double leg_link_len1=0, leg_link_len2=0; 
-    halfconf[16] = halfconf[23] = ToRad(40);
-    halfconf[17] = ToRad(-10); halfconf[24] = -halfconf[17];
-    halfconf[19] = halfconf[26] = ToRad(-80);
-    //halfconf[20] = ToRad(80); halfconf[27] = -halfconf[20];
-    halfconf[21] = halfconf[28] = ToRad(40);
-    halfconf[22] = halfconf[29] = -1.0;
-    leg_link_len1 = leg_link_len2 = 0.3;
-    double waistHeight = leg_link_len1*cos(halfconf[2])
-        + leg_link_len2*cos(halfconf[4]) 
-        + robot->FootToAnkle()[2];
-    robot->rootLink()->p(2) = waistHeight;
-    for (int i=0; i<robot->numJoints(); i++){
-        robot->joint(i)->q = halfconf[i];
-    }
+    setHalfConf(robot);
     robot->calcForwardKinematics();
 
     Matrix33 goalR(rotFromRpy(goalRpy));
@@ -143,10 +127,41 @@ int main(int argc, char *argv[])
 
     prob.updateOLV();
 
+#if 0
+    // numerical solution
     JointPathPtr jpath = JointPathPtr(new JointPath(robot->chestLink,
                                                     robot->wristLink[RIGHT]));
-
     std::cout << calcInverseKinematics(jpath, goalP, goalR, prob) << std::endl;
+#else
+    // analytical solution
+    
+    JointPathPtr jpath;
+    if (robot->modelName() == "HRP2SH"){
+        jpath = robot->getJointPath(robot->chestLink,
+                                    robot->wristLink[RIGHT]->parent);
+    }else{
+        jpath = robot->getJointPath(robot->chestLink,
+                                    robot->wristLink[RIGHT]);
+    }
+    std::cout << "joint path:" << jpath->baseLink()->name << "->"
+              << jpath->endLink()->name << std::endl;
+    std::cout << "AnalyticalIK is " << (jpath->hasAnalyticalIK() ? "used" : "not used") << ", numJoints = " << jpath->numJoints() << std::endl;
+    for (int i=0;i<10;i++){
+        std::cout << i << std::endl;
+        for (int j=0; j<jpath->numJoints(); j++){
+            Link *l = jpath->joint(j);
+            l->q = l->llimit + (rand()*(l->ulimit - l->llimit))/RAND_MAX;
+        }
+        jpath->calcForwardKinematics();
+        goalP = jpath->endLink()->p;
+        goalR = jpath->endLink()->R;
+        robot->calcForwardKinematics();
+        prob.updateOLV();
+        if (!jpath->calcInverseKinematics(goalP, goalR)){
+            break;
+        }
+    }
+#endif
 
     return 0;
 }

@@ -36,9 +36,10 @@ bool find_a_goal(problem &prob, myCfgSetter3 &setter,
     Configuration cfg = cspace.random();
     if (setter.set(prob.planner(), cfg) && !prob.planner()->checkCollision()){
         for (int i=0; i<4; i++) goalCfg[i] = cfg[i];
+        int armDof = armPath[0]->numJoints();
         for (int i=0; i<2; i++){
             for (int j=0; j<armPath[i]->numJoints(); j++){
-                goalCfg[4+i*6+j] = armPath[i]->joint(j)->q;
+                goalCfg[4+i*armDof+j] = armPath[i]->joint(j)->q;
             }
         }
         return true;
@@ -103,8 +104,14 @@ int main(int argc, char *argv[])
 
     HumanoidBodyPtr robot = HumanoidBodyPtr(new HumanoidBody());
     loadHumanoidBodyFromModelLoader(robot, robotURL, argc, argv, true);
+    JointPathPtr armPath[2];
+    for (int k=0; k<2; k++){
+        armPath[k] = robot->getJointPath(robot->chestLink,
+                                         robot->wristLink[k]);
+    }
+    int armDof = armPath[0]->numJoints();
 
-    problem prob(4+6+6);
+    problem prob(4+armDof*2);
     prob.addRobot("robot", robotURL, robot);
     std::vector<BodyPtr> obstacles;
     for (unsigned int i=0; i<obstacleURL.size(); i++){
@@ -169,12 +176,6 @@ int main(int argc, char *argv[])
     cd.tolerance(0.005);
     planner->setCollisionDetector(&cd);
     
-    JointPathPtr armPath[2];
-    for (int k=0; k<2; k++){
-        armPath[k] = robot->getJointPath(robot->chestLink,
-                                         robot->wristLink[k]);
-    }
-
     ConfigurationSpace* CSforPath = planner->getConfigurationSpace();
 
     CSforPath->bounds(0,  0.26, 0.705); // body z
@@ -184,7 +185,7 @@ int main(int argc, char *argv[])
     for (int k=0; k<2; k++){
         for (int i=0; i<armPath[k]->numJoints(); i++){
             Link *j = armPath[k]->joint(i);
-            CSforPath->bounds(4+k*6+i, j->llimit, j->ulimit);
+            CSforPath->bounds(4+k*armDof+i, j->llimit, j->ulimit);
         }
     }
 
@@ -200,12 +201,14 @@ int main(int argc, char *argv[])
     CSforPath->weight(8) = 0.2;
     CSforPath->weight(9) = 0.1;
 
-    CSforPath->weight(10) = 0.8;
-    CSforPath->weight(11) = 0.6;
-    CSforPath->weight(12) = 0.4;
-    CSforPath->weight(13) = 0.3;
-    CSforPath->weight(14) = 0.2;
-    CSforPath->weight(15) = 0.1;
+    CSforPath->weight(armDof+4) = 0.8;
+    CSforPath->weight(armDof+5) = 0.6;
+    CSforPath->weight(armDof+6) = 0.4;
+    CSforPath->weight(armDof+7) = 0.3;
+    CSforPath->weight(armDof+8) = 0.2;
+    CSforPath->weight(armDof+9) = 0.1;
+
+    if (armDof==7) CSforPath->weight(10) = CSforPath->weight(17) = 0.1;
 
     Configuration startCfg(CSforPath->size()), goalCfg(CSforPath->size());
     startCfg[0] = robot->rootLink()->p[2];
@@ -213,7 +216,7 @@ int main(int argc, char *argv[])
     startCfg[1] = rpy[0]; startCfg[2] = rpy[1]; startCfg[3] = rpy[2];
     for (int j=0; j<2; j++){
         for (int i=0; i<armPath[j]->numJoints(); i++){
-            startCfg[4+j*6+i] = armPath[j]->joint(i)->q;
+            startCfg[4+j*armDof+i] = armPath[j]->joint(i)->q;
         }
     }
     planner->setApplyConfigFunc(boost::bind(&myCfgSetter2::set, 
@@ -226,7 +229,8 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    ConfigurationSpace CSforGoal(7); 
+    int dim = armDof == 7 ? 8 : 7;
+    ConfigurationSpace CSforGoal(dim); 
     CSforGoal.bounds(0,  0.26, 0.705); // body z
     CSforGoal.bounds(1, -0.5, 0.5); // body roll
     CSforGoal.bounds(2, -0.0, 0.5); // body pitch
@@ -234,8 +238,10 @@ int main(int argc, char *argv[])
     CSforGoal.bounds(4, -M_PI/2, M_PI/2);   // hand roll
     CSforGoal.bounds(5, -M_PI/2, M_PI/2); // hand pitch
     CSforGoal.bounds(6, -M_PI, M_PI);   // hand yaw
-    for (int i=0; i<7; i++){
-        CSforGoal.weight(i) = 1.0;
+    if (dim == 8){
+        CSforGoal.bounds(7, 
+                         robot->wristLink[RIGHT]->llimit,
+                         robot->wristLink[RIGHT]->ulimit);
     }
 
     double Psample = 0.1;
