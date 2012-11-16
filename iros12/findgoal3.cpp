@@ -134,7 +134,8 @@ int main(int argc, char *argv[])
 
     myCfgSetter3 setter(robot, goalP);
 
-    CustomCD cd(robot, "hrp2.shape", "hrp2.pairs", 
+    std::string shapeFile = robot->modelName() + ".shape";
+    CustomCD cd(robot, shapeFile.c_str(), "hrp2.pairs", 
                 obstacles[0], "plant.pc");
     prob.planner()->setCollisionDetector(&cd);
     

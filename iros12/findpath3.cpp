@@ -167,7 +167,8 @@ int main(int argc, char *argv[])
     }
 #endif
 
-    CustomCD cd(robot, "hrp2.shape", "hrp2.pairs", 
+    std::string shapeFile = robot->modelName()+".shape";
+    CustomCD cd(robot, shapeFile.c_str(), "hrp2.pairs", 
                 obstacles[0], "plant.pc");
     cd.tolerance(0.005);
     prob.planner()->setCollisionDetector(&cd);

@@ -171,7 +171,8 @@ int main(int argc, char *argv[])
     loadPointArray(cloudf, points);
     if (obstacleP.size() >= 2) addObstaclePoints(points, obstacleP[1]);
     SphereTree stree(obstacles[0]->rootLink(), points, 0.01);
-    CustomCD cd(robot, "hrp2.shape", "hrp2.pairs", 
+    std::string shapeFile = robot->modelName() + ".shape";
+    CustomCD cd(robot, shapeFile.c_str(), "hrp2.pairs", 
                 obstacles[0], &stree);
     cd.tolerance(0.005);
     planner->setCollisionDetector(&cd);
