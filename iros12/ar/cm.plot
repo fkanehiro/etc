@@ -4,6 +4,6 @@ set output "cm.eps"
 set key left top
 
 set xlabel "Time[s]"
-set ylabel "ZMP[m]"
-plot "orig/com.dat" u 1:2 w l lw 5 t "X(initial trajectory)", "full/com.dat" u 1:2 w l lw 5 t "X(executed trajectory)", "orig/com.dat" u 1:3 w l lw 5 t "Y(initial trajectory)", "full/com.dat" u 1:3 w l lw 5 t "Y(executed trajectory)"
+set ylabel "COG[m]"
+plot [0:10] "orig/com.dat" u 1:2 w l lw 5 t "X(without compensation)", "full/com.dat" u 1:2 w l lw 5 t "X(with compensation)", "orig/com.dat" u 1:3 w l lw 5 t "Y(without compensation)", "full/com.dat" u 1:3 w l lw 5 t "Y(with compensation)"
 

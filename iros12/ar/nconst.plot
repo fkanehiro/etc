@@ -4,5 +4,5 @@ set output "consts.eps"
 
 set xlabel "Time[s]"
 set ylabel "Number of spheres"
-plot [0:8] "full/const.dat" u 1:2 w l lw 5 t ""
+plot [0:10] "full/const.dat" u 1:2 w l lw 5 t ""
 
