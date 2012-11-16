@@ -10,7 +10,7 @@ class myCfgSetter3 : public cfgSetterBase
 public:
     myCfgSetter3(motion_generator::HumanoidBodyPtr i_body,
                  const hrp::Vector3 &i_goalP)
-        : cfgSetterBase(i_body), m_goalP(i_goalP), m_q(i_body->numJoints()){
+        : cfgSetterBase(i_body), m_goalP(i_goalP){
         for (int i=0; i<2; i++){
             m_arm[i] = m_body->getJointPath(m_body->chestLink,
                                             m_body->wristLink[i]);
@@ -24,7 +24,6 @@ public:
         for (int i=0; i<4; i++){
             m_ikFailCount[i] = 0;
         }
-        m_body->getPosture(m_q);
     }
     bool set(PathEngine::PathPlanner *i_planner,
              const PathEngine::Configuration &i_cfg){
@@ -61,11 +60,7 @@ public:
         hrp::JointPathPtr path = m_arm[freeArm];
         for (int i=0; i<path->numJoints(); i++){
             hrp::Link *j = path->joint(i);
-#if 0
-            j->q = m_q[j->jointId];
-#else
             j->q = j->defaultJointValue;
-#endif
         }
         if (i_cfg.size() == 8){
             m_body->wristLink[freeArm]->q 
@@ -85,6 +80,5 @@ private:
     int m_ikFailCount[4];
     hrp::JointPathPtr m_arm[2], m_trunk;
     hrp::Vector3 m_goalP;
-    hrp::dvector m_q;
     int m_reachedArm;
 };
