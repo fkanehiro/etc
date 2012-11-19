@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
     // load shapes
     std::vector<DistanceGeometry *> shapes;
     std::string shapeFile = robot->modelName() + ".shape";
-    loadShape(shapeFile.c_str(), robot, shapes);
+    if (!loadShape(shapeFile.c_str(), robot, shapes)) exit(1);
 
     Filter *filter = new Filter(robot);
     filter->selectArm(arm);

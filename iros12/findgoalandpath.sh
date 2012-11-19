@@ -5,8 +5,8 @@ export NS_OPT='-ORBInitRef NameService=corbaloc:iiop:localhost:2809/NameService'
 export MODEL_URL=file://$HOME/openrtp/share/OpenHRP-3.1/robot/HRP2SH/model/HRP2SHmain.wrl
 #export OBSTACLE_URL=file://$OPENHRPHOME/etc/house/table.main.wrl
 #export OBSTACLE_POS='-1.0 1.0 0.0 0 0 0'   
-#export OBSTACLE_URL=file://$PWD/EnvPlant.wrl
-export OBSTACLE_URL=file://$PWD/plant_pc.wrl
+export OBSTACLE_URL=file://$PWD/EnvPlant.wrl
+#export OBSTACLE_URL=file://$PWD/plant_pc.wrl
 export OBSTACLE_POS='0.0 0.0 0 0 0 0'
 export OBSTACLE2_URL=file://$PWD/cube.wrl
 export OBSTACLE2_POS='0 0 -1 0 0 0'

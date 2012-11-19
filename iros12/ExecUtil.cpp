@@ -98,10 +98,12 @@ void loadPath(const char *filename, int dof, int &arm,
     std::cout << "done." << std::endl;
 }
 
-void loadShape(const char *filename, HumanoidBodyPtr robot,
+bool loadShape(const char *filename, HumanoidBodyPtr robot,
                std::vector<DistanceGeometry *>& shapes)
 {
     std::ifstream ifs(filename);
+    if (!ifs.is_open()) return false;
+
     std::string linkname;
     int stype;
     Vector3 p,p2,v;
@@ -112,6 +114,7 @@ void loadShape(const char *filename, HumanoidBodyPtr robot,
         Link *l = robot->link(linkname);
         if (!l && linkname[0] != '#'){
             std::cerr << "can't find a link named " << linkname << std::endl;
+            return false;
         }
         if (stype == CdShape::SPHERE){
             ifs >> p[0] >> p[1] >> p[2] >> r;
@@ -128,6 +131,7 @@ void loadShape(const char *filename, HumanoidBodyPtr robot,
         }
         ifs >> linkname;
     }
+    return true;
 }
 
 void setupSelfCollisionCheckPairs(const char *filename, 

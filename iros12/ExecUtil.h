@@ -27,7 +27,7 @@ void loadPath(const char *filename, int dof, int &arm,
               std::vector<hrp::Vector3> &pPath, 
               std::vector<hrp::Vector3> &rpyPath);
 
-void loadShape(const char *filename, motion_generator::HumanoidBodyPtr robot,
+bool loadShape(const char *filename, motion_generator::HumanoidBodyPtr robot,
                std::vector<DistanceGeometry *>& shapes);
 
 void setupSelfCollisionCheckPairs(const char *filename, 
