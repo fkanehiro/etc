@@ -13,7 +13,7 @@ $(TARGET)-1-src.deb: $(TARGET)
 	\cp ./debian/control* $(TARGET)/debian/
 	\cp ./debian/changelog.$(DIR) $(TARGET)/debian/changelog
 	cd $(TARGET)/debian; debuild -S -sa
-	cd $(TARGET); ../ppa_publish.sh $(PPA) lucid maverick natty oneiric precise
+	cd $(TARGET); ../ppa_publish.sh $(PPA) lucid maverick natty oneiric precise quantal
 
 clean:
 	-rm -rf $(TARGET) *~ debian/*~ debian/*.log *.build *.dsc *.tar.gz *.changes *.deb
