@@ -1,3 +1,16 @@
+hrpsys-base (3.1.4-1~ppa25~lucid) lucid; urgency=low
+
+  * adds libopencv-dev to required packages for quantal
+
+ -- Fumio Kanehiro <f-kanehiro@aist.go.jp>  Tue, 30 Oct 2012 07:57:32 +0900
+
+hrpsys-base (3.1.4-1~ppa24~lucid) lucid; urgency=low
+
+  * supports ubuntu12.10(r563)
+  * avoids crash(r562)
+
+ -- Fumio Kanehiro <f-kanehiro@aist.go.jp>  Mon, 29 Oct 2012 22:58:06 +0900
+
 hrpsys-base (3.1.4-1~ppa23~lucid) lucid; urgency=low
 
   * fixes a typo(r561)
