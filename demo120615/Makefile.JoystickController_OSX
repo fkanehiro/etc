@@ -52,7 +52,7 @@ clean: clean_objs clean_skelstub
 	rm -f *~
 
 clean_objs:
-	rm -f $(OBJS) $(OBJS2) JoystickControllerComp.o JoystickController.dylib JoystickControllerComp JoystickController2.dylib 
+	rm -f $(OBJS) $(OBJS2) $(OBJS3) JoystickControllerComp.o JoystickController.dylib JoystickControllerComp JoystickController2.dylib 
 
 clean_skelstub:
 	rm -f *Skel.h *Skel.cpp
