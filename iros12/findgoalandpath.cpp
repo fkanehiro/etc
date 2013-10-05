@@ -17,8 +17,13 @@
 #include <hrpPlanner/ShortcutOptimizer.h>
 #include <hrpPlanner/ConfigurationSpace.h>
 #include "problem.h"
+#if 0
 #include "myCfgSetter2.h"
 #include "myCfgSetter3.h"
+#else
+#include "myCfgSetter2exactCOG.h"
+#include "myCfgSetter3exactCOG.h"
+#endif
 #include "SphereTreeUtil.h"
 #include "SphereTree.h"
 #include <Math/Physics.h>
@@ -310,7 +315,7 @@ int main(int argc, char *argv[])
 
             for (unsigned int i=0; i<path.size(); i++){
                 planner->setConfiguration(path[i]);
-                prob.updateOLV();
+                if (display) prob.updateOLV();
 
                 ofs << robot << std::endl;
             }

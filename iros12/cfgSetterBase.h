@@ -1,6 +1,10 @@
 #ifndef __CFG_SETTER_BASE_H__
 #define __CFG_SETTER_BASE_H__
 #include <Model/HumanoidBodyUtil.h>
+#include <hrpModel/Link.h>
+#include <hrpModel/JointPath.h>
+#include <iostream>
+#include <hrpPlanner/PathPlanner.h>
 #define USE_ANALYTICAL_IK
 
 #ifndef USE_ANALYTICAL_IK
