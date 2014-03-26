@@ -16,7 +16,13 @@ main (int argc, char** argv)
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr original(new pcl::PointCloud<pcl::PointXYZRGB>);
 
   std::ifstream ifs("pointCloud.txt");
-  int npoint = 17286;
+  char buf[1024];
+  for (int i=0; i<5; i++) {
+    ifs.getline(buf, 1024);
+  }
+  int npoint;
+  sscanf(buf, "n=%d", &npoint);
+  std::cout << "npoint = " << npoint << std::endl;
   
   original->width = npoint;
   original->height = 1;

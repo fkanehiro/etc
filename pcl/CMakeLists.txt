@@ -13,3 +13,6 @@ target_link_libraries (cluster_extraction ${PCL_LIBRARIES})
 
 add_executable (planar_segmentation planar_segmentation.cpp)
 target_link_libraries (planar_segmentation ${PCL_LIBRARIES})
+
+add_executable (region_growing_segmentation region_growing_segmentation.cpp)
+target_link_libraries (region_growing_segmentation ${PCL_LIBRARIES})
