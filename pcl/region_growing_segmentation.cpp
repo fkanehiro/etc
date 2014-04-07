@@ -13,13 +13,6 @@ int
 main (int argc, char** argv)
 {
   pcl::PointCloud<pcl::PointXYZ>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZ>);
-#if 0
-  if ( pcl::io::loadPCDFile <pcl::PointXYZ> ("region_growing_tutorial.pcd", *cloud) == -1)
-    {
-      std::cout << "Cloud reading failed." << std::endl;
-      return (-1);
-    }
-#else
   std::ifstream ifs("pointCloud.txt");
   char buf[1024];
   for (int i=0; i<5; i++) {
@@ -39,7 +32,6 @@ main (int argc, char** argv)
     cloud->points[i].y = y;
     cloud->points[i].z = z;
   }
-#endif
 
   pcl::search::Search<pcl::PointXYZ>::Ptr tree = boost::shared_ptr<pcl::search::Search<pcl::PointXYZ> > (new pcl::search::KdTree<pcl::PointXYZ>);
   pcl::PointCloud <pcl::Normal>::Ptr normals (new pcl::PointCloud <pcl::Normal>);

@@ -15,7 +15,11 @@ main (int argc, char** argv)
 {
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr original(new pcl::PointCloud<pcl::PointXYZRGB>);
 
-  std::ifstream ifs("pointCloud.txt");
+  const char *filename = "pointCloud.txt";
+  if (argc >= 2){
+    filename = argv[1];
+  }
+  std::ifstream ifs(filename);
   char buf[1024];
   for (int i=0; i<5; i++) {
     ifs.getline(buf, 1024);

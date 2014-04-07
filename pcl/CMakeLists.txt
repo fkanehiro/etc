@@ -16,3 +16,6 @@ target_link_libraries (planar_segmentation ${PCL_LIBRARIES})
 
 add_executable (region_growing_segmentation region_growing_segmentation.cpp)
 target_link_libraries (region_growing_segmentation ${PCL_LIBRARIES})
+
+add_executable (statistical_removal statistical_removal.cpp)
+target_link_libraries (statistical_removal ${PCL_LIBRARIES})
