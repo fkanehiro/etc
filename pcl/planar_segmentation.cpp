@@ -15,28 +15,21 @@ main (int argc, char** argv)
 {
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr original(new pcl::PointCloud<pcl::PointXYZRGB>);
 
-  const char *filename = "pointCloud.txt";
+  double thd = 0.01;
+  for (int i=1; i<argc; i++){
+    if (strcmp(argv[i], "-thd")==0){
+      thd = atof(argv[++i]);
+    } 
+  }
+  const char *filename = "PointCloud.pcd";
   if (argc >= 2){
     filename = argv[1];
   }
-  std::ifstream ifs(filename);
-  char buf[1024];
-  for (int i=0; i<5; i++) {
-    ifs.getline(buf, 1024);
-  }
-  int npoint;
-  sscanf(buf, "n=%d", &npoint);
+  pcl::PCDReader reader;
+  reader.read (filename, *original);
+  int npoint = original->points.size();
   std::cout << "npoint = " << npoint << std::endl;
-  
-  original->width = npoint;
-  original->height = 1;
-  original->points.resize (npoint);
-  float x,y,z;
   for (int i=0; i<npoint; i++){
-    ifs >> x >> y >> z; 
-    original->points[i].x = x;
-    original->points[i].y = y;
-    original->points[i].z = z;
     original->points[i].r = 255;
     original->points[i].g = 255;
     original->points[i].b = 255;
@@ -51,7 +44,7 @@ main (int argc, char** argv)
   // Mandatory
   seg.setModelType (pcl::SACMODEL_PLANE);
   seg.setMethodType (pcl::SAC_RANSAC);
-  seg.setDistanceThreshold (0.01);
+  seg.setDistanceThreshold (thd);
   
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud = original;
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_p(new pcl::PointCloud<pcl::PointXYZRGB>);
@@ -78,6 +71,11 @@ main (int argc, char** argv)
 	      << coefficients->values[1] << " "
 	      << coefficients->values[2] << " "
 	      << coefficients->values[3] << std::endl;
+    std::cerr << "roll:" << -asin(coefficients->values[1])
+	      << "[rad](" << -asin(coefficients->values[1])*180/M_PI
+	      << "[deg]), pitch:" << asin(coefficients->values[0])
+	      << "[rad](" << asin(coefficients->values[0])*180/M_PI
+	      << "[deg])" << std::endl;
     
     extract.setInputCloud( cloud );
     extract.setIndices( inliers );
@@ -89,28 +87,6 @@ main (int argc, char** argv)
       cloud_p->points[i].b = count&4 ? 255 : 0;
     }
 
-#if 0
-    // Project the model inliers
-    pcl::ProjectInliers<pcl::PointXYZRGB> proj;
-    proj.setModelType (pcl::SACMODEL_PLANE);
-    proj.setIndices (inliers);
-    proj.setInputCloud (cloud_p);
-    proj.setModelCoefficients (coefficients);
-    proj.filter (*cloud_projected);
-    std::cerr << "PointCloud after projection has: "
-	      << cloud_projected->points.size () << " data points." << std::endl;
-
-    // Create a Concave Hull representation of the projected inliers
-    pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_hull (new pcl::PointCloud<pcl::PointXYZRGB>);
-    pcl::ConcaveHull<pcl::PointXYZRGB> chull;
-    chull.setInputCloud (cloud_projected);
-    chull.setAlpha (0.1);
-    chull.reconstruct (*cloud_hull);
-
-    std::cerr << "Concave hull has: " << cloud_hull->points.size ()
-	      << " data points." << std::endl;
-#endif
-    
     std::stringstream   ss;
     ss << "cloud_" << count;
     viewer.addPointCloud( cloud_p, ss.str() );
