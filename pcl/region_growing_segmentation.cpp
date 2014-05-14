@@ -13,25 +13,15 @@ int
 main (int argc, char** argv)
 {
   pcl::PointCloud<pcl::PointXYZ>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZ>);
-  std::ifstream ifs("pointCloud.txt");
-  char buf[1024];
-  for (int i=0; i<5; i++) {
-    ifs.getline(buf, 1024);
+  const char *filename = "PointCloud.pcd";
+  if (argc >= 2){
+    filename = argv[1];
   }
-  int npoint;
-  sscanf(buf, "n=%d", &npoint);
+  pcl::PCDReader reader;
+  reader.read (filename, *cloud);
+  int npoint = cloud->points.size();
   std::cout << "npoint = " << npoint << std::endl;
-  
-  cloud->width = npoint;
-  cloud->height = 1;
-  cloud->points.resize (npoint);
-  float x,y,z;
-  for (int i=0; i<npoint; i++){
-    ifs >> x >> y >> z; 
-    cloud->points[i].x = x;
-    cloud->points[i].y = y;
-    cloud->points[i].z = z;
-  }
+
 
   pcl::search::Search<pcl::PointXYZ>::Ptr tree = boost::shared_ptr<pcl::search::Search<pcl::PointXYZ> > (new pcl::search::KdTree<pcl::PointXYZ>);
   pcl::PointCloud <pcl::Normal>::Ptr normals (new pcl::PointCloud <pcl::Normal>);
