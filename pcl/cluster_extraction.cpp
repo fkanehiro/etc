@@ -18,7 +18,11 @@ main (int argc, char** argv)
   // Read in the cloud data
   pcl::PCDReader reader;
   pcl::PointCloud<pcl::PointXYZ>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZ>);
-  reader.read ("table_scene_lms400.pcd", *cloud);
+  const char *filename = "PointCloud.pcd";
+  if (argc >= 2){
+    filename = argv[1];
+  }
+  reader.read (filename, *cloud);
   std::cout << "PointCloud before filtering has: " << cloud->points.size () << " data points." << std::endl; //*
 
   // Create the filtering object: downsample the dataset using a leaf size of 1cm
