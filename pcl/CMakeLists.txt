@@ -19,3 +19,12 @@ target_link_libraries (region_growing_segmentation ${PCL_LIBRARIES})
 
 add_executable (statistical_removal statistical_removal.cpp)
 target_link_libraries (statistical_removal ${PCL_LIBRARIES})
+
+add_executable (plane_extraction plane_extraction.cpp)
+target_link_libraries (plane_extraction ${PCL_LIBRARIES})
+
+add_executable (moving_least_squares moving_least_squares.cpp)
+target_link_libraries (moving_least_squares ${PCL_LIBRARIES})
+
+add_executable (normals normals.cpp)
+target_link_libraries (normals ${PCL_LIBRARIES})
