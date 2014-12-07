@@ -72,7 +72,6 @@ public:
       std::vector<nodePtr> Xnear = near(xnew);
       for (unsigned int i=0; i<Xnear.size(); i++){
 	nodePtr xnear = Xnear[i];
-	if (xnear == xnew) continue;
 	if (obstacleFree(xnear, xnew)){
 	  double cdash = xnear->cost() + xnew->cost(xnear);
 	  if (cdash < xnew->cost()){
