@@ -225,7 +225,7 @@ public:
     double ratio_dx=1.0, ratio_dy=1.0, ratio_dth=1.0;
     double max_dx = 0.3, max_dy = 0.1, max_dth = 1.0;
     if (rel_dx >  max_dx) ratio_dx =  max_dx/rel_dx;
-    if (rel_dx < -max_dx) ratio_dy = -max_dx/rel_dx;
+    if (rel_dx < -max_dx) ratio_dx = -max_dx/rel_dx;
     if (rel_dy >  max_dy) ratio_dy =  max_dy/rel_dy;
     if (rel_dy < -max_dy) ratio_dy = -max_dy/rel_dy;
     if (dth >  max_dth) ratio_dth =  max_dth/dth;
