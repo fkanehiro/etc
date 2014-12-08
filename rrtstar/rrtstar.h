@@ -37,16 +37,66 @@ private:
   nodePtr m_parent;
 };
 
+class region
+{
+public:
+  region() :
+    m_cx(0),
+    m_cy(0),
+    m_wx(0),
+    m_wy(0){
+  }
+
+  region(double cx, double cy,
+	 double wx, double wy) :
+    m_cx(cx),
+    m_cy(cy),
+    m_wx(wx),
+    m_wy(wy){
+  }
+
+  double cx() { return m_cx; }
+  double cy() { return m_cy; }
+  double wx() { return m_wx; }
+  double wy() { return m_wy; }
+
+  bool contain(nodePtr n){
+    double x = n->x();
+    double y = n->y();
+    return (x >= m_cx - m_wx/2 && x <= m_cx + m_wx/2
+	    && y >= m_cy - m_wy/2 && y <= m_cy + m_wy/2);
+  }
+private:
+  double m_cx, m_cy, m_wx, m_wy;
+};
+
 class rrtstar
 {
 public:
-  rrtstar(){
+  rrtstar() :
+    m_searchRegion(0,0,2,2),
+    m_gamma(0.2){
   }
 
+  void setGoalRegion(const region& reg) { m_goalRegion = reg; }
+  void setSearchRegion(const region & reg) { m_searchRegion = reg; }
+  void setGamma(double g) { m_gamma = g; } 
+
   std::vector<nodePtr>& vertices() { return m_nodes; }
+  std::vector<nodePtr>& verticesInGoalRegion() { 
+    return m_nodesInGoalRegion;
+  }
+
+  void addVertex(nodePtr x){
+    m_nodes.push_back(x);
+    if (m_goalRegion.contain(x)){
+      m_nodesInGoalRegion.push_back(x);
+    }
+  }
   void initPlan(nodePtr xinit){
     m_nodes.clear();
-    m_nodes.push_back(xinit);
+    m_nodesInGoalRegion.clear();
+    addVertex(xinit);
   }
   void plan(nodePtr xinit, unsigned int niter){
     initPlan(xinit);
@@ -80,7 +130,7 @@ public:
 	  }
 	}
       }
-      m_nodes.push_back(xnew);
+      addVertex(xnew);
       addEdge(xmin, xnew);
       for (unsigned int i=0; i<Xnear.size(); i++){
 	nodePtr xnear = Xnear[i];
@@ -96,7 +146,7 @@ public:
   std::vector<nodePtr> near(nodePtr x){
     std::vector<nodePtr> ret;
     for (unsigned int i=0; i<m_nodes.size(); i++){
-      if (x->cost(m_nodes[i]) < 0.2){
+      if (x->cost(m_nodes[i]) < m_gamma){
 	ret.push_back(m_nodes[i]);
       }
     }
@@ -104,7 +154,14 @@ public:
   }
 
   bool obstacleFree(nodePtr from, nodePtr to){
-    return true;
+    if ((from->x() > -0.25 && from->x() < 0.25
+	 && from->y() > -0.25 && from->y() < 0.25)
+	|| (to->x() > -0.25 && to->x() < 0.25
+	    && to->y() > -0.25 && to->y() < 0.25)){
+      return false;
+    }else{
+      return true;
+    }
   }
 
   nodePtr steer(nodePtr from, nodePtr to){
@@ -132,10 +189,14 @@ public:
   }
 
   nodePtr sample(){
-    return nodePtr(new node((2.0*rand())/RAND_MAX-1.0,
-			    (2.0*rand())/RAND_MAX-1.0));
+    return nodePtr(new node((m_searchRegion.wx()*rand())/RAND_MAX
+			    + m_searchRegion.cx()-m_searchRegion.wx()/2,
+			    (m_searchRegion.wy()*rand())/RAND_MAX
+			    + m_searchRegion.cy()-m_searchRegion.wy()/2));
   }
 
 private:
-  std::vector<nodePtr> m_nodes;
+  std::vector<nodePtr> m_nodes, m_nodesInGoalRegion;
+  region m_goalRegion, m_searchRegion;
+  double m_gamma;
 };
