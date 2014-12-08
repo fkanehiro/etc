@@ -67,18 +67,20 @@ public:
     nodePtr xnearest  = nearest(x);
     nodePtr xnew = steer(xnearest, x);
     if (obstacleFree(xnearest, xnew)){
-      m_nodes.push_back(xnew);
       nodePtr xmin = xnearest;
+      double cmin = xnearest->cost() + xnew->cost(xnearest);
       std::vector<nodePtr> Xnear = near(xnew);
       for (unsigned int i=0; i<Xnear.size(); i++){
 	nodePtr xnear = Xnear[i];
 	if (obstacleFree(xnear, xnew)){
-	  double cdash = xnear->cost() + xnew->cost(xnear);
-	  if (cdash < xnew->cost()){
+	  double c = xnear->cost() + xnew->cost(xnear);
+	  if (c < cmin){
 	    xmin = xnear;
+	    cmin = c;
 	  }
 	}
       }
+      m_nodes.push_back(xnew);
       addEdge(xmin, xnew);
       for (unsigned int i=0; i<Xnear.size(); i++){
 	nodePtr xnear = Xnear[i];
