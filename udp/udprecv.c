@@ -7,6 +7,8 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
+#include <string.h>
+#include <strings.h>
 
 #define WAIT_PORT 8000
 #define BUFLEN 256
@@ -16,6 +18,14 @@ main(int argc, char *argv[]) {
   struct sockaddr_in my_addr, from_addr;
   int flag, n, from_len;
   char buf[BUFLEN];
+  int i, port=WAIT_PORT,cnt=0;
+
+  for (i=1; i<argc; i++){
+    if (strcmp(argv[i], "-p")==0){
+      port = atoi(argv[++i]);
+    }
+  }
+  printf("port = %d\n", port);
 
   udp_socket = socket(AF_INET, SOCK_DGRAM,0);
 
@@ -29,6 +39,7 @@ main(int argc, char *argv[]) {
   flag=0;
   while(1) {
     n = recvfrom(udp_socket,buf,BUFLEN,flag,&from_addr,&from_len);
+    printf("%d:",cnt++);fflush(stdout);
     write(1,buf,n);
   }
 }
