@@ -15,7 +15,7 @@
 
 main(int argc, char *argv[]) {
   int udp_socket;
-  struct sockaddr_in my_addr, from_addr;
+  struct sockaddr_in from_addr;
   int flag, n, from_len;
   char buf[BUFLEN];
   int i, port=WAIT_PORT,cnt=0;
@@ -30,11 +30,11 @@ main(int argc, char *argv[]) {
   udp_socket = socket(AF_INET, SOCK_DGRAM,0);
 
   bzero((char *) &from_addr,sizeof(from_addr));
-  my_addr.sin_family = AF_INET;
-  my_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-  my_addr.sin_port = htons(WAIT_PORT);
+  from_addr.sin_family = AF_INET;
+  from_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+  from_addr.sin_port = htons(WAIT_PORT);
 
-  bind(udp_socket, (struct sockaddr *) &my_addr, sizeof(my_addr));
+  bind(udp_socket, (struct sockaddr *) &from_addr, sizeof(from_addr));
 
   flag=0;
   while(1) {
