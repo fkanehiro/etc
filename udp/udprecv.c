@@ -10,7 +10,7 @@
 #include <string.h>
 #include <strings.h>
 
-#define WAIT_PORT 8000
+#define DEFAULT_PORT 8000
 #define BUFLEN 256
 
 main(int argc, char *argv[]) {
@@ -18,7 +18,7 @@ main(int argc, char *argv[]) {
   struct sockaddr_in from_addr;
   int flag, n, from_len;
   char buf[BUFLEN];
-  int i, port=WAIT_PORT,cnt=0;
+  int i, port=DEFAULT_PORT,cnt=0;
 
   for (i=1; i<argc; i++){
     if (strcmp(argv[i], "-p")==0){
@@ -32,7 +32,7 @@ main(int argc, char *argv[]) {
   bzero((char *) &from_addr,sizeof(from_addr));
   from_addr.sin_family = AF_INET;
   from_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-  from_addr.sin_port = htons(WAIT_PORT);
+  from_addr.sin_port = htons(port);
 
   bind(udp_socket, (struct sockaddr *) &from_addr, sizeof(from_addr));
 

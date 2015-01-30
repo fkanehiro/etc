@@ -10,15 +10,15 @@
 #include <string.h>
 #include <strings.h>
 
-#define DEST_PORT 8000
-#define DEST_HOSTNAME "tetsujin2"
+#define DEFAULT_PORT 8000
+#define DEFAULT_HOSTNAME "tetsujin2"
 
 main(int argc, char *argv[]) {
   int udp_socket;
   struct sockaddr_in dest_addr;
   struct hostent *dest_host;
-  char* message, *host=DEST_HOSTNAME;
-  int i,port=DEST_PORT,n=100;
+  char* message, *host=DEFAULT_HOSTNAME;
+  int i,port=DEFAULT_PORT,n=100;
 
   for (i=1; i<argc; i++){
     if (strcmp(argv[i], "-p")==0){
@@ -35,7 +35,7 @@ main(int argc, char *argv[]) {
   dest_addr.sin_family = AF_INET;
   dest_host = gethostbyname(host);
   bcopy(dest_host->h_addr,(char *)&dest_addr.sin_addr,dest_host->h_length);
-  dest_addr.sin_port = htons(DEST_PORT);
+  dest_addr.sin_port = htons(port);
 
   message = "Hello!\n";
   for (i=0; i<n; i++){
