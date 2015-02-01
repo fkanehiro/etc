@@ -34,6 +34,10 @@ main(int argc, char *argv[]) {
   bzero((char *) &dest_addr, sizeof(dest_addr));
   dest_addr.sin_family = AF_INET;
   dest_host = gethostbyname(host);
+  if (!dest_host) {
+    printf("invalid hostname(%s)\n", host);
+    return -1;
+  }
   bcopy(dest_host->h_addr,(char *)&dest_addr.sin_addr,dest_host->h_length);
   dest_addr.sin_port = htons(port);
 
@@ -42,4 +46,5 @@ main(int argc, char *argv[]) {
     sendto(udp_socket,message,strlen(message),0,&dest_addr,sizeof(dest_addr));
   }
   close(udp_socket);
+  return 0;
 }
