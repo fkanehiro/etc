@@ -11,18 +11,18 @@
 #include <strings.h>
 
 #define DEFAULT_PORT 8000
-#define BUFLEN 256
 
 main(int argc, char *argv[]) {
   int udp_socket;
   struct sockaddr_in from_addr;
   int flag, n, from_len;
-  char buf[BUFLEN];
-  int i, port=DEFAULT_PORT,cnt=0;
+  int i, port=DEFAULT_PORT,cnt=0, l=100;
 
   for (i=1; i<argc; i++){
     if (strcmp(argv[i], "-p")==0){
       port = atoi(argv[++i]);
+    }else if (strcmp(argv[i], "-l")==0){
+      l = atoi(argv[++i]);
     }
   }
   printf("port = %d\n", port);
@@ -36,9 +36,10 @@ main(int argc, char *argv[]) {
 
   bind(udp_socket, (struct sockaddr *) &from_addr, sizeof(from_addr));
 
+  char buf[l];
   flag=0, cnt=0;
   while(1) {
-    cnt += recvfrom(udp_socket,buf,BUFLEN,flag,&from_addr,&from_len);
+    cnt += recvfrom(udp_socket,buf,l,flag,&from_addr,&from_len);
     printf("received %d bytes\n", cnt);
   }
 
