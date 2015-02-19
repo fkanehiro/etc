@@ -36,10 +36,10 @@ main(int argc, char *argv[]) {
 
   bind(udp_socket, (struct sockaddr *) &from_addr, sizeof(from_addr));
 
-  flag=0;
+  flag=0, cnt=0;
   while(1) {
-    n = recvfrom(udp_socket,buf,BUFLEN,flag,&from_addr,&from_len);
-    printf("%d:",cnt++);fflush(stdout);
-    write(1,buf,n);
+    cnt += recvfrom(udp_socket,buf,BUFLEN,flag,&from_addr,&from_len);
+    printf("received %d bytes\n", cnt);
   }
+
 }

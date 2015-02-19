@@ -18,16 +18,23 @@ main(int argc, char *argv[]) {
   struct sockaddr_in dest_addr;
   struct hostent *dest_host;
   char* message, *host=DEFAULT_HOSTNAME;
-  int i,port=DEFAULT_PORT,n=100;
+  int i,port=DEFAULT_PORT,n=100,l=100,interval=0;
 
   for (i=1; i<argc; i++){
     if (strcmp(argv[i], "-p")==0){
       port = atoi(argv[++i]);
     }else if(strcmp(argv[i], "-h")==0){
       host = argv[++i];
-    } 
+    }else if(strcmp(argv[i], "-n")==0){
+      n = atoi(argv[++i]);
+    }else if(strcmp(argv[i], "-l")==0){
+      l = atoi(argv[++i]);
+    }else if(strcmp(argv[i], "-i")==0){
+      interval = atoi(argv[++i]);
+    }
   }
   printf("destination = %s:%d\n", host, port);
+  printf("n = %d, l = %d\n", n, l);
 
   udp_socket = socket(AF_INET,SOCK_DGRAM,0);
 
@@ -41,10 +48,15 @@ main(int argc, char *argv[]) {
   bcopy(dest_host->h_addr,(char *)&dest_addr.sin_addr,dest_host->h_length);
   dest_addr.sin_port = htons(port);
 
-  message = "Hello!\n";
+  char buf[l];
   for (i=0; i<n; i++){
-    sendto(udp_socket,message,strlen(message),0,&dest_addr,sizeof(dest_addr));
+    sendto(udp_socket,buf,l,0,&dest_addr,sizeof(dest_addr));
+    if (interval){
+      usleep(interval);
+    }
   }
+
+  printf("sent %d bytes\n", n*l);
   close(udp_socket);
   return 0;
 }
