@@ -49,8 +49,11 @@ main(int argc, char *argv[]) {
   dest_addr.sin_port = htons(port);
 
   char buf[l];
+  int ret;
   for (i=0; i<n; i++){
-    sendto(udp_socket,buf,l,0,&dest_addr,sizeof(dest_addr));
+    if ((ret = sendto(udp_socket,buf,l,0,&dest_addr,sizeof(dest_addr)))!=l){
+      printf("return value=%d, data length=%d\n", ret, l); 
+    };
     if (interval){
       usleep(interval);
     }
