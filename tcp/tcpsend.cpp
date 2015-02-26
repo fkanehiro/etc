@@ -7,7 +7,7 @@
 
 int main(int argc, char *argv[])
 {
-  int port=8000;
+  int port=2047;
   char *host="tetsujin2", *message;
   int n = 100;
  
