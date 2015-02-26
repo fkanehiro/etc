@@ -34,7 +34,7 @@ main(int argc, char *argv[]) {
     }
   }
   printf("destination = %s:%d\n", host, port);
-  printf("n = %d, l = %d\n", n, l);
+  printf("number(-n) = %d, length(-l) = %d, interval(-i) = %d\n", n, l, interval);
 
   udp_socket = socket(AF_INET,SOCK_DGRAM,0);
 
