@@ -10,7 +10,7 @@
 #include <string.h>
 #include <strings.h>
 
-#define DEFAULT_PORT 8000
+#define DEFAULT_PORT 24575
 #define DEFAULT_HOSTNAME "tetsujin2"
 
 main(int argc, char *argv[]) {

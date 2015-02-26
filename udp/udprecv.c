@@ -10,7 +10,7 @@
 #include <string.h>
 #include <strings.h>
 
-#define DEFAULT_PORT 8000
+#define DEFAULT_PORT 24575
 
 main(int argc, char *argv[]) {
   int udp_socket;
