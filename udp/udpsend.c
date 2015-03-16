@@ -10,7 +10,7 @@
 #include <string.h>
 #include <strings.h>
 
-#define DEFAULT_PORT 8000
+#define DEFAULT_PORT 24575
 #define DEFAULT_HOSTNAME "localhost"
 
 main(int argc, char *argv[]) {
@@ -34,7 +34,7 @@ main(int argc, char *argv[]) {
     }
   }
   printf("destination = %s:%d\n", host, port);
-  printf("n = %d[times], l = %d[bytes], interval = %d[usec]\n", n, l, interval);
+  printf("number(-n) = %d, length(-l) = %d, interval(-i) = %d\n", n, l, interval);
 
   udp_socket = socket(AF_INET,SOCK_DGRAM,0);
 

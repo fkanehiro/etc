@@ -7,7 +7,7 @@
 
 int main(int argc, char *argv[])
 {
-  int port=8000;
+  int port=2047;
  
   for (int i=1; i<argc; i++){
     if (strcmp(argv[i], "-p")==0){
@@ -41,10 +41,11 @@ int main(int argc, char *argv[])
       char buf[BUFLEN];
       
       if ((ret = recv(client, buf, BUFLEN, 0)) <= 0){
-	close(client);
-	std::cout << "connection is lost" << std::endl;
-	break;
+          close(client);
+          std::cout << "connection is lost(received " << cnt << "bytes)" << std::endl;
+          break;
       }else{
+          cnt += ret;
       }
     }
   }
