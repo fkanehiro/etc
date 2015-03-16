@@ -11,7 +11,7 @@
 #include <strings.h>
 
 #define DEFAULT_PORT 8000
-#define DEFAULT_HOSTNAME "tetsujin2"
+#define DEFAULT_HOSTNAME "localhost"
 
 main(int argc, char *argv[]) {
   int udp_socket;
@@ -34,7 +34,7 @@ main(int argc, char *argv[]) {
     }
   }
   printf("destination = %s:%d\n", host, port);
-  printf("n = %d, l = %d\n", n, l);
+  printf("n = %d[times], l = %d[bytes], interval = %d[usec]\n", n, l, interval);
 
   udp_socket = socket(AF_INET,SOCK_DGRAM,0);
 
@@ -50,6 +50,8 @@ main(int argc, char *argv[]) {
 
   char buf[l];
   int ret;
+  struct timeval tv1, tv2;
+  gettimeofday(&tv1, NULL);
   for (i=0; i<n; i++){
     if ((ret = sendto(udp_socket,buf,l,0,&dest_addr,sizeof(dest_addr)))!=l){
       printf("return value=%d, data length=%d\n", ret, l); 
@@ -58,8 +60,11 @@ main(int argc, char *argv[]) {
       usleep(interval);
     }
   }
+  gettimeofday(&tv2, NULL);
+  double dt = tv2.tv_sec - tv1.tv_sec + (tv2.tv_usec - tv1.tv_usec)/1e6;
 
-  printf("sent %d bytes\n", n*l);
+  printf("sent %d[bytes] in %f[s](%f[Mbps])\n", 
+	 n*l, dt, n*l*8/dt/1e6);
   close(udp_socket);
   return 0;
 }
