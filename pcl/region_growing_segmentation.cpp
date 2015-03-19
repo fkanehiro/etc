@@ -12,11 +12,32 @@
 int
 main (int argc, char** argv)
 {
-  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZ>);
-  const char *filename = "PointCloud.pcd";
-  if (argc >= 2){
-    filename = argv[1];
+  if (argc < 2){
+    std::cerr << "Usage: " << argv[0] << " [PCD file] [-s smoothness] [-c curvature] [-n neighbors]" << std::endl; 
+    return 1;
   }
+
+  const char *filename = argv[1];
+  double smoothness = 7.0 / 180.0 * M_PI;
+  double curvature = 1.0;
+  int neighbors = 30;
+
+  for (int i=2; i<argc; i++){
+    if (strcmp(argv[i], "-s")==0){
+      smoothness = atof(argv[++i])/180.0*M_PI;
+    }else if(strcmp(argv[i], "-c")==0){
+      curvature = atof(argv[++i]);
+    }else if(strcmp(argv[i], "-n")==0){
+      neighbors = atoi(argv[++i]);
+    }
+  }
+
+  std::cout << "smoothness = " << smoothness*180.0/M_PI << "[deg]" << std::endl;
+  std::cout << "curvature = " << curvature << std::endl;
+  std::cout << "neighbors = " << neighbors << std::endl;
+
+  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZ>);
+
   pcl::PCDReader reader;
   reader.read (filename, *cloud);
   int npoint = cloud->points.size();
@@ -42,12 +63,12 @@ main (int argc, char** argv)
   reg.setMinClusterSize (100);
   reg.setMaxClusterSize (10000);
   reg.setSearchMethod (tree);
-  reg.setNumberOfNeighbours (30);
+  reg.setNumberOfNeighbours (neighbors);
   reg.setInputCloud (cloud);
   //reg.setIndices (indices);
   reg.setInputNormals (normals);
-  reg.setSmoothnessThreshold (7.0 / 180.0 * M_PI);
-  reg.setCurvatureThreshold (1.0);
+  reg.setSmoothnessThreshold (smoothness);
+  reg.setCurvatureThreshold (curvature);
 
   std::vector <pcl::PointIndices> clusters;
   reg.extract (clusters);
