@@ -1,44 +1,46 @@
-#include <iostream>
-#include <opencv2/core/core.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/highgui/highgui.hpp>
+#include <stdio.h>
+#include <cv.h>
+#include <highgui.h>
 
 int
-main(int argc, char *argv[])
+main (int argc, char **argv)
 {
-  if (argc < 2){
-    std::cerr << "Usage: " << argv[0] << " [image file]" << std::endl;
-    return 1;
-  } 
-  cv::Mat src_img = cv::imread(argv[1], 1);
-  if(!src_img.data) {
-    std::cerr << "failed to open the image(" << argv[1] << ")" << std::endl; 
-    return -1; 
+  int i;
+  float *p;
+  IplImage *src_img = 0, *src_img_gray = 0;
+  CvMemStorage *storage;
+  CvSeq *circles = 0;
+
+  // (1)画像の読み込み
+  if (argc >= 2)
+    src_img_gray = cvLoadImage (argv[1], CV_LOAD_IMAGE_GRAYSCALE);
+  if (src_img_gray == 0)
+    exit (-1);
+  src_img = cvLoadImage (argv[1], CV_LOAD_IMAGE_COLOR);
+
+
+  // (2)ハフ変換のための前処理（画像の平滑化を行なわないと誤検出が発生しやすい）
+  cvSmooth (src_img_gray, src_img_gray, CV_GAUSSIAN, 11, 11, 0, 0);
+  storage = cvCreateMemStorage (0);
+
+  // (3)ハフ変換による円の検出と検出した円の描画
+  circles = cvHoughCircles (src_img_gray, storage, CV_HOUGH_GRADIENT,
+                            1, 100, 20, 50, 10, MAX (src_img_gray->width, src_img_gray->height));
+  for (i = 0; i < circles->total; i++) {
+    p = (float *) cvGetSeqElem (circles, i);
+    cvCircle (src_img, cvPoint (cvRound (p[0]), cvRound (p[1])), 3, CV_RGB (0, 255, 0), -1, 8, 0);
+    cvCircle (src_img, cvPoint (cvRound (p[0]), cvRound (p[1])), cvRound (p[2]), CV_RGB (255, 0, 0), 3, 8, 0);
   }
 
-  cv::Mat dst_img, work_img;
-  dst_img = src_img.clone();
-  cv::cvtColor(src_img, work_img, CV_BGR2GRAY);
+  // (4)検出結果表示用のウィンドウを確保し表示する
+  cvNamedWindow ("circles", 1);
+  cvShowImage ("circles", src_img);
+  cvWaitKey (0);
 
-  // Hough変換のための前処理（画像の平滑化を行なわないと誤検出が発生しやすい）
-  //cv::GaussianBlur(work_img, work_img, cv::Size(11,11), 2, 2);
-  cv::GaussianBlur(work_img, work_img, cv::Size(5,5), 2, 2);
-  
-  // Hough変換による円の検出と検出した円の描画
-  std::vector<cv::Vec3f> circles;
-  cv::HoughCircles(work_img, circles, CV_HOUGH_GRADIENT, 1, 100, 20, 30, 10, 30);
+  cvDestroyWindow ("circles");
+  cvReleaseImage (&src_img);
+  cvReleaseImage (&src_img_gray);
+  cvReleaseMemStorage (&storage);
 
-  std::vector<cv::Vec3f>::iterator it = circles.begin();
-  for(; it!=circles.end(); ++it) {
-    cv::Point center(cv::saturate_cast<int>((*it)[0]), cv::saturate_cast<int>((*it)[1]));
-    int radius = cv::saturate_cast<int>((*it)[2]);
-    std::cout << "radius=" << radius << std::endl;
-    cv::circle(dst_img, center, radius, cv::Scalar(0,0,255), 2);
-  }
-
-  cv::namedWindow("HoughCircles", CV_WINDOW_AUTOSIZE|CV_WINDOW_FREERATIO);
-  cv::namedWindow("Blurred", CV_WINDOW_AUTOSIZE|CV_WINDOW_FREERATIO);
-  cv::imshow("HoughCircles", dst_img);
-  cv::imshow("Blurred", work_img);
-  cv::waitKey(0);
+  return 0;
 }
