@@ -1,4 +1,4 @@
-all: viewer oval circle rectangle shape hough
+all: viewer oval circle rectangle shape hough capture calib undistort
 
 viewer: viewer.cpp
 	g++ viewer.cpp -o viewer `pkg-config --cflags --libs opencv`
@@ -18,6 +18,15 @@ rectangle: rectangle.cpp
 shape: shape.cpp
 	g++ shape.cpp -o shape `pkg-config --cflags --libs opencv`
 
+capture: capture.cpp
+	g++ capture.cpp -o capture `pkg-config --cflags --libs opencv`
+
+calib: calib.cpp
+	g++ calib.cpp -o calib `pkg-config --cflags --libs opencv`
+
+undistort: undistort.cpp
+	g++ undistort.cpp -o undistort `pkg-config --cflags --libs opencv`
+
 clean : 
-	-rm -f viewer *.o *~ core oval circle rectangle shape hough
+	-rm -f viewer *.o *~ core oval circle rectangle shape hough capture calib undistort
  
