@@ -41,13 +41,13 @@ main(int argc, char *argv[]) {
 
 #define BUFLEN 1024
   char buf[BUFLEN];
-  fgets(buf, BUFLEN, stdin);
-
-  int ret;
-  if ((ret = sendto(udp_socket,buf,BUFLEN,0,(sockaddr *)&dest_addr,sizeof(dest_addr)))!=BUFLEN){
-    printf("return value=%d, data length=%d\n", ret, BUFLEN); 
-  };
-
+  while (1){
+    if (!fgets(buf, BUFLEN, stdin)) break;
+    int ret;
+    if ((ret = sendto(udp_socket,buf,BUFLEN,0,(sockaddr *)&dest_addr,sizeof(dest_addr)))!=BUFLEN){
+      printf("return value=%d, data length=%d\n", ret, BUFLEN); 
+    };
+  }
   close(udp_socket);
   return 0;
 }
