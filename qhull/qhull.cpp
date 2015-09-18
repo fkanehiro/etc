@@ -27,7 +27,19 @@ void convertToConvexHull(hrp::Link *i_link)
         return;
     }
 
-    std::ofstream ofs(i_link->name.c_str());
+    std::string fname = i_link->name + ".wrl";
+    std::ofstream ofs(fname.c_str());
+
+    ofs << "#VRML V2.0 utf8" << std::endl;
+    ofs << "Shape {" << std::endl;
+    ofs << "  appearance Appearance {" << std::endl;
+    ofs << "    material Material {" << std::endl;
+    ofs << "      diffuseColor 0.8 0.8 0.8" << std::endl;
+    ofs << "    }" << std::endl;
+    ofs << "  }" << std::endl;
+    ofs << "  geometry IndexedFaceSet {" << std::endl;
+    ofs << "    coord Coordinate {" << std::endl;
+    ofs << "      point [" << std::endl;
 
     // qhull
     int numVertices = i_link->coldetModel->getNumVertices();
@@ -53,9 +65,14 @@ void convertToConvexHull(hrp::Link *i_link)
     FORALLvertices {
         int p = qh_pointid(vertex->point);
         index[p] = vertexIndex;
-	ofs << points[p*3+0] << " " <<  points[p*3+1] << " " <<  points[p*3+2] << std::endl;
+	ofs << points[p*3+0] << " " <<  points[p*3+1] << " " <<  points[p*3+2] << "," << std::endl;
         vertexIndex++;
     }
+
+    ofs << "      ]" << std::endl;
+    ofs << "    }" << std::endl;
+    ofs << "    coordIndex [" << std::endl;
+
     facetT *facet;
     int num = qh num_facets;
     int triangleIndex = 0;
@@ -71,9 +88,16 @@ void convertToConvexHull(hrp::Link *i_link)
             }
             j++;
         }
-	ofs << p[0] << " " <<  p[1] << " " <<  p[2] << std::endl;
+	ofs << p[0] << ", " <<  p[1] << ", " <<  p[2] << ", -1," << std::endl;
         triangleIndex++;
     }
+
+    std::cout << i_link->name << ":" << i_link->coldetModel->getNumTriangles()
+	      << "->" << triangleIndex++ << std::endl;
+
+    ofs << "    ]" << std::endl;
+    ofs << "  }" << std::endl;
+    ofs << "}" << std::endl;
 
     qh_freeqhull(!qh_ALL);
     int curlong, totlong;
@@ -89,10 +113,11 @@ int main(int argc, char *argv[])
 {
   if (argc < 2){
     std::cerr << "Usage:" << argv[0] << " [VRML model]" << std::endl;
+    return 1;
   }
 
   hrp::BodyPtr body(new hrp::Body());
-  loadBodyFromModelLoader(body, argv[1], argc, argv);
+  loadBodyFromModelLoader(body, argv[1], argc, argv, true);
   convertToConvexHull(body);
 
   return 0;
