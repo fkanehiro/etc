@@ -35,6 +35,7 @@ void convertToConvexHull(hrp::Link *i_link)
     ofs << "  appearance Appearance {" << std::endl;
     ofs << "    material Material {" << std::endl;
     ofs << "      diffuseColor 0.8 0.8 0.8" << std::endl;
+    ofs << "      transparency 0.5" << std::endl;
     ofs << "    }" << std::endl;
     ofs << "  }" << std::endl;
     ofs << "  geometry IndexedFaceSet {" << std::endl;
@@ -65,7 +66,7 @@ void convertToConvexHull(hrp::Link *i_link)
     FORALLvertices {
         int p = qh_pointid(vertex->point);
         index[p] = vertexIndex;
-	ofs << points[p*3+0] << " " <<  points[p*3+1] << " " <<  points[p*3+2] << "," << std::endl;
+	ofs << "        " << points[p*3+0] << " " <<  points[p*3+1] << " " <<  points[p*3+2] << "," << std::endl;
         vertexIndex++;
     }
 
@@ -88,7 +89,7 @@ void convertToConvexHull(hrp::Link *i_link)
             }
             j++;
         }
-	ofs << p[0] << ", " <<  p[1] << ", " <<  p[2] << ", -1," << std::endl;
+	ofs << "      " << p[0] << ", " <<  p[1] << ", " <<  p[2] << ", -1," << std::endl;
         triangleIndex++;
     }
 
