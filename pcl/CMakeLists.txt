@@ -28,3 +28,9 @@ target_link_libraries (moving_least_squares ${PCL_LIBRARIES})
 
 add_executable (normals normals.cpp)
 target_link_libraries (normals ${PCL_LIBRARIES})
+
+add_executable (append_pcd append_pcd.cpp)
+target_link_libraries (append_pcd ${PCL_LIBRARIES})
+
+add_executable (filter_pcd filter_pcd.cpp)
+target_link_libraries (filter_pcd ${PCL_LIBRARIES})
