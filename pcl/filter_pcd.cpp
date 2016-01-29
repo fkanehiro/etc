@@ -40,35 +40,26 @@ int main(int argc, char **argv)
 
   pcl::PCDReader reader;
 
-  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZ>);
-  pcl::PointCloud<pcl::PointXYZ>::Ptr filtered_cloud (new pcl::PointCloud<pcl::PointXYZ>);
-
+  pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZRGB>);
   reader.read (argv[1], *cloud);
 
-  if (cloud->height != 1){
-    std::cerr << "height of " << argv[1] << " is not equal to 1" << std::endl;
-    return 2;
-  }
+  cloud->is_dense = false;
   
-  filtered_cloud->points.resize(cloud->points.size());
-
-  int cnt = 0;
   for (int i=0; i<cloud->points.size(); i++){
     float x = cloud->points[i].x;
     float y = cloud->points[i].y;
     float z = cloud->points[i].z;
     double d = sqrt(x*x + y*y + z*z);
     if (d < dmin || d > dmax || x < xmin || x > xmax 
-	|| y < ymin || y > ymax || z < zmin || z > zmax) continue;
-    filtered_cloud->points[cnt++] = cloud->points[i];
+	|| y < ymin || y > ymax || z < zmin || z > zmax) {
+      cloud->points[i].x = std::numeric_limits<float>::quiet_NaN();
+      cloud->points[i].y = std::numeric_limits<float>::quiet_NaN();
+      cloud->points[i].z = std::numeric_limits<float>::quiet_NaN();
+    }
   }
 
-  filtered_cloud->height = 1;
-  filtered_cloud->width = cnt;
-  filtered_cloud->points.resize(cnt);
-
   pcl::PCDWriter writer;
-  writer.write<pcl::PointXYZ> (filename, *filtered_cloud, true);
+  writer.write<pcl::PointXYZRGB> (filename, *cloud, true);
   
   return 0;
 }

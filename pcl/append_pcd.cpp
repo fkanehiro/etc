@@ -9,8 +9,8 @@ int main(int argc, char **argv)
 
   pcl::PCDReader reader;
 
-  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZ>);
-  pcl::PointCloud<pcl::PointXYZ>::Ptr integrated_cloud (new pcl::PointCloud<pcl::PointXYZ>);
+  pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZRGB>);
+  pcl::PointCloud<pcl::PointXYZRGB>::Ptr integrated_cloud (new pcl::PointCloud<pcl::PointXYZRGB>);
   integrated_cloud->width = 0;
   integrated_cloud->height = 1;
 
@@ -29,7 +29,7 @@ int main(int argc, char **argv)
   }
 
   pcl::PCDWriter writer;
-  writer.write<pcl::PointXYZ> ("result.pcd", *integrated_cloud, true);
+  writer.write<pcl::PointXYZRGB> ("result.pcd", *integrated_cloud, true);
   
   return 0;
 }
