@@ -34,3 +34,6 @@ target_link_libraries (append_pcd ${PCL_LIBRARIES})
 
 add_executable (filter_pcd filter_pcd.cpp)
 target_link_libraries (filter_pcd ${PCL_LIBRARIES})
+
+add_executable (sor sor.cpp)
+target_link_libraries (sor ${PCL_LIBRARIES})
