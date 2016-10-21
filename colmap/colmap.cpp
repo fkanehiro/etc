@@ -23,6 +23,9 @@ void gen_colmap(BodyPtr body, Link *link1, Link *link2)
 #define DTH (M_PI/180);
     std::string fname = link1->name + "_" + link2->name + ".dat";
     std::ofstream ofs(fname.c_str());
+    ofs << link1->ulimit << " " << link2->ulimit << std::endl;
+    ofs << link1->llimit << " " << link2->llimit << std::endl;
+    ofs << std::endl << std::endl;
     int ntest=0, ncollision=0;
     while (th1 < joint1->ulimit){
         joint1->q = th1;
