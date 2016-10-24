@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
     std::cerr << "Usage:" << argv[0] << "[sch file1] [sch file2]" << std::endl;
     return 1;
   }
-  STP_BV_P obj1, obj2;
+  STP_BV obj1, obj2;
   obj1.constructFromFile(argv[1]);
   obj2.constructFromFile(argv[2]);
 
