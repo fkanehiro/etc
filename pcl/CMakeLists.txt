@@ -43,3 +43,9 @@ target_link_libraries (sor ${PCL_LIBRARIES})
 
 add_executable (openni_viewer_simple openni_viewer_simple.cpp)
 target_link_libraries (openni_viewer_simple ${PCL_LIBRARIES})
+
+add_executable (openni_grabber openni_grabber.cpp)
+target_link_libraries (openni_grabber ${PCL_LIBRARIES})
+
+add_executable (openni2_viewer openni2_viewer.cpp)
+target_link_libraries (openni2_viewer ${PCL_LIBRARIES})
