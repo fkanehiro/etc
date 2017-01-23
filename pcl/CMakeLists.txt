@@ -52,3 +52,6 @@ target_link_libraries (openni2_viewer ${PCL_LIBRARIES})
 
 add_executable (extract_image extract_image.cpp)
 target_link_libraries (extract_image ${PCL_LIBRARIES})
+
+add_executable (extract_region extract_region.cpp)
+target_link_libraries (extract_region ${PCL_LIBRARIES})
