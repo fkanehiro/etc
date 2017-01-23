@@ -45,6 +45,8 @@
 #include <pcl/console/print.h>
 #include <pcl/console/parse.h>
 #include <pcl/console/time.h>
+#include <pcl/io/pcd_io.h>
+#include <pcl/io/png_io.h>
 
 #include <boost/chrono.hpp>
 
@@ -120,7 +122,7 @@ public:
     : cloud_viewer_ (new pcl::visualization::PCLVisualizer ("PCL OpenNI2 cloud"))
     , image_viewer_ ()
     , grabber_ (grabber)
-    , rgb_data_ (0), rgb_data_size_ (0)
+    , rgb_data_ (0), rgb_data_size_ (0), counter_ (0)
   {
   }
 
@@ -155,12 +157,27 @@ public:
     void
     keyboard_callback (const pcl::visualization::KeyboardEvent& event, void*)
   {
-    if (event.getKeyCode ())
+    int key = event.getKeyCode ();
+    if (key)
       cout << "the key \'" << event.getKeyCode () << "\' (" << event.getKeyCode () << ") was";
     else
       cout << "the special key \'" << event.getKeySym () << "\' was";
     if (event.keyDown ())
-      cout << " pressed" << endl;
+      {
+	cout << " pressed" << endl;
+	if (key == 's')
+	  {
+	    char cloud[25], image[25];
+	    sprintf(cloud, "cloud%03d.pcd", counter_);
+	    sprintf(image, "image%03d.png", counter_++);
+	    {
+	      boost::mutex::scoped_lock lock (cloud_mutex_);
+	      pcl::io::savePCDFileASCII(cloud, *cloud_);
+	      pcl::io::savePNGFile(image, *cloud_, "rgb");
+	    }
+	  }
+      }
+    
     else
       cout << " released" << endl;
   }
@@ -281,6 +298,7 @@ public:
   boost::shared_ptr<pcl::io::openni2::Image> image_;
   unsigned char* rgb_data_;
   unsigned rgb_data_size_;
+  int counter_;
 };
 
 // Create the PCLVisualizer object
