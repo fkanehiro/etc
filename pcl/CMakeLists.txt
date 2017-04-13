@@ -3,6 +3,9 @@ cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 project(pcl)
 
 find_package(PCL 1.1 REQUIRED)
+if (NOT "${PCL_LIBRARIES}" STREQUAL "")
+  list(REMOVE_ITEM PCL_LIBRARIES "vtkproj4")
+endif()
 
 include_directories(${PCL_INCLUDE_DIRS})
 link_directories(${PCL_LIBRARY_DIRS})
@@ -40,3 +43,15 @@ target_link_libraries (sor ${PCL_LIBRARIES})
 
 add_executable (openni_viewer_simple openni_viewer_simple.cpp)
 target_link_libraries (openni_viewer_simple ${PCL_LIBRARIES})
+
+add_executable (openni_grabber openni_grabber.cpp)
+target_link_libraries (openni_grabber ${PCL_LIBRARIES})
+
+add_executable (openni2_viewer openni2_viewer.cpp)
+target_link_libraries (openni2_viewer ${PCL_LIBRARIES})
+
+add_executable (extract_image extract_image.cpp)
+target_link_libraries (extract_image ${PCL_LIBRARIES})
+
+add_executable (extract_region extract_region.cpp)
+target_link_libraries (extract_region ${PCL_LIBRARIES})
