@@ -5,6 +5,7 @@ int main(int argc, char *argv[])
 {
   if (argc < 10){
     std::cerr << "Usage:" << argv[0] << " R00 R01 R02 ... R22" << std::endl;
+    return 1;
   }
 
   hrp::Matrix33 R;
