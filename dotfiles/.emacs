@@ -25,3 +25,12 @@
 (setq jedi:use-shortcuts t)
 (add-hook 'python-mode-hook 'jedi:setup)
 (add-to-list 'company-backends 'company-jedi) ; backendに追加
+
+(when (require 'rtags nil 'noerror)
+  (add-hook 'c-mode-common-hook
+            (lambda ()
+	      (setq rtags-path "/usr/local/bin")
+	      (local-set-key (kbd "M-.") 'rtags-find-symbol-at-point)
+	      (local-set-key (kbd "M-;") 'rtags-find-symbol)
+	      (local-set-key (kbd "M-@") 'rtags-find-references)
+	      (local-set-key (kbd "M-,") 'rtags-location-stack-back))))
