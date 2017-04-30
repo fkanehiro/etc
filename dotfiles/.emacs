@@ -34,3 +34,6 @@
 	      (local-set-key (kbd "M-;") 'rtags-find-symbol)
 	      (local-set-key (kbd "M-@") 'rtags-find-references)
 	      (local-set-key (kbd "M-,") 'rtags-location-stack-back))))
+
+(require 'powerline)
+(powerline-default-theme)

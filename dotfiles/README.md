@@ -19,6 +19,7 @@ M-x package-list-packages
 M-x package-install RET company-irony
 M-x package-install RET company-jedi
 M-x package-install RET rtags
+M-x package-install RET powerline
 M-x irony-install-server
 M-x jedi:install-server
 
