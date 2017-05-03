@@ -1,7 +1,6 @@
-export PATH=$HOME/openrtp/bin:$HOME/.local/bin:$PATH
-export LD_LIBRARY_PATH=$HOME/openrtp/lib:$HOME/openrtp/lib64:/usr/local/lib/roboptim-core
-export PYTHONPATH=$HOME/openrtp/lib/python2.7/dist-packages/hrpsys
-export PKG_CONFIG_PATH=$HOME/openrtp/lib/pkgconfig
+export PATH=$HOME/.local/bin:$PATH
+
+source $HOME/src/drcutil/setup.bash 
 
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
