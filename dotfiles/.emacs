@@ -37,3 +37,6 @@
 
 (require 'powerline)
 (powerline-default-theme)
+
+(require 'linum)            ;\左に行番号表示
+(global-linum-mode)
