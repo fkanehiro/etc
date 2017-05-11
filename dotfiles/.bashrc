@@ -120,8 +120,8 @@ fi
 
 if [ -e /usr/local/lib/python2.7/dist-packages/rtshell/data/shell_support ]; then
     source /usr/local/lib/python2.7/dist-packages/rtshell/data/shell_support
-elif [ -e $HOME/.local/lib/python2.7/dist-packages/rtshell/data/shell_support ]; then
-    source $HOME/.local/lib/python2.7/dist-packages/rtshell/data/shell_support
+elif [ -e $HOME/.local/lib/python2.7/site-packages/rtshell/data/shell_support ]; then
+    source $HOME/.local/lib/python2.7/site-packages/rtshell/data/shell_support
 fi
 
 powerline-daemon -q
