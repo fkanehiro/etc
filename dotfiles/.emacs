@@ -1,3 +1,5 @@
+(menu-bar-mode -1)
+
 (require 'package)
 
 ; Add package-archives
@@ -40,3 +42,6 @@
 
 (require 'linum)            ;\左に行番号表示
 (global-linum-mode)
+
+(global-git-gutter-mode t)
+
