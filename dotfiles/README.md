@@ -5,6 +5,7 @@ M-x package-install RET company-irony
 M-x package-install RET company-jedi
 M-x package-install RET rtags
 M-x package-install RET powerline
+M-x package-install RET git-gutter
 M-x irony-install-server
 M-x jedi:install-server
 
