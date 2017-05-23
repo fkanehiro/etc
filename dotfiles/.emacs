@@ -1,5 +1,7 @@
 (menu-bar-mode -1)
 
+(setq-default indent-tabs-mode nil)
+
 (require 'package)
 
 ; Add package-archives
