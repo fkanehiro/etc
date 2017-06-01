@@ -1,3 +1,4 @@
+#include <iostream>
 #include <fstream>
 #include <hrpModel/Link.h>
 #include <hrpModel/Body.h>
