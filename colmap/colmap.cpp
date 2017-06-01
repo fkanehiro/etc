@@ -23,11 +23,11 @@ void gen_colmap(BodyPtr body, Link *link1, Link *link2)
 #define DTH (M_PI/180);
     std::string fname = link1->name + "_" + link2->name + ".dat";
     std::ofstream ofs(fname.c_str());
-    ofs << link1->ulimit << " " << link2->ulimit << std::endl;
-    ofs << link1->ulimit << " " << link2->llimit << std::endl;
-    ofs << link1->llimit << " " << link2->llimit << std::endl;
-    ofs << link1->llimit << " " << link2->ulimit << std::endl;
-    ofs << link1->ulimit << " " << link2->ulimit << std::endl;
+    ofs << joint1->ulimit << " " << joint2->ulimit << std::endl;
+    ofs << joint1->ulimit << " " << joint2->llimit << std::endl;
+    ofs << joint1->llimit << " " << joint2->llimit << std::endl;
+    ofs << joint1->llimit << " " << joint2->ulimit << std::endl;
+    ofs << joint1->ulimit << " " << joint2->ulimit << std::endl;
     ofs << std::endl << std::endl;
     int ntest=0, ncollision=0;
     while (th1 < joint1->ulimit){
@@ -36,8 +36,8 @@ void gen_colmap(BodyPtr body, Link *link1, Link *link2)
         while (th2 < joint2->ulimit){
             joint2->q = th2;
             path->calcForwardKinematics();
-            link1->coldetModel->setPosition(link1->attitude(), link1->p);
-            link2->coldetModel->setPosition(link2->attitude(), link2->p);
+            joint1->coldetModel->setPosition(joint1->attitude(), joint1->p);
+            joint2->coldetModel->setPosition(joint2->attitude(), joint2->p);
 	    ntest++;
             if (pair->checkCollision()){
                 ofs << th1 << " " << th2 << std::endl;
