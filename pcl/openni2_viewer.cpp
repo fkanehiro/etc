@@ -122,7 +122,7 @@ public:
     : cloud_viewer_ (new pcl::visualization::PCLVisualizer ("PCL OpenNI2 cloud"))
     , image_viewer_ ()
     , grabber_ (grabber)
-    , rgb_data_ (0), rgb_data_size_ (0), counter_ (0)
+    , rgb_data_ (0), rgb_data_size_ (0), counter_ (0), autosave_ (false)
   {
   }
 
@@ -132,6 +132,15 @@ public:
     FPS_CALC ("cloud callback");
     boost::mutex::scoped_lock lock (cloud_mutex_);
     cloud_ = cloud;
+    if (autosave_){
+      char cloud[25], image[25];
+      sprintf(cloud, "cloud%03d.pcd", counter_);
+      sprintf(image, "image%03d.png", counter_++);
+      {
+        pcl::io::savePCDFileASCII(cloud, *cloud_);
+        pcl::io::savePNGFile(image, *cloud_, "rgb");
+      }
+    }
   }
 
     void
@@ -299,6 +308,7 @@ public:
   unsigned char* rgb_data_;
   unsigned rgb_data_size_;
   int counter_;
+  bool autosave_;
 };
 
 // Create the PCLVisualizer object
@@ -370,16 +380,22 @@ main (int argc, char** argv)
   if (pcl::console::find_argument (argc, argv, "-xyz") != -1)
     xyz = true;
 
+  bool autosave = false;
+  if (pcl::console::find_argument (argc, argv, "-autosave") != -1)
+    autosave = true;
+
   pcl::io::OpenNI2Grabber grabber (device_id, depth_mode, image_mode);
 
   if (xyz || !grabber.providesCallback<pcl::io::OpenNI2Grabber::sig_cb_openni_point_cloud_rgb> ())
     {
       OpenNI2Viewer<pcl::PointXYZ> openni_viewer (grabber);
+      openni_viewer.autosave_ = autosave;
       openni_viewer.run ();
     }
   else
     {
       OpenNI2Viewer<pcl::PointXYZRGBA> openni_viewer (grabber);
+      openni_viewer.autosave_ = autosave;
       openni_viewer.run ();
     }
 
