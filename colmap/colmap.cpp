@@ -36,8 +36,8 @@ void gen_colmap(BodyPtr body, Link *link1, Link *link2)
         while (th2 < joint2->ulimit){
             joint2->q = th2;
             path->calcForwardKinematics();
-            joint1->coldetModel->setPosition(joint1->attitude(), joint1->p);
-            joint2->coldetModel->setPosition(joint2->attitude(), joint2->p);
+            link1->coldetModel->setPosition(link1->attitude(), link1->p);
+            link2->coldetModel->setPosition(link2->attitude(), link2->p);
 	    ntest++;
             if (pair->checkCollision()){
                 ofs << th1 << " " << th2 << std::endl;
