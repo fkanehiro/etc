@@ -79,11 +79,13 @@ int main(int argc, char *argv[])
       gen_colmap(body, link1, link2);
     }else{
       for (unsigned int i=0; i<body->numLinks(); i++){
-	Link *link2  = body->link(i);
-	if (link2->parent && link2->parent->parent){
-	  Link *link1 = link2->parent->parent;
-	  gen_colmap(body, link1, link2);
-	}
+	Link *link1  = body->link(i);
+        for (unsigned int j=i+1; j<body->numLinks(); j++){
+          Link *link2 = body->link(j);
+          if (body->getJointPath(link1, link2)->numJoints()  == 2){
+            gen_colmap(body, link1, link2);
+          }
+        }
       }
     }
 
