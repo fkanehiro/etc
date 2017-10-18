@@ -61,3 +61,6 @@ target_link_libraries (voxel_grid_filter ${PCL_LIBRARIES})
 
 add_executable (approximate_voxel_grid_filter approximate_voxel_grid_filter.cpp)
 target_link_libraries (approximate_voxel_grid_filter ${PCL_LIBRARIES})
+
+add_executable (icp icp.cpp)
+target_link_libraries (icp ${PCL_LIBRARIES})
