@@ -1,4 +1,7 @@
-all: viewer oval circle rectangle shape hough capture calib undistort
+all: crop viewer oval circle rectangle shape hough capture calib undistort
+
+crop: crop.cpp
+	g++ crop.cpp -o crop `pkg-config --cflags --libs opencv`
 
 viewer: viewer.cpp
 	g++ viewer.cpp -o viewer `pkg-config --cflags --libs opencv`
