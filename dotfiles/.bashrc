@@ -5,7 +5,9 @@
 export PATH=$HOME/.local/bin:$PATH
 export LD_LIBRARY_PATH=$HOME/openrtp/lib/roboptim-core:$LD_LIBRARY_PATH
 
-source $HOME/src/drcutil/setup.bash 
+source $HOME/src/drcutil/setup.bash
+
+export ASAN_OPTIONS="disable_coredump=0:unmap_shadow_on_exit=1:abort_on_error=1"
 
 # If not running interactively, don't do anything
 case $- in
@@ -128,3 +130,7 @@ powerline-daemon -q
 . /home/kanehiro/.local/lib/python2.7/site-packages/powerline/bindings/bash/powerline.sh
 
 [[ -z "$TMUX" && ! -z "$PS1" ]] && tmux
+
+
+. /home/kanehiro/src/torch/install/bin/torch-activate
+

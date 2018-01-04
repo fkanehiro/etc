@@ -45,5 +45,5 @@
 (require 'linum)            ;\左に行番号表示
 (global-linum-mode)
 
-(global-git-gutter-mode t)
+;(global-git-gutter-mode t)
 
