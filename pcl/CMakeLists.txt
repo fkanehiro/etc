@@ -64,3 +64,6 @@ target_link_libraries (approximate_voxel_grid_filter ${PCL_LIBRARIES})
 
 add_executable (icp icp.cpp)
 target_link_libraries (icp ${PCL_LIBRARIES})
+
+add_executable (ascii2bin ascii2bin.cpp)
+target_link_libraries (ascii2bin ${PCL_LIBRARIES})
