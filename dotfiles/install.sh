@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-sudo apt-get install python-virtualenv guake tmux libclang-dev clang bear cmake emacs python-pip
+sudo apt-get install python-virtualenv guake tmux libclang-dev clang bear cmake emacs python-pip xsel
 pip install --user powerline-status
 
 git clone https://github.com/powerline/fonts.git
