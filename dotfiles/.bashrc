@@ -130,7 +130,3 @@ powerline-daemon -q
 . /home/kanehiro/.local/lib/python2.7/site-packages/powerline/bindings/bash/powerline.sh
 
 [[ -z "$TMUX" && ! -z "$PS1" ]] && tmux
-
-
-. /home/kanehiro/src/torch/install/bin/torch-activate
-
