@@ -19,10 +19,12 @@ source config.sh
 cd src
 make robot_state_chain_publisher.install
 make hpp-model-urdf.install
+make hpp-gepetto-viewer.install
 make hpp-rbprm-corba.install
 
 git clone https://github.com/iit-DLSLab/hyq-description.git
 git clone https://github.com/iit-DLSLab/sensors-description.git
 
+export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:$DEVEL_DIR
 rosrun xacro xacro.py `rospack find hyq_description`/robots/hyq_model.urdf.xacro -o $DEVEL_DIR/install/share/hpp-rbprm-corba/hyq.urdf
 
