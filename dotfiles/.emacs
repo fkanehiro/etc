@@ -45,5 +45,45 @@
 (require 'linum)            ;\左に行番号表示
 (global-linum-mode)
 
-;(global-git-gutter-mode t)
+(global-git-gutter-mode t)
 
+;; ivy設定
+(require 'ivy)
+(ivy-mode 1)
+(setq ivy-use-virtual-buffers t)
+(setq enable-recursive-minibuffers t)
+(setq ivy-height 30) ;; minibufferのサイズを拡大！（重要）
+(setq ivy-extra-directories nil)
+(setq ivy-re-builders-alist
+      '((t . ivy--regex-plus)))
+
+;; counsel設定
+(require 'counsel)
+(global-set-key (kbd "M-x") 'counsel-M-x)
+;(global-set-key (kbd "C-x C-f") 'counsel-find-file) ;; find-fileもcounsel任せ！
+(defvar counsel-find-file-ignore-regexp (regexp-opt '("./" "../")))
+
+(global-set-key "\C-s" 'swiper)
+(defvar swiper-include-line-number-in-search t) ;; line-numberでも検索可能
+
+(show-paren-mode t)
+
+;; Highlight the line we are currently on
+(global-hl-line-mode t)
+
+(global-set-key (kbd "C-x g") 'magit-status)
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   (quote
+    (magit erc-image rtags powerline git-gutter counsel company-jedi company-irony))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
