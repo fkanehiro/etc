@@ -16,7 +16,9 @@ cd fonts
 ./install.sh
 cd ..
 
-if [ $OSNAME != "Darwin" ]; then
+if [ $OSNAME = "Darwin" ]; then
+    sudo cp omniORB.cfg /etc/
+else
     git clone --recursive https://github.com/Andersbakken/rtags.git
     cd rtags
     mkdir build
