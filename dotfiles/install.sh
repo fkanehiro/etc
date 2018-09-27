@@ -5,6 +5,7 @@ OSNAME="$(uname)"
 if [ $OSNAME = "Darwin" ]; then
     /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
     brew install caskbrew emacs git tmux
+    pip install virtualenv
 else
     sudo apt-get install python-virtualenv guake tmux libclang-dev clang bear cmake emacs python-pip xsel
 fi
@@ -36,6 +37,7 @@ if [ $OSNAME = "Darwin" ]; then
     ln -s $THISDIR/.emacs.el .
     ln -s $THISDIR/.bash_profile .
     ln -s $THISDIR/.tmux.conf.macos .tmux.conf
+    ln -s $THISDIR/.aspell.conf .
 else
     mv .bashrc .bashrc.bak
     ln -s $THISDIR/.bashrc .
