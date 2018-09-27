@@ -152,3 +152,5 @@
 	   '(("CMakeLists\\.txt\\'" . cmake-mode))
 	   '(("\\.cmake\\'" . cmake-mode))
 	   auto-mode-alist))
+
+(setq ispell-program-name "/usr/local/bin/aspell")
