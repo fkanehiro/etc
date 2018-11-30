@@ -1,0 +1,52 @@
+<root main_tree_to_execute="BehaviorTree">
+    <!--  -----------------------------------  -->
+    <BehaviorTree ID="BehaviorTree">
+        <Fallback name="Fallback1">
+            <Sequence>
+                <Fallback name="Fallback2">
+                    <Condition ID="BallFound"/>
+                    <Action ID="FindBall"/>
+                </Fallback>
+                <Fallback name="Fallback3">
+                    <Condition ID="BallClose"/>
+                    <Action ID="ApproachBall"/>
+                </Fallback>
+                <Fallback name="Fallback4">
+                    <Condition ID="BallGrasped"/>
+                    <Action ID="GraspBall"/>
+                </Fallback>
+                <Fallback name="Fallback5">
+                    <Condition ID="BinFound"/>
+                    <Action ID="FindBin"/>
+                </Fallback>
+                <Fallback name="Fallback6">
+                    <Condition ID="BinClose"/>
+                    <Action ID="ApproachBin"/>
+                </Fallback>
+                <Fallback name="Fallback7">
+                    <Condition ID="BallPlaced"/>
+                    <Action ID="PlaceBall"/>
+                </Fallback>
+            </Sequence>
+            <Action ID="AskForHelp"/>
+        </Fallback>
+    </BehaviorTree>
+    <!--  -----------------------------------  -->
+    <TreeNodesModel>
+        <Action ID="ApproachBall"/>
+        <Action ID="ApproachBin"/>
+        <Action ID="AskForHelp"/>
+        <Condition ID="BallClose"/>
+        <Condition ID="BallFound"/>
+        <Condition ID="BallGrasped"/>
+        <Condition ID="BallPlaced"/>
+        <Condition ID="BinClose"/>
+        <Condition ID="BinFound"/>
+        <Action ID="FindBall"/>
+        <Action ID="FindBin"/>
+        <Action ID="GraspBall"/>
+        <Action ID="PlaceBall"/>
+    </TreeNodesModel>
+    <!--  -----------------------------------  -->
+</root>
+
