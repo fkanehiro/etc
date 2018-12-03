@@ -8,7 +8,7 @@ example2.1: example2.1.o
 example2.1.o: example2.1.cpp
 	g++  ${CXX_FLAGS} -c $<
 
-example_nodes.o: example_nodes.cpp example_nodes.h
+example_nodes.o: example_nodes.cpp
 	g++  ${CXX_FLAGS} -c $<
 
 libexample_nodes.so: example_nodes.o

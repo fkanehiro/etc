@@ -8,7 +8,7 @@
                     <Action ID="FindBall"/>
                 </Fallback>
                 <Fallback name="Fallback3">
-                    <Condition ID="BallClose"/>
+                    <Condition ID="BallClose" thd="10"/>
                     <Action ID="ApproachBall"/>
                 </Fallback>
                 <Fallback name="Fallback4">

@@ -1,11 +1,10 @@
-#include "example_nodes.h"
+#include "behaviortree_cpp/bt_factory.h"
 #include "Pose2D.h"
 
-BT_REGISTER_NODES(factory)
-{
-    Example::RegisterNodes(factory);
-}
+using namespace BT;
 
+namespace Example {
+    
 double direction(const Pose2D& self, const Pose2D& target)
 {
     auto dx = target.x - self.x;
@@ -24,7 +23,7 @@ double distance(const Pose2D& obj1, const Pose2D& obj2)
     return sqrt(dx*dx+dy*dy);
 }
 
-NodeStatus Example::BallFound(TreeNode& self)
+NodeStatus BallFound(TreeNode& self)
 {
     std::cout << "BallFound" << std::endl;
     Pose2D robot, ball;
@@ -39,7 +38,8 @@ NodeStatus Example::BallFound(TreeNode& self)
     }
 }
 
-NodeStatus Example::BallClose(TreeNode& self)
+#if 0
+NodeStatus BallClose(TreeNode& self)
 {
     std::cout << "BallClose" << std::endl;
     Pose2D robot, ball;
@@ -53,14 +53,49 @@ NodeStatus Example::BallClose(TreeNode& self)
         return NodeStatus::FAILURE;
     }
 }
+#else
+class BallClose: public BT::ActionNodeBase
+{
+public:
+    BallClose(const std::string& name, const NodeParameters& params)
+        : BT::ActionNodeBase(name, params) {}
 
-NodeStatus Example::BallGrasped(TreeNode& self)
+    static const NodeParameters& requiredNodeParameters(){
+        static NodeParameters params = {{"thd", "10"}};
+        return params;
+    }
+        
+    NodeStatus tick() override {
+        std::cout << "BallClose" << std::endl;
+        Pose2D robot, ball;
+        blackboard()->get("robot",robot);
+        blackboard()->get("ball",ball);
+        auto d = distance(ball, robot);
+        //std::cout << "distance = " << distance << std::endl;
+        double thd;
+        if (!getParam<double>("thd", thd)){
+            auto default_thd = requiredNodeParameters().at("thd");
+            thd = BT::convertFromString<double>(default_thd);
+        }
+        std::cout << thd << std::endl;
+        if (d < thd){
+            return NodeStatus::SUCCESS;
+        }else{
+            return NodeStatus::FAILURE;
+        }
+    }
+
+    virtual void halt() override {}
+};
+#endif
+
+NodeStatus BallGrasped(TreeNode& self)
 {
     std::cout << "BallGrasped" << std::endl;
     return NodeStatus::SUCCESS;
 }
 
-NodeStatus Example::BinFound(TreeNode& self)
+NodeStatus BinFound(TreeNode& self)
 {
     std::cout << "BinFound" << std::endl;
     Pose2D robot, bin;
@@ -74,7 +109,7 @@ NodeStatus Example::BinFound(TreeNode& self)
     }
 }
 
-NodeStatus Example::BinClose(TreeNode& self)
+NodeStatus BinClose(TreeNode& self)
 {
     std::cout << "BinClose" << std::endl;
     Pose2D robot, bin;
@@ -88,19 +123,19 @@ NodeStatus Example::BinClose(TreeNode& self)
     }
 }
 
-NodeStatus Example::BallPlaced(TreeNode& self)
+NodeStatus BallPlaced(TreeNode& self)
 {
     std::cout << "BallPlaced" << std::endl;
     return NodeStatus::SUCCESS;
 }
 
-NodeStatus Example::AskForHelp(TreeNode& self)
+NodeStatus AskForHelp(TreeNode& self)
 {
     std::cout << "AskForHelp" << std::endl;
     return NodeStatus::SUCCESS;
 }
 
-NodeStatus Example::FindBall(TreeNode& self)
+NodeStatus FindBall(TreeNode& self)
 {
     std::cout << "FindBall" << std::endl;
     Pose2D robot;
@@ -110,7 +145,7 @@ NodeStatus Example::FindBall(TreeNode& self)
     return NodeStatus::RUNNING;
 }
 
-NodeStatus Example::ApproachBall(TreeNode& self)
+NodeStatus ApproachBall(TreeNode& self)
 {
     std::cout << "ApproachBall" << std::endl;
     Pose2D robot, ball;
@@ -129,13 +164,13 @@ NodeStatus Example::ApproachBall(TreeNode& self)
     }
 }
 
-NodeStatus Example::GraspBall(TreeNode& self)
+NodeStatus GraspBall(TreeNode& self)
 {
     std::cout << "GraspBall" << std::endl;
     return NodeStatus::SUCCESS;
 }
 
-NodeStatus Example::FindBin(TreeNode& self)
+NodeStatus FindBin(TreeNode& self)
 {
     std::cout << "FindBin" << std::endl;
     Pose2D robot;
@@ -145,7 +180,7 @@ NodeStatus Example::FindBin(TreeNode& self)
     return NodeStatus::RUNNING;
 }
 
-NodeStatus Example::ApproachBin(TreeNode& self)
+NodeStatus ApproachBin(TreeNode& self)
 {
     std::cout << "ApproachBin" << std::endl;
     Pose2D robot, ball, bin;
@@ -164,16 +199,20 @@ NodeStatus Example::ApproachBin(TreeNode& self)
     return NodeStatus::RUNNING;
 }
 
-NodeStatus Example::PlaceBall(TreeNode& self)
+NodeStatus PlaceBall(TreeNode& self)
 {
     std::cout << "PlaceBall" << std::endl;
     return NodeStatus::SUCCESS;
 }
 
-void Example::RegisterNodes(BehaviorTreeFactory& factory)
+BT_REGISTER_NODES(factory)    
 {
     factory.registerSimpleCondition("BallFound", BallFound);
+#if 0
     factory.registerSimpleCondition("BallClose", BallClose);
+#else
+    factory.registerNodeType<BallClose>("BallClose");
+#endif
     factory.registerSimpleCondition("BallGrasped", BallGrasped);
     factory.registerSimpleCondition("BinFound", BinFound);
     factory.registerSimpleCondition("BinClose", BinClose);
@@ -187,3 +226,4 @@ void Example::RegisterNodes(BehaviorTreeFactory& factory)
     factory.registerSimpleAction("ApproachBin", ApproachBin);
     factory.registerSimpleAction("PlaceBall", PlaceBall);
 }
+};
