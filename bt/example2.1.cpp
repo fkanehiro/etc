@@ -1,8 +1,8 @@
+#include "Pose2D.h"
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 
-#include "example_nodes.h"
 #include "behaviortree_cpp/xml_parsing.h"
 #include "behaviortree_cpp/loggers/bt_cout_logger.h"
 #include "behaviortree_cpp/loggers/bt_minitrace_logger.h"
@@ -15,8 +15,6 @@
 
 using namespace BT;
 
-Pose2D robot, ball, bin;
-
 int main()
 {
     unsigned int now = (unsigned int)time( 0 );
@@ -26,15 +24,18 @@ int main()
 
     // The state of the door is read/written using these keys of the blackboard.
     auto blackboard = Blackboard::create<BlackboardLocal>();
-    //blackboard->set("robot", "250;250;0");
-    //blackboard->set("ball", "150;0;0");
-    //blackboard->set("bin", "150;150;0");
+
+    Pose2D robot, ball, bin;
+    
     robot.x = robot.y = 250; robot.theta = 0;
     ball.x = (rand()*500.0)/RAND_MAX; ball.y = (rand()*500.0)/RAND_MAX; ball.theta = 0;
     bin.x = (rand()*500.0)/RAND_MAX; bin.y = (rand()*500.0)/RAND_MAX; bin.theta = 0;
+    blackboard->set("robot", robot);
+    blackboard->set("ball", ball);
+    blackboard->set("bin", bin);
 
     // register all the actions into the factory
-    Example::RegisterNodes(factory);
+    factory.registerFromPlugin("./libexample_nodes.so");
 
     // Important: when the object tree goes out of scope, all the TreeNodes are destroyed
     auto tree = buildTreeFromFile(factory, "example2.1.xml", blackboard);
@@ -59,6 +60,8 @@ int main()
             std::cout << std::endl << "tick:" << cnt++ << std::endl;
             status = tree.root_node->executeTick();
             //Example::SleepMS(1000);   // optional sleep to avoid "busy loops"
+            blackboard->get("robot",robot);
+            blackboard->get("ball",ball);
 
             cv::Mat img = cv::Mat::zeros(500, 500, CV_8UC3);
             // Red
@@ -82,6 +85,7 @@ int main()
             if ((rand()*1.0)/RAND_MAX < 0.05){
                 ball.x = (rand()*500.0)/RAND_MAX;
                 ball.y = (rand()*500.0)/RAND_MAX;
+                blackboard->set("ball",ball);
                 //std::cout << "ball position is changed" << std::endl;
             }
             

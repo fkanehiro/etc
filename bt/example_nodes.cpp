@@ -1,8 +1,5 @@
 #include "example_nodes.h"
-
-extern Pose2D robot;
-extern Pose2D ball;
-extern Pose2D bin;
+#include "Pose2D.h"
 
 BT_REGISTER_NODES(factory)
 {
@@ -30,6 +27,9 @@ double distance(const Pose2D& obj1, const Pose2D& obj2)
 NodeStatus Example::BallFound(TreeNode& self)
 {
     std::cout << "BallFound" << std::endl;
+    Pose2D robot, ball;
+    self.blackboard()->get("robot",robot);
+    self.blackboard()->get("ball",ball);
     auto dth = direction(robot, ball);
     auto d = distance(robot, ball);
     if (fabs(dth) > 1.0 && d > 10){
@@ -42,6 +42,9 @@ NodeStatus Example::BallFound(TreeNode& self)
 NodeStatus Example::BallClose(TreeNode& self)
 {
     std::cout << "BallClose" << std::endl;
+    Pose2D robot, ball;
+    self.blackboard()->get("robot",robot);
+    self.blackboard()->get("ball",ball);
     auto d = distance(ball, robot);
     //std::cout << "distance = " << distance << std::endl;
     if (d < 10){
@@ -60,6 +63,9 @@ NodeStatus Example::BallGrasped(TreeNode& self)
 NodeStatus Example::BinFound(TreeNode& self)
 {
     std::cout << "BinFound" << std::endl;
+    Pose2D robot, bin;
+    self.blackboard()->get("robot",robot);
+    self.blackboard()->get("bin",bin);
     auto dth = direction(robot, bin);
     if (fabs(dth) > 1.0){
         return NodeStatus::FAILURE;
@@ -71,6 +77,9 @@ NodeStatus Example::BinFound(TreeNode& self)
 NodeStatus Example::BinClose(TreeNode& self)
 {
     std::cout << "BinClose" << std::endl;
+    Pose2D robot, bin;
+    self.blackboard()->get("robot",robot);
+    self.blackboard()->get("bin",bin);
     auto d = distance(robot, bin);
     if (d < 10){
         return NodeStatus::SUCCESS;
@@ -94,19 +103,26 @@ NodeStatus Example::AskForHelp(TreeNode& self)
 NodeStatus Example::FindBall(TreeNode& self)
 {
     std::cout << "FindBall" << std::endl;
+    Pose2D robot;
+    self.blackboard()->get("robot",robot);
     robot.theta += 0.5;
+    self.blackboard()->set("robot",robot);
     return NodeStatus::RUNNING;
 }
 
 NodeStatus Example::ApproachBall(TreeNode& self)
 {
     std::cout << "ApproachBall" << std::endl;
+    Pose2D robot, ball;
+    self.blackboard()->get("robot",robot);
+    self.blackboard()->get("ball", ball);
     auto dx = robot.x - ball.x;
     auto dy = robot.y - ball.y;
     auto distance = sqrt(dx*dx+dy*dy);
     if (distance > 10){
         robot.x -= dx*10/distance;
         robot.y -= dy*10/distance;
+        self.blackboard()->set("robot",robot);
         return NodeStatus::RUNNING;
     }else{
         return NodeStatus::SUCCESS;
@@ -122,13 +138,20 @@ NodeStatus Example::GraspBall(TreeNode& self)
 NodeStatus Example::FindBin(TreeNode& self)
 {
     std::cout << "FindBin" << std::endl;
+    Pose2D robot;
+    self.blackboard()->get("robot",robot);
     robot.theta += 0.5;
+    self.blackboard()->set("robot",robot);
     return NodeStatus::RUNNING;
 }
 
 NodeStatus Example::ApproachBin(TreeNode& self)
 {
     std::cout << "ApproachBin" << std::endl;
+    Pose2D robot, ball, bin;
+    self.blackboard()->get("robot",robot);
+    self.blackboard()->get("ball",ball);
+    self.blackboard()->get("bin",bin);
     auto dx = robot.x - bin.x;
     auto dy = robot.y - bin.y;
     auto distance = sqrt(dx*dx+dy*dy);
@@ -136,6 +159,8 @@ NodeStatus Example::ApproachBin(TreeNode& self)
     robot.y -= dy*10/distance;
     ball.x -= dx*10/distance;
     ball.y -= dy*10/distance;
+    self.blackboard()->set("robot",robot);
+    self.blackboard()->set("ball",ball);
     return NodeStatus::RUNNING;
 }
 
