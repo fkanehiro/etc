@@ -38,27 +38,11 @@ NodeStatus BallFound(TreeNode& self)
     }
 }
 
-#if 0
-NodeStatus BallClose(TreeNode& self)
-{
-    std::cout << "BallClose" << std::endl;
-    Pose2D robot, ball;
-    self.blackboard()->get("robot",robot);
-    self.blackboard()->get("ball",ball);
-    auto d = distance(ball, robot);
-    //std::cout << "distance = " << distance << std::endl;
-    if (d < 10){
-        return NodeStatus::SUCCESS;
-    }else{
-        return NodeStatus::FAILURE;
-    }
-}
-#else
-class BallClose: public BT::ActionNodeBase
+class BallClose: public BT::ConditionNode
 {
 public:
     BallClose(const std::string& name, const NodeParameters& params)
-        : BT::ActionNodeBase(name, params) {}
+        : BT::ConditionNode(name, params) {}
 
     static const NodeParameters& requiredNodeParameters(){
         static NodeParameters params = {{"thd", "10"}};
@@ -77,7 +61,6 @@ public:
             auto default_thd = requiredNodeParameters().at("thd");
             thd = BT::convertFromString<double>(default_thd);
         }
-        std::cout << thd << std::endl;
         if (d < thd){
             return NodeStatus::SUCCESS;
         }else{
@@ -87,7 +70,6 @@ public:
 
     virtual void halt() override {}
 };
-#endif
 
 NodeStatus BallGrasped(TreeNode& self)
 {
@@ -154,14 +136,10 @@ NodeStatus ApproachBall(TreeNode& self)
     auto dx = robot.x - ball.x;
     auto dy = robot.y - ball.y;
     auto distance = sqrt(dx*dx+dy*dy);
-    if (distance > 10){
-        robot.x -= dx*10/distance;
-        robot.y -= dy*10/distance;
-        self.blackboard()->set("robot",robot);
-        return NodeStatus::RUNNING;
-    }else{
-        return NodeStatus::SUCCESS;
-    }
+    robot.x -= dx*10/distance;
+    robot.y -= dy*10/distance;
+    self.blackboard()->set("robot",robot);
+    return NodeStatus::RUNNING;
 }
 
 NodeStatus GraspBall(TreeNode& self)
@@ -208,11 +186,7 @@ NodeStatus PlaceBall(TreeNode& self)
 BT_REGISTER_NODES(factory)    
 {
     factory.registerSimpleCondition("BallFound", BallFound);
-#if 0
-    factory.registerSimpleCondition("BallClose", BallClose);
-#else
     factory.registerNodeType<BallClose>("BallClose");
-#endif
     factory.registerSimpleCondition("BallGrasped", BallGrasped);
     factory.registerSimpleCondition("BinFound", BinFound);
     factory.registerSimpleCondition("BinClose", BinClose);
