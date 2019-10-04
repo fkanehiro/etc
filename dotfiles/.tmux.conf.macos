@@ -17,9 +17,9 @@ bind -T root WheelUpPane   if-shell -F -t = "#{alternate_on}" "send-keys -M" "se
 bind -T root WheelDownPane if-shell -F -t = "#{alternate_on}" "send-keys -M" "select-pane -t =; send-keys -M"
 
 # Setup 'C-@' to begin selection as in Emacs
-bind-key -T copy-mode C-@ send -X begin-selection
-bind-key -T copy-mode C-w send -X copy-pipe "reattach-to-user-namespace pbcopy"
+bind-key -T copy-mode C-@ send-keys -X begin-selection
+bind-key -T copy-mode C-w send -X copy-pipe-and-cancel "pbcopy"
 
 # Update default binding of `Enter` to also use copy-pipe
 unbind -T copy-mode Enter
-bind-key -T copy-mode Enter send -X copy-pipe "reattach-to-user-namespace pbcopy"
+bind-key -T copy-mode Enter send -X copy-pipe-and-cancel "pbcopy"
