@@ -1,11 +1,13 @@
 #!/bin/bash
 
 # find sip for python2.7 first
-export PATH=/usr/local/Cellar/python@2/2.7.17/Frameworks/Python.framework/Versions/2.7/bin:$PATH
+export PATH=/usr/local/Cellar/python@2/2.7.17_1/Frameworks/Python.framework/Versions/2.7/bin:$PATH
 
 # rename sip.h for python3
 mv /usr/local/include/sip.h /usr/local/include/sip.h.bak
 
+# Poco
+# 1.10.0 causes exception related compile errors. use 1.9.4.
 # remove opecv3
 rm -rf src/opencv3
 # brew install opencv@3
@@ -63,3 +65,6 @@ rm -rf src/opencv3
 
 # restore sip.h
 mv /usr/local/include/sip.h.bak /usr/local/include/sip.h
+
+# edit rosrun add the following line
+# export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/Users/kanehiro/ros_catkin_ws/install_isolated/lib
